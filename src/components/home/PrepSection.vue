@@ -1,3 +1,24 @@
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import HomeNav from './HomeNav.vue'
+
+interface PrepItem {
+  label: string
+  detail: string
+  done: boolean
+}
+
+const TOTAL_PREP = 5
+
+const items = ref<PrepItem[]>([
+  { label: 'Papier cartonné', detail: 'À acheter · dans 3 jours', done: false },
+  { label: 'Carte du voyage', detail: 'À imprimer · dans 5 jours', done: true },
+  { label: 'Biscuits', detail: 'À prévoir · dans 8 jours', done: true },
+])
+
+const doneCount = computed(() => items.value.filter((i) => i.done).length)
+</script>
+
 <template>
   <section class="home-prep">
     <div class="section-heading">
@@ -5,27 +26,36 @@
         <p class="home-overline">DANS LES 7 PROCHAINS JOURS</p>
         <h2>À anticiper</h2>
       </div>
-      <span>2/5 prêts</span>
+      <span>{{ doneCount }}/{{ TOTAL_PREP }} prêts</span>
     </div>
-    <div class="prep-preview">
-      <div><v-icon icon="mdi-paperclip" /><strong>Papier cartonné</strong><small>À acheter · dans 3 jours</small></div>
-      <div><v-icon icon="mdi-printer-outline" /><strong>Carte du voyage</strong><small>À imprimer · dans 5 jours</small></div>
-      <div><v-icon icon="mdi-cookie-outline" /><strong>Biscuits</strong><small>À prévoir · dans 6 jours</small></div>
-    </div>
-    <button class="prep-link" type="button">Voir toute la préparation <v-icon icon="mdi-arrow-right" size="16" /></button>
+    <HomeNav />
+    <ul class="prep-list">
+      <li v-for="item in items" :key="item.label">
+        <button class="prep-row" type="button" :class="{ 'is-done': item.done }" @click="item.done = !item.done">
+          <span class="prep-check"><i v-if="item.done" class="mdi mdi-check" aria-hidden="true" /></span>
+          <span class="prep-text"><strong>{{ item.label }}</strong><small>{{ item.detail }}</small></span>
+          <i class="prep-chevron mdi mdi-chevron-right" aria-hidden="true" />
+        </button>
+      </li>
+    </ul>
+    <RouterLink class="prep-link" to="/preparer">Voir toute la préparation <i class="mdi mdi-arrow-right" aria-hidden="true" /></RouterLink>
   </section>
 </template>
 
 <style scoped>
-.home-prep{margin-top:30px}
+.home-prep{margin-top:28px}
 .section-heading{display:flex;align-items:flex-end;justify-content:space-between}
-.home-prep h2{margin:6px 0 0;font:500 25px var(--font-serif)}
-.section-heading>span{font-size:11px;color:var(--color-gold-deep)}
-.prep-preview{margin-top:16px;border-top:1px solid var(--color-line)}
-.prep-preview>div{display:grid;grid-template-columns:28px 1fr auto;grid-template-rows:auto auto;align-items:center;column-gap:8px;padding:12px 0;border-bottom:1px solid var(--color-line)}
-.prep-preview .v-icon{grid-row:1/3;display:grid;place-items:center;width:28px;height:28px;background:#e9e0d1;border-radius:9px;color:var(--color-gold-deep)}
-.prep-preview strong{font-size:12px}
-.prep-preview small{grid-column:2;font-size:10px;color:#8a958d}
-.prep-preview>div::after{content:'›';grid-column:3;grid-row:1/3;color:var(--color-gold-deep);font-size:20px}
-.prep-link{display:flex;align-items:center;gap:7px;margin-top:14px;border:0;background:none;color:var(--color-gold-deep);font-size:11px}
+.section-heading .home-overline{font-size:11px;letter-spacing:.12em;color:rgba(255,255,255,.6)}
+.home-prep h2{margin:6px 0 0;font:500 26px var(--font-serif);color:#fff}
+.section-heading>span{font-size:13px;color:#e6c280}
+.prep-list{list-style:none;margin:14px 0 0;padding:0;border-top:1px solid rgba(255,255,255,.05)}
+.prep-row{display:flex;align-items:center;gap:13px;width:100%;padding:13px 2px;border:0;border-bottom:1px solid rgba(255,255,255,.05);background:none;text-align:left;cursor:pointer}
+.prep-check{display:grid;place-items:center;width:24px;height:24px;flex:0 0 auto;border:1.5px solid rgba(255,255,255,.3);border-radius:50%;background:transparent;color:#1c3a30;font-size:13px;transition:background .25s,border-color .25s,box-shadow .25s}
+.prep-row.is-done .prep-check{background:#e6c280;border-color:#e6c280;box-shadow:0 0 10px rgba(230,194,128,.4)}
+.prep-text{flex:1;display:grid;gap:3px}
+.prep-text strong{font-size:16px;font-weight:500;color:#fff;transition:color .25s}
+.prep-text small{font-size:11px;color:rgba(255,255,255,.5)}
+.prep-row.is-done .prep-text strong{color:rgba(255,255,255,.45)}
+.prep-chevron{color:rgba(255,255,255,.5);font-size:15px}
+.prep-link{display:flex;align-items:center;gap:7px;margin-top:16px;color:#e6c280;font-size:12px;text-decoration:none}
 </style>

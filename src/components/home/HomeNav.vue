@@ -1,16 +1,23 @@
 <template>
   <nav class="home-nav" aria-label="Navigation principale">
-    <button class="active" type="button"><v-icon icon="mdi-sparkles" /><span>Aventure</span></button>
-    <button type="button"><v-icon icon="mdi-calendar-blank-outline" /><span>Planning</span></button>
-    <button type="button"><v-icon icon="mdi-basket-outline" /><span>Préparer</span></button>
-    <button type="button"><v-icon icon="mdi-book-open-page-variant-outline" /><span>Souvenirs</span></button>
+    <RouterLink v-for="item in items" :key="item.to" :to="item.to" class="nav-item">
+      <span>{{ item.label }}</span>
+    </RouterLink>
   </nav>
 </template>
 
+<script setup lang="ts">
+const items = [
+  { label: 'Aventure', to: '/home' },
+  { label: 'Planning', to: '/planning' },
+  { label: 'Préparer', to: '/preparer' },
+  { label: 'Souvenirs', to: '/souvenirs' },
+]
+</script>
+
 <style scoped>
-.home-nav{position:fixed;z-index:4;bottom:0;left:50%;display:grid;grid-template-columns:repeat(4,1fr);width:min(540px,100%);padding:10px 12px calc(10px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#fffdf9eb;backdrop-filter:blur(18px);border-top:1px solid #e1d8ca}
-.home-nav button{display:flex;flex-direction:column;align-items:center;gap:4px;border:0;background:none;color:#a0aaa3;font-size:10px}
-.home-nav button.active{color:var(--color-forest)}
-.home-nav button.active .v-icon{color:#b4873d}
-.home-nav .v-icon{font-size:20px}
+.home-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:18px;padding:4px;border:1px solid rgba(255,255,255,.12);border-radius:20px;background:rgba(255,255,255,.05)}
+.nav-item{position:relative;display:flex;align-items:center;justify-content:center;min-height:40px;padding:10px 4px;border-radius:16px;color:rgba(255,255,255,.6);font-size:12px;font-weight:500;text-decoration:none;transition:background .25s,color .25s}
+.nav-item.router-link-active{background:rgba(255,255,255,.15);color:#fff;font-weight:600}
+.nav-item.router-link-active::after{content:'';position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:16px;height:2px;border-radius:2px;background:#fff;box-shadow:0 0 8px rgba(255,215,0,.9)}
 </style>

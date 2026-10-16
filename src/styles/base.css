@@ -30,7 +30,16 @@ body{margin:0;min-width:320px;background:var(--color-cream)}
 button{font:inherit}
 
 /* Shared typographic pattern used across home sections */
-.home-overline{margin:0;color:var(--color-gold-deep);font-size:9px;font-weight:700;letter-spacing:.18em}
+.home-overline{margin:0;color:var(--color-gold);font-size:10px;font-weight:700;letter-spacing:.18em}
+
+/* Shared app screen shell (used by every routed view) */
+.app-screen{position:relative;min-height:100svh;max-width:540px;margin:auto;padding:calc(24px + env(safe-area-inset-top)) 20px calc(40px + env(safe-area-inset-bottom));overflow:hidden;background:linear-gradient(180deg,#0e241d 0%,#0a1c15 55%,#07140e 100%);color:#f2ead8}
+@media(min-width:700px){.app-screen{box-shadow:0 0 50px #173b3220}}
+.app-header{margin-top:6px}
+.app-header h1{margin:6px 0 0;font:500 30px/1.05 var(--font-serif);letter-spacing:-.02em;color:#f7efdb}
+.app-header p{margin:8px 0 0;color:#a9bcae;font-size:13px;line-height:1.5}
+.app-card{margin-top:24px;padding:20px;border:1px solid rgba(241,204,122,.22);border-radius:22px;background:rgba(255,255,255,.05);backdrop-filter:blur(16px);box-shadow:0 14px 36px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.07)}
+.app-card h2{margin:6px 0 14px;font:500 20px/1.1 var(--font-serif);color:#f5edd9}
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}

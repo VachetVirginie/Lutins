@@ -1,4 +1,3 @@
-export { default as HomeHeader } from './HomeHeader.vue'
 export { default as ProgressHero } from './ProgressHero.vue'
 export { default as StoryPhase } from './StoryPhase.vue'
 export { default as NextStep } from './NextStep.vue'

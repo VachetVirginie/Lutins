@@ -128,7 +128,9 @@ onBeforeUnmount(() => {
     <span class="seal-comet" />
 
     <!-- L3 · empreinte & éclats -->
-    <span class="seal-core"><v-icon icon="mdi-fingerprint" /></span>
+    <span class="seal-core">
+      <i class="seal-fingerprint mdi mdi-fingerprint" aria-hidden="true"></i>
+    </span>
     <span class="seal-flare seal-flare--l" />
     <span class="seal-flare seal-flare--r" />
 
@@ -218,10 +220,10 @@ onBeforeUnmount(() => {
   box-shadow:inset 0 0 0 1px rgba(var(--rgb-seal),.55),inset 0 0 14px rgba(var(--rgb-seal),.22),0 0 18px rgba(0,0,0,.35);
   transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s;
 }
-.seal-core .v-icon{color:var(--mg3);font-size:38px;transform:translateY(2px);filter:drop-shadow(0 0 5px rgba(255,242,161,.55));animation:ember 2.6s ease-in-out infinite}
+.seal-fingerprint{font-size:38px;line-height:1;color:var(--color-gold);filter:drop-shadow(0 0 5px rgba(241,204,122,.6));animation:ember 2.6s ease-in-out infinite}
 .is-excited .seal-core,.is-holding .seal-core{transform:scale(1.06);box-shadow:inset 0 0 0 1px rgba(255,242,161,.8),inset 0 0 18px rgba(var(--rgb-seal),.4),0 0 26px rgba(255,215,0,.35)}
-.is-holding .seal-core .v-icon{animation:none;filter:drop-shadow(0 0 9px rgba(255,242,161,.95))}
-@keyframes ember{0%,100%{filter:drop-shadow(0 0 4px rgba(255,242,161,.45))}50%{filter:drop-shadow(0 0 7px rgba(255,242,161,.7))}}
+.is-holding .seal-fingerprint{animation:none;filter:drop-shadow(0 0 9px rgba(241,204,122,.95))}
+@keyframes ember{0%,100%{filter:drop-shadow(0 0 4px rgba(241,204,122,.5))}50%{filter:drop-shadow(0 0 8px rgba(241,204,122,.8))}}
 
 /* éclats latéraux */
 .seal-flare{inset:auto;top:50%;margin-top:-15px;width:16px;height:30px;border-radius:50%;background:radial-gradient(ellipse,rgba(255,242,161,.9),transparent 70%);filter:blur(3px);mix-blend-mode:screen;opacity:.25;animation:flare-flicker 1.9s ease-in-out infinite alternate}
@@ -233,7 +235,7 @@ onBeforeUnmount(() => {
 
 /* ---- Unlock · explosion ---- */
 .is-done .seal-core{animation:core-pop .35s cubic-bezier(.2,.8,.2,1) forwards}
-.is-done .seal-core .v-icon{opacity:0;animation:none;transition:opacity .12s}
+.is-done .seal-fingerprint{opacity:0;animation:none;transition:opacity .12s}
 @keyframes core-pop{0%{transform:scale(1.05)}40%{transform:scale(1.28);background:#fff2a1}100%{transform:scale(1.15);background:#fff2a1;box-shadow:0 0 40px rgba(255,215,0,.9)}}
 .seal-flash{inset:-12px;background:radial-gradient(circle,#fff 0%,rgba(255,242,161,.85) 38%,transparent 70%);mix-blend-mode:screen;opacity:0;animation:seal-flash .45s ease-out forwards}
 @keyframes seal-flash{0%{opacity:0;transform:scale(.55)}18%{opacity:1}100%{opacity:0;transform:scale(1.7)}}
