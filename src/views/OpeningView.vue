@@ -5,7 +5,6 @@ import MagicSeal from '../components/MagicSeal.vue'
 const router = useRouter()
 
 function enter() {
-  navigator.vibrate?.([15, 35, 15])
   router.push('/home')
 }
 </script>
