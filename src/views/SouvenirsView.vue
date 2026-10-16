@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { HomeNav } from '../components/home'
 
 const doneActivities = [
   { date: '12 nov', title: 'Lecture de la première lettre', detail: 'Découverte du voyage à venir.' },
@@ -62,7 +61,6 @@ const notes = [
       </article>
       <button class="note-add" type="button"><i class="mdi mdi-plus" aria-hidden="true" /> Ajouter une note</button>
     </section>
-    <HomeNav />
   </main>
 </template>
 

@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { currentAdventure } from '../data/adventure'
-import { HomeNav } from '../components/home'
+
+const router = useRouter()
+
+function goBack() {
+  if (window.history.state?.back) router.back()
+  else router.push('/home')
+}
 
 type ActionKey = 'scene' | 'print' | 'write' | 'gather'
 
@@ -17,7 +24,7 @@ function toggle(key: ActionKey) {
 <template>
   <main class="today-screen">
     <header class="today-header">
-      <RouterLink class="back-link" to="/"><i class="mdi mdi-chevron-left" aria-hidden="true" /> Aventure</RouterLink>
+      <button class="back-link" type="button" @click="goBack"><i class="mdi mdi-chevron-left" aria-hidden="true" /> Retour</button>
       <p class="today-overline">JOUR {{ currentAdventure.currentDay }} · AUJOURD’HUI</p>
       <h1>{{ currentAdventure.currentTitle }}</h1>
       <p class="today-intro">{{ currentAdventure.currentDescription }}</p>
@@ -38,7 +45,6 @@ function toggle(key: ActionKey) {
     <section class="today-resource" aria-labelledby="gather-title"><div class="today-section-heading"><p class="today-overline">AVANT DE COMMENCER</p><h2 id="gather-title">À rassembler</h2></div><div class="gather-list"><span><i class="mdi mdi-email-outline" aria-hidden="true" /> Une enveloppe</span><span><i class="mdi mdi-file-document-outline" aria-hidden="true" /> Le courrier</span></div><button class="check-resource" :class="{ done: completed.gather }" type="button" @click="toggle('gather')"><i class="mdi" :class="completed.gather ? 'mdi-check-circle' : 'mdi-circle-outline'" aria-hidden="true" /> {{ completed.gather ? 'Tout est rassemblé' : 'Marquer comme rassemblé' }}</button></section>
 
     <section class="today-footer"><p v-if="!isReady">Pas besoin de tout faire maintenant. L’essentiel est de préparer le premier courrier.</p><p v-else>La journée est prête. Le voyage peut commencer.</p><RouterLink to="/planning">Parcourir les 70 jours <i class="mdi mdi-arrow-right" aria-hidden="true" /></RouterLink></section>
-    <HomeNav />
   </main>
 </template>
 
@@ -60,8 +66,13 @@ function toggle(key: ActionKey) {
   display:inline-flex;
   align-items:center;
   gap:4px;
+  padding:0;
+  border:0;
+  background:none;
   color:var(--color-gold);
+  font-family:inherit;
   font-size:12px;
+  cursor:pointer;
   text-decoration:none
 }
 

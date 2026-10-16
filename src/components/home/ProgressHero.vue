@@ -1,12 +1,19 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+import { currentAdventure } from '../../data/adventure'
+
+const fillPct = computed(() => (currentAdventure.currentDay / currentAdventure.totalDays) * 100)
+</script>
+
 <template>
   <section class="progress-hero">
     <i class="hero-spark hero-spark--tl" aria-hidden="true" /><i class="hero-spark hero-spark--br" aria-hidden="true" />
     <div class="progress-copy">
-      <p class="home-overline">JOUR 1 · DÉBUT DE L’AVENTURE</p>
+      <p class="home-overline">JOUR {{ currentAdventure.currentDay }} · DÉBUT DE L’AVENTURE</p>
       <h2>Le voyage<br /><em>commence.</em></h2>
       <p>Une première étape vers Noël.</p>
     </div>
-    <div class="progress-orb"><strong>1</strong><span>/ 70</span><small>JOURS</small></div>
+    <div class="progress-orb" :style="{ '--fill': fillPct + '%' }"><strong>{{ currentAdventure.currentDay }}</strong><span>/ {{ currentAdventure.totalDays }}</span><small>JOURS</small></div>
   </section>
 </template>
 
@@ -60,7 +67,7 @@
   position:absolute;
   inset:0;
   border-radius:50%;
-  background:conic-gradient(var(--color-gold) 43%,rgba(241,204,122,.13) 0);
+  background:conic-gradient(var(--color-gold) var(--fill,0%),rgba(241,204,122,.13) 0);
   mask:radial-gradient(farthest-side,transparent calc(100% - 6px),#000 calc(100% - 5px));
   -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 6px),#000 calc(100% - 5px));
   filter:drop-shadow(0 0 5px rgba(241,204,122,.55))

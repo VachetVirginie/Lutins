@@ -49,7 +49,7 @@ button  {
   min-height:100svh;
   max-width:540px;
   margin:auto;
-  padding:calc(24px + env(safe-area-inset-top)) 20px calc(110px + env(safe-area-inset-bottom));
+  padding:calc(24px + env(safe-area-inset-top)) 20px calc(34px + env(safe-area-inset-bottom));
   overflow:hidden;
   background:linear-gradient(180deg,#0e241d 0%,#0a1c15 55%,#07140e 100%);
   color:#f2ead8

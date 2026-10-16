@@ -6,7 +6,7 @@ const router = useRouter()
 
 function enter() {
   sessionStorage.setItem('lutins-unlocked', '1')
-  router.push('/')
+  router.push('/home')
 }
 </script>
 
@@ -34,7 +34,7 @@ function enter() {
   min-height:100svh;
   max-width:540px;
   margin:auto;
-  padding-bottom:calc(22px + env(safe-area-inset-bottom));
+  padding-bottom:calc(38px + env(safe-area-inset-bottom));
   overflow:hidden;
   background:var(--color-forest-deep);
   color:#fff

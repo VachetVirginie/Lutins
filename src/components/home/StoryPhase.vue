@@ -1,3 +1,29 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+import { currentAdventure, narrativeMilestones } from '../../data/adventure'
+
+const STEP = 58
+const PAD_X = 60
+const TRACK_W = PAD_X * 2 + STEP * 69
+const TOTAL_DAYS = 70
+
+const milestoneByDay = new Map<number, string>(narrativeMilestones.map((m) => [m.day, m.title]))
+
+const nodes = computed(() =>
+  Array.from({ length: TOTAL_DAYS }, (_, i) => {
+    const day = i + 1
+    return {
+      day,
+      title: milestoneByDay.get(day),
+      x: PAD_X + i * STEP,
+      state: day === currentAdventure.currentDay ? 'active' : day < currentAdventure.currentDay ? 'done' : 'upcoming',
+    }
+  }),
+)
+
+const activeX = computed(() => nodes.value.find((n) => n.state === 'active')?.x ?? PAD_X)
+</script>
+
 <template>
   <section class="story-phase">
     <div class="phase-top">
@@ -5,41 +31,57 @@
         <p class="home-overline">PHASE ACTUELLE</p>
         <h2>Le voyage<i class="phase-dot" /></h2>
       </div>
-      <span>JOUR 1</span>
+      <span>JOUR {{ currentAdventure.currentDay }}</span>
     </div>
-    <div class="phase-track">
-      <svg class="phase-wave" viewBox="0 0 200 14" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M0 7 Q6.25 1 12.5 7 T25 7 T37.5 7 T50 7 T62.5 7 T75 7 T87.5 7 T100 7 T112.5 7 T125 7 T137.5 7 T150 7 T162.5 7 T175 7 T187.5 7 T200 7" />
-      </svg>
-      <i class="phase-fill" />
-      <span v-for="n in 11" :key="n" class="phase-dust" aria-hidden="true" />
-      <b class="phase-marker phase-marker--done" />
-      <b class="phase-marker phase-marker--active"><i class="elf-halo" /><img class="phase-elf" src="/assets/imgs/lutin.png" alt="" /></b>
-      <b class="phase-marker phase-marker--next" />
-      <b class="phase-marker phase-marker--end" />
+
+    <div class="phase-scroller">
+      <div class="phase-track" :style="{ width: TRACK_W + 'px' }">
+        <i class="phase-line" />
+        <i class="phase-fill" :style="{ width: activeX + 'px' }" />
+        <svg class="phase-wave" viewBox="0 0 600 14" preserveAspectRatio="none" aria-hidden="true" :style="{ left: activeX + 'px' }">
+          <path d="M0 7 Q10 1 20 7 T40 7 T60 7 T80 7 T100 7 T120 7 T140 7 T160 7 T180 7 T200 7 T220 7 T240 7 T260 7 T280 7 T300 7 T320 7 T340 7 T360 7 T380 7 T400 7 T420 7 T440 7 T460 7 T480 7 T500 7 T520 7 T540 7 T560 7 T580 7 T600 7" />
+        </svg>
+        <span v-for="n in 8" :key="n" class="phase-dust" aria-hidden="true" />
+
+        <RouterLink
+          v-for="n in nodes"
+          :key="n.day"
+          class="phase-node"
+          :class="[`is-${n.state}`, { 'is-milestone': n.title }]"
+          :style="{ left: n.x + 'px' }"
+          :to="`/activites/jour-${n.day}`"
+          :aria-label="`Jour ${n.day}${n.title ? ' · ' + n.title : ''}`"
+        >
+          <template v-if="n.state === 'active'">
+            <i class="elf-halo" aria-hidden="true" />
+            <img class="phase-elf" src="/assets/imgs/lutin.png" alt="" />
+          </template>
+          <b class="node-dot" aria-hidden="true" />
+          <span class="node-label"><strong>J{{ n.day }}</strong><em v-if="n.title">{{ n.title }}</em></span>
+        </RouterLink>
+      </div>
     </div>
-    <div class="phase-labels"><strong>Le voyage</strong><span>La rencontre</span><span>Les farces</span></div>
   </section>
 </template>
 
 <style scoped>
-.story-phase   {
+.story-phase {
   padding:26px 0 0
 }
 
-.phase-top   {
+.phase-top {
   display:flex;
   align-items:flex-end;
   justify-content:space-between
 }
 
-.story-phase h2   {
+.story-phase h2 {
   margin:6px 0 0;
   font:500 24px var(--font-serif);
   color:#f5edd9
 }
 
-.phase-dot   {
+.phase-dot {
   display:inline-block;
   width:7px;
   height:7px;
@@ -49,30 +91,54 @@
   box-shadow:0 0 7px rgba(241,204,122,.6)
 }
 
-.phase-top>span   {
+.phase-top>span {
   font-size:11px;
   letter-spacing:.12em;
   color:var(--color-gold)
 }
 
-/* base = futur : très fine, sombre, désaturée */ .phase-track   {
+/* ---- zone défilable ---- */
+.phase-scroller {
+  margin:0px -20px 0;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scrollbar-width:none;
+  scroll-snap-type:x proximity;
+  -webkit-overflow-scrolling:touch;
+  mask:linear-gradient(90deg,#000 82%,transparent 99%);
+  -webkit-mask:linear-gradient(90deg,#000 82%,transparent 99%)
+}
+
+.phase-scroller::-webkit-scrollbar {
+  display:none
+}
+
+.phase-track {
   position:relative;
+  height:150px;
+  margin:0 20px
+}
+
+/* base = futur : très fine, sombre, désaturée */
+.phase-line {
+  position:absolute;
+  left:0;
+  right:0;
+  top:70px;
   height:2px;
-  margin:46px 10px 12px;
   background:rgba(170,160,110,.14);
   border-radius:10px
 }
 
-/* sillage ondulé de points d'or vers la prochaine étape */ .phase-wave {
+/* sillage ondulé de points d'or vers les prochaines étapes */
+.phase-wave {
   position:absolute;
-  left:38%;
-  right:-2px;
-  top:50%;
-  height:20px;
-  transform:translateY(-50%);
+  right:0;
+  top:63px;
+  height:14px;
   overflow:visible;
-  mask:linear-gradient(90deg,transparent 0%,#000 14%,#000 62%,transparent 95%);
-  -webkit-mask:linear-gradient(90deg,transparent 0%,#000 14%,#000 62%,transparent 95%)
+  mask:linear-gradient(90deg,transparent 0%,#000 12%,#000 70%,transparent 96%);
+  -webkit-mask:linear-gradient(90deg,transparent 0%,#000 12%,#000 70%,transparent 96%)
 }
 
 .phase-wave path {
@@ -83,17 +149,16 @@
   stroke-dasharray:.1 9
 }
 
-/* accompli : épais, chaud, très lumineux */ .phase-fill {
+/* accompli : épais, chaud, très lumineux */
+.phase-fill {
   position:absolute;
   left:0;
-  top:50%;
-  width:43%;
+  top:67px;
   height:6px;
-  transform:translateY(-50%);
   overflow:hidden;
   border-radius:10px;
   background:linear-gradient(90deg,rgba(255,215,0,.45) 0%,var(--color-gold) 55%,#ffe9a8 100%);
-  box-shadow:0 0 10px rgba(241,204,122,.7),0 0 26px rgba(255,200,80,.4),inset 0 1px 0 rgba(255,242,161,.7);
+  box-shadow:0 0 10px rgba(241,204,122,.7),0 0 26px rgba(255,200,80,.4),inset 0 1px 0 rgba(255,242,161,.7)
 }
 
 .phase-fill::after {
@@ -116,9 +181,10 @@
   }
 }
 
-/* fairy dust : tailles 1-5px, opacités variables, certaines floues */ .phase-dust {
+/* fairy dust autour du nœud actif */
+.phase-dust {
   position:absolute;
-  top:50%;
+  top:70px;
   width:3px;
   height:3px;
   border-radius:50%;
@@ -128,25 +194,23 @@
 }
 
 .phase-dust:nth-of-type(1) {
-  left:8%;
-  top:45%;
+  left:12px;
+  margin-top:-8px;
   width:2px;
   height:2px;
   --o:.55
 }
 
 .phase-dust:nth-of-type(2) {
-  left:17%;
-  top:65%;
-  width:3px;
-  height:3px;
+  left:60px;
+  margin-top:9px;
   --o:.75;
   animation-delay:.5s
 }
 
 .phase-dust:nth-of-type(3) {
-  left:27%;
-  top:30%;
+  left:95px;
+  margin-top:-14px;
   width:2px;
   height:2px;
   --o:.5;
@@ -154,8 +218,8 @@
 }
 
 .phase-dust:nth-of-type(4) {
-  left:35%;
-  top:60%;
+  left:118px;
+  margin-top:12px;
   width:4px;
   height:4px;
   --o:.9;
@@ -163,17 +227,15 @@
 }
 
 .phase-dust:nth-of-type(5) {
-  left:39%;
-  top:18%;
-  width:3px;
-  height:3px;
+  left:140px;
+  margin-top:-22px;
   --o:.85;
   animation-delay:1.1s
 }
 
 .phase-dust:nth-of-type(6) {
-  left:41.5%;
-  top:80%;
+  left:70px;
+  margin-top:-34px;
   width:2px;
   height:2px;
   --o:.7;
@@ -181,8 +243,8 @@
 }
 
 .phase-dust:nth-of-type(7) {
-  left:44.5%;
-  top:22%;
+  left:150px;
+  margin-top:20px;
   width:5px;
   height:5px;
   --o:.95;
@@ -191,41 +253,12 @@
 }
 
 .phase-dust:nth-of-type(8) {
-  left:47%;
-  top:70%;
-  width:2px;
-  height:2px;
-  --o:.6;
-  animation-delay:1.3s
-}
-
-.phase-dust:nth-of-type(9) {
-  left:43%;
-  top:-16px;
+  left:34px;
+  margin-top:-40px;
   width:3px;
   height:3px;
   --o:.8;
   animation:spark-rise 2.4s ease-in infinite
-}
-
-.phase-dust:nth-of-type(10) {
-  left:60%;
-  top:40%;
-  width:2px;
-  height:2px;
-  --o:.3;
-  filter:blur(1.2px);
-  animation-delay:.15s
-}
-
-.phase-dust:nth-of-type(11) {
-  left:76%;
-  top:60%;
-  width:1px;
-  height:1px;
-  --o:.22;
-  filter:blur(1.2px);
-  animation-delay:.95s
 }
 
 @keyframes dust-twinkle {
@@ -253,51 +286,92 @@
   }
 }
 
-.phase-marker {
+/* ---- nœuds d'étape ---- */
+.phase-node {
   position:absolute;
-  top:50%;
+  top:70px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  width:110px;
+  margin-left:-55px;
+  text-decoration:none;
+  scroll-snap-align:center
+}
+
+.node-dot {
   width:10px;
   height:10px;
   border:2px solid #0e241d;
-  background:var(--color-gold);
   border-radius:50%;
-  transform:translate(-50%,-50%)
+  background:#1d332b;
+  border-color:rgba(170,160,110,.35);
+  transform:translateY(-50%)
 }
 
-.phase-marker--done {
-  left:0
+.is-done .node-dot {
+  background:var(--color-gold);
+  border-color:#0e241d;
+  box-shadow:0 0 8px rgba(230,194,128,.55)
 }
 
-/* nœud actif : ×1.5, irradiation forte */ .phase-marker--active {
-  left:43%;
+/* nœud actif : ×1.5, irradiation forte */
+.is-active .node-dot {
   width:26px;
   height:26px;
   border-width:2.5px;
   border-color:var(--color-gold);
   background:radial-gradient(circle,#fff 0%,#fff2a1 45%,#ffd75e 100%);
-  box-shadow:0 0 0 6px rgba(241,204,122,.15),0 0 18px 6px rgba(255,215,0,.75),0 0 44px 14px rgba(255,190,60,.4);
+  box-shadow:0 0 0 6px rgba(241,204,122,.15),0 0 18px 6px rgba(255,215,0,.75),0 0 44px 14px rgba(255,190,60,.4)
 }
 
-.phase-marker--next {
-  left:70%;
-  width:8px;
-  height:8px;
-  background:#1d332b;
-  border-color:rgba(170,160,110,.35)
+.node-label {
+  display:grid;
+  gap:2px;
+  margin-top:14px;
+  text-align:center;
+  font-size:10px;
+  line-height:1.3;
+  color:#7d8f85
 }
 
-.phase-marker--end {
-  left:100%;
-  width:8px;
-  height:8px;
-  background:#1d332b;
-  border-color:rgba(170,160,110,.28)
+.node-label strong {
+  color:rgba(241,204,122,.55);
+  font-size:9px;
+  letter-spacing:.12em;
+  font-weight:600
 }
 
-/* halo chaud sous les pieds du lutin */ .elf-halo {
+.node-label em {
+  font-style:normal;
+  font-size:10px;
+  color:#c9d6cc
+}
+
+.is-milestone .node-dot {
+  width:12px;
+  height:12px;
+  border-color:rgba(241,204,122,.5)
+}
+
+.is-milestone .node-label strong {
+  color:var(--color-gold)
+}
+
+.is-done .node-label strong {
+  color:rgba(241,204,122,.8)
+}
+
+.is-active .node-label,
+.is-active .node-label em {
+  color:#f5edd9
+}
+
+/* halo chaud sous les pieds du lutin */
+.elf-halo {
   position:absolute;
   left:50%;
-  top:-3px;
+  top:-14px;
   width:52px;
   height:18px;
   transform:translateX(-50%);
@@ -310,22 +384,10 @@
 .phase-elf {
   position:absolute;
   left:50%;
-  bottom:16px;
+  top:-52px;
   transform:translateX(-50%);
   width:44px;
   height:auto;
   filter:brightness(1.12) contrast(1.12) saturate(1.3) drop-shadow(0 4px 5px rgba(0,0,0,.55))
 }
-
-.phase-labels {
-  display:flex;
-  justify-content:space-between;
-  color:#7d8f85;
-  font-size:10px
-}
-
-.phase-labels strong {
-  color:var(--color-gold)
-}
-
 </style>

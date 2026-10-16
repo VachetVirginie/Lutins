@@ -1,177 +1,361 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { HomeNav } from '../components/home'
-import { preparationNext7Days } from '../data/adventure'
+import { useRouter } from 'vue-router'
+import { preparationCatalog, type PreparationCategory } from '../data/preparationCatalog'
 
-type Filter = 'all' | 'print' | 'buy' | 'gather'
-interface UpcomingItem { id: string; day: string; title: string; type: Exclude<Filter, 'all'>; detail: string; activityId: string; done: boolean }
+const router = useRouter()
+
+function goBack(): void {
+  if (window.history.state?.back) router.back()
+  else router.push('/home')
+}
+
+type Filter = 'all' | PreparationCategory
 const filter = ref<Filter>('all')
-const kindLabels: Record<Exclude<Filter, 'all'>, string> = { print: 'À imprimer', buy: 'À acheter', gather: 'À rassembler' }
-const items = ref<UpcomingItem[]>(preparationNext7Days.map((item) => ({
-  ...item,
-  type: item.kind,
-  day: `${item.day} · ${item.due.toLowerCase()}`,
-  detail: kindLabels[item.kind],
-  done: false,
-})))
-const visibleItems = computed(() => items.value.filter((item) => filter.value === 'all' || item.type === filter.value))
-const filters: { id: Filter; label: string }[] = [
-  { id: 'all', label: 'Tout' }, { id: 'print', label: 'À imprimer' }, { id: 'buy', label: 'À acheter' }, { id: 'gather', label: 'À rassembler' },
+const done = ref<Set<string>>(new Set())
+
+const groups: { id: PreparationCategory; label: string; icon: string }[] = [
+  { id: 'print', label: 'À imprimer', icon: 'mdi-printer-outline' },
+  { id: 'food', label: 'Aliments', icon: 'mdi-food-apple-outline' },
+  { id: 'gift', label: 'Cadeaux', icon: 'mdi-gift-outline' },
+  { id: 'material', label: 'Matériel & scène', icon: 'mdi-home-edit-outline' },
 ]
+
+const visibleGroups = computed(() => groups
+  .filter((group) => filter.value === 'all' || group.id === filter.value)
+  .map((group) => ({ ...group, items: preparationCatalog.filter((item) => item.category === group.id) }))
+  .filter((group) => group.items.length))
+const readyCount = computed(() => done.value.size)
+const totalCount = preparationCatalog.length
+
+function toggle(id: string): void {
+  const next = new Set(done.value)
+  if (next.has(id)) next.delete(id)
+  else next.add(id)
+  done.value = next
+  navigator.vibrate?.(12)
+}
 </script>
 
 <template>
-  <main class="prepare-screen">
-    <header class="prepare-header"><RouterLink class="back-link" to="/"><i class="mdi mdi-chevron-left" /> Aventure</RouterLink><p class="prepare-overline">ANTICIPER SANS SE PRESSER</p><h1>À prévoir</h1><p>Les prochains éléments, du plus urgent au moins urgent.</p></header>
-    <div class="prepare-filters" aria-label="Filtrer les éléments"><button v-for="item in filters" :key="item.id" type="button" :class="{ active: filter === item.id }" @click="filter = item.id">{{ item.label }}</button></div>
-    <section class="prepare-list" aria-label="Éléments à prévoir"><div v-if="visibleItems.length === 0" class="prepare-empty">Aucun élément dans ce filtre.</div><article v-for="item in visibleItems" :key="item.id" class="prepare-item" :class="{ done: item.done }"><button class="prepare-check" type="button" :aria-label="item.done ? `Marquer ${item.title} comme non terminé` : `Marquer ${item.title} comme terminé`" @click="item.done = !item.done"><i class="mdi" :class="item.done ? 'mdi-check' : 'mdi-circle-outline'" /></button><div class="prepare-item-copy"><span class="prepare-day">{{ item.day }}</span><strong>{{ item.title }}</strong><small>{{ item.detail }}</small></div><RouterLink class="prepare-link" :to="`/activites/${item.activityId}`" :aria-label="`Ouvrir la journée liée à ${item.title}`"><i class="mdi mdi-arrow-up-right" /></RouterLink></article></section>
-    <p class="prepare-note">Chaque élément reste lié à sa journée. Quand la journée est prête, son matériel passe automatiquement en terminé.</p>
-    <HomeNav />
+  <main class="app-screen prepare-screen">
+    <i class="warm-glow" aria-hidden="true" />
+    <header class="prepare-header">
+      <button class="back-link" type="button" @click="goBack"><i class="mdi mdi-chevron-left" aria-hidden="true" /> Retour</button>
+      <p class="prepare-overline">TOUT LE KIT, AU BON ENDROIT</p>
+      <h1>À prévoir</h1>
+      <p>Impressions, aliments, cadeaux et matériel, classés par type puis par jour.</p>
+    </header>
+
+    <section class="prepare-summary" aria-label="Progression de la préparation">
+      <div class="summary-top"><strong>{{ readyCount }}<em>/{{ totalCount }}</em></strong><span>éléments prêts</span></div>
+      <div class="summary-bar"><i :style="{ width: (readyCount / totalCount) * 100 + '%' }" /></div>
+    </section>
+
+    <div class="prepare-filters" aria-label="Filtrer par type">
+      <button type="button" :class="{ active: filter === 'all' }" @click="filter = 'all'">Tout</button>
+      <button v-for="group in groups" :key="group.id" type="button" :class="{ active: filter === group.id }" @click="filter = group.id"><i :class="['mdi', group.icon]" aria-hidden="true" /> {{ group.label }}</button>
+    </div>
+
+    <section v-for="group in visibleGroups" :key="group.id" class="app-card prepare-group" :aria-labelledby="`group-${group.id}`">
+      <header class="group-heading"><div><span class="group-icon"><i :class="['mdi', group.icon]" aria-hidden="true" /></span><h2 :id="`group-${group.id}`">{{ group.label }}</h2></div><span class="group-count">{{ group.items.length }}</span></header>
+      <ul class="prepare-list">
+        <li v-for="item in group.items" :key="item.id" class="prepare-item" :class="{ done: done.has(item.id) }">
+          <button class="prepare-check" type="button" :aria-label="done.has(item.id) ? `Marquer ${item.title} comme non prêt` : `Marquer ${item.title} comme prêt`" @click="toggle(item.id)"><i class="mdi" :class="done.has(item.id) ? 'mdi-check' : ''" aria-hidden="true" /></button>
+          <RouterLink class="prepare-item-copy" :to="`/activites/${item.activityId}`"><span class="prepare-day">J{{ item.day }}</span><strong>{{ item.title }}</strong><small>{{ item.detail }}</small></RouterLink>
+        </li>
+      </ul>
+    </section>
+
+    <p class="prepare-note">Chaque élément reste relié à sa fiche du jour. Les textes et annexes proviennent du kit Louis.</p>
   </main>
 </template>
 
 <style scoped>
-.prepare-screen  {
-  min-height:100svh;
-  max-width:540px;
-  margin:auto;
-  padding:calc(22px + env(safe-area-inset-top)) 22px calc(92px + env(safe-area-inset-bottom));
-  background:var(--color-night);
-  color:#fff
+.prepare-screen {
+  overflow:hidden
 }
 
-.prepare-header  {
+.warm-glow {
+  position:absolute;
+  top:-70px;
+  right:-60px;
+  width:300px;
+  height:300px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,190,80,.14),transparent 65%);
+  filter:blur(4px);
+  pointer-events:none
+}
+
+/* ---- header ---- */
+.prepare-header {
   padding-top:4px
 }
 
-.back-link  {
+.back-link {
   display:inline-flex;
   align-items:center;
   gap:4px;
+  padding:0;
+  border:0;
+  background:none;
   color:var(--color-gold);
+  font-family:inherit;
   font-size:12px;
+  cursor:pointer;
   text-decoration:none
 }
 
-.prepare-overline  {
-  margin:28px 0 0;
+.prepare-overline {
+  margin:26px 0 0;
   color:var(--color-gold);
   font-size:9px;
   font-weight:700;
   letter-spacing:.18em
 }
 
-.prepare-header h1  {
+.prepare-header h1 {
   margin:8px 0;
   color:#f8f0dd;
   font:500 38px/.95 var(--font-serif)
 }
 
-.prepare-header>p:last-child  {
-  max-width:300px;
+.prepare-header>p:last-child {
+  max-width:330px;
   margin:0;
   color:#a9bcae;
-  font-size:14px;
+  font-size:13px;
   line-height:1.5
 }
 
-.prepare-filters  {
-  display:flex;
-  gap:7px;
-  margin:26px 0 18px;
-  overflow-x:auto;
-  padding-bottom:2px
+/* ---- résumé progression ---- */
+.prepare-summary {
+  margin-top:24px;
+  padding:18px 18px 16px;
+  border:1px solid rgba(241,204,122,.22);
+  border-radius:20px;
+  background:rgba(255,255,255,.05);
+  backdrop-filter:blur(16px);
+  box-shadow:0 14px 36px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.07)
 }
 
-.prepare-filters button  {
-  flex:0 0 auto;
-  padding:8px 12px;
-  border:1px solid #ffffff25;
-  border-radius:999px;
-  background:#ffffff08;
+.summary-top {
+  display:flex;
+  align-items:baseline;
+  gap:8px
+}
+
+.summary-top strong {
+  font:500 26px var(--font-serif);
+  color:#ffe9a8
+}
+
+.summary-top strong em {
+  font-style:normal;
+  font-size:14px;
+  color:#a9bcae
+}
+
+.summary-top span {
   color:#a9bcae;
   font-size:11px
 }
 
-.prepare-filters button.active  {
+.summary-bar {
+  height:5px;
+  margin-top:12px;
+  border-radius:4px;
+  background:rgba(255,255,255,.09);
+  overflow:hidden
+}
+
+.summary-bar i {
+  display:block;
+  height:100%;
+  border-radius:4px;
+  background:linear-gradient(90deg,#ffd700,#ffe9a8);
+  box-shadow:0 0 8px rgba(255,215,0,.55);
+  transition:width .4s ease
+}
+
+/* ---- filtres ---- */
+.prepare-filters {
+  display:flex;
+  gap:7px;
+  margin:20px 0 4px;
+  overflow-x:auto;
+  padding-bottom:2px;
+  scrollbar-width:none
+}
+
+.prepare-filters::-webkit-scrollbar {
+  display:none
+}
+
+.prepare-filters button {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  flex:0 0 auto;
+  padding:8px 14px;
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:999px;
+  background:rgba(255,255,255,.05);
+  color:#a9bcae;
+  font-size:11px;
+  font-weight:500;
+  cursor:pointer;
+  transition:background .25s,color .25s,border-color .25s
+}
+
+.prepare-filters button i {
+  font-size:14px
+}
+
+.prepare-filters button.active {
   border-color:#e6c280;
   background:#e6c280;
   color:#173b32;
+  font-weight:700
+}
+
+/* ---- groupes ---- */
+.prepare-group {
+  margin-top:20px;
+  padding:16px 16px 8px
+}
+
+.group-heading {
+  display:flex;
+  align-items:center;
+  justify-content:space-between
+}
+
+.group-heading>div {
+  display:flex;
+  align-items:center;
+  gap:10px
+}
+
+.group-icon {
+  display:grid;
+  place-items:center;
+  width:32px;
+  height:32px;
+  border-radius:10px;
+  background:rgba(230,194,128,.14);
+  color:#e6c280;
+  font-size:17px
+}
+
+.group-heading h2 {
+  margin:0;
+  color:#f5edd9;
+  font:500 20px var(--font-serif)
+}
+
+.group-count {
+  padding:4px 10px;
+  border:1px solid rgba(241,204,122,.3);
+  border-radius:999px;
+  color:#e6c280;
+  font-size:11px;
   font-weight:600
 }
 
-.prepare-list  {
-  border-top:1px solid #ffffff1f
+/* ---- items ---- */
+.prepare-list {
+  list-style:none;
+  margin:12px 0 0;
+  padding:0;
+  border-top:1px solid rgba(255,255,255,.06)
 }
 
-.prepare-item  {
+.prepare-item {
   display:flex;
   align-items:center;
   gap:11px;
-  padding:14px 0;
-  border-bottom:1px solid #ffffff18
+  padding:11px 0;
+  border-bottom:1px solid rgba(255,255,255,.05)
 }
 
-.prepare-check  {
+.prepare-item:last-child {
+  border-bottom:0
+}
+
+.prepare-check {
   display:grid;
   place-items:center;
   flex:0 0 auto;
-  width:25px;
-  height:25px;
-  border:0;
-  background:none;
-  color:#e6c280;
-  font-size:21px
+  width:24px;
+  height:24px;
+  padding:0;
+  border:1.5px solid rgba(255,255,255,.3);
+  border-radius:50%;
+  background:transparent;
+  color:#1c3a30;
+  font-size:13px;
+  cursor:pointer;
+  transition:background .25s,border-color .25s,box-shadow .25s
 }
 
-.prepare-item.done .prepare-check  {
-  color:#9ebca3
+.prepare-item.done .prepare-check {
+  border-color:#e6c280;
+  background:#e6c280;
+  box-shadow:0 0 10px rgba(230,194,128,.45)
 }
 
-.prepare-item-copy  {
+.prepare-item-copy {
   display:grid;
   flex:1;
-  gap:3px
+  gap:2px;
+  min-width:0;
+  color:#fff;
+  text-decoration:none
 }
 
-.prepare-day  {
+.prepare-day {
   color:#e6c280;
   font-size:9px;
   font-weight:700;
   letter-spacing:.1em
 }
 
-.prepare-item strong  {
+.prepare-item-copy strong {
+  overflow:hidden;
   font-size:14px;
-  font-weight:600
+  font-weight:600;
+  text-overflow:ellipsis;
+  white-space:nowrap
 }
 
-.prepare-item small  {
+.prepare-item-copy small {
+  overflow:hidden;
   color:#a9bcae;
-  font-size:11px
+  font-size:11px;
+  line-height:1.4;
+  text-overflow:ellipsis;
+  white-space:nowrap
 }
 
-.prepare-item.done strong  {
+.prepare-item.done strong {
   color:#8ba195;
   text-decoration:line-through
 }
 
-.prepare-link  {
-  display:grid;
-  place-items:center;
-  width:30px;
-  height:30px;
-  border-radius:50%;
-  background:#ffffff0b;
-  color:#e6c280;
-  text-decoration:none
-}
-
-.prepare-note  {
-  margin:24px 0;
+.prepare-note {
+  margin:26px 0 0;
   color:#718a7b;
   font-size:11px;
+  font-style:italic;
+  font-family:var(--font-serif);
   line-height:1.5
 }
 
+.back-link:focus-visible,.prepare-filters button:focus-visible,.prepare-check:focus-visible,.prepare-item-copy:focus-visible {
+  outline:2px solid #ffe9a8;
+  outline-offset:3px;
+  border-radius:6px
+}
 </style>

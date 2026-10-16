@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { HomeNav } from '../components/home'
+import { useRouter } from 'vue-router'
 import { narrativeMilestones, upcomingJourneyActivities } from '../data/adventure'
+
+const router = useRouter()
+
+function goBack() {
+  if (window.history.state?.back) router.back()
+  else router.push('/home')
+}
 
 type Phase = 'all' | 'voyage' | 'arrivee' | 'farce' | 'depart' | 'conclusion'
 const phase = ref<Phase>('all')
@@ -13,12 +20,11 @@ const visibleMilestones = computed(() => phase.value === 'all' ? narrativeMilest
 
 <template>
   <main class="planning-screen">
-    <header class="planning-header"><RouterLink class="back-link" to="/"><i class="mdi mdi-chevron-left" aria-hidden="true" /> Aventure</RouterLink><p class="planning-overline">LE FIL DE L’HISTOIRE</p><h1>Le planning</h1><p>Les étapes essentielles de l’aventure, dans l’ordre du récit.</p></header>
+    <header class="planning-header"><button class="back-link" type="button" @click="goBack"><i class="mdi mdi-chevron-left" aria-hidden="true" /> Retour</button><p class="planning-overline">LE FIL DE L’HISTOIRE</p><h1>Le planning</h1><p>Les étapes essentielles de l’aventure, dans l’ordre du récit.</p></header>
     <section class="planning-progress"><div><strong>Jour 1</strong><span>sur 70</span></div><div class="planning-progress-bar"><i /></div><small>Le voyage commence</small></section>
     <section class="upcoming-days" aria-labelledby="upcoming-title"><div class="section-heading"><div><p class="planning-overline">À VENIR</p><h2 id="upcoming-title">Les prochains jours</h2></div><span>Voyage</span></div><ol class="day-list"><li v-for="activity in upcomingJourneyActivities" :key="activity.id" :class="{ current: activity.day === 'J1' }"><span class="day-marker">{{ activity.day }}</span><RouterLink :to="`/activites/${activity.id}`"><strong>{{ activity.title }}</strong><small>{{ activity.detail }}</small></RouterLink><i v-if="activity.day === 'J1'" class="mdi mdi-check-circle-outline current-icon" aria-hidden="true" /></li></ol></section>
     <section class="milestones" aria-labelledby="milestones-title"><div class="section-heading"><div><p class="planning-overline">LES REPÈRES</p><h2 id="milestones-title">Les grandes étapes</h2></div><span>Essentiel</span></div><div class="phase-filters" aria-label="Filtrer les phases"><button v-for="item in phaseLabels" :key="item.id" type="button" :class="{ active: phase === item.id }" @click="phase = item.id">{{ item.label }}</button></div><ol class="milestone-list"><li v-for="item in visibleMilestones" :key="item.day" :class="{ current: item.status === 'active' }"><span class="milestone-day">J{{ item.day }}</span><div><strong>{{ item.title }}</strong><small>{{ item.detail }}</small></div><span v-if="item.status === 'active'" class="current-badge">En cours</span></li></ol></section>
     <p class="planning-note">Les journées peuvent être déplacées ou remplacées depuis leur fiche, sans modifier le fil narratif de référence.</p>
-    <HomeNav />
   </main>
 </template>
 
@@ -40,8 +46,13 @@ const visibleMilestones = computed(() => phase.value === 'all' ? narrativeMilest
   display:inline-flex;
   align-items:center;
   gap:4px;
+  padding:0;
+  border:0;
+  background:none;
   color:var(--color-gold);
+  font-family:inherit;
   font-size:12px;
+  cursor:pointer;
   text-decoration:none
 }
 

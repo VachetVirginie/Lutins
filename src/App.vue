@@ -9,7 +9,7 @@ router.beforeEach((_to, from) => {
   fromName.value = from.name as string
 })
 
-// Transition uniquement entre l'écran d'ouverture (/entree) et l'Aventure (/)
+// Transition uniquement entre l'écran d'ouverture (/) et l'Aventure (/home)
 const transitionName = computed(() => (fromName.value === 'opening' ? 'page' : ''))
 </script>
 

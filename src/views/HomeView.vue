@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { HomeNav, NextStep, PrepSection, ProgressHero, StoryPhase } from '../components/home'
+import { NextStep, PrepSection, ProgressHero, StoryPhase } from '../components/home'
 </script>
 
 <template>
@@ -8,6 +8,5 @@ import { HomeNav, NextStep, PrepSection, ProgressHero, StoryPhase } from '../com
     <StoryPhase />
     <NextStep />
     <PrepSection />
-    <HomeNav />
   </main>
 </template>

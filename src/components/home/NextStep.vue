@@ -20,7 +20,7 @@
   overflow:hidden;
   border:1px solid rgba(241,204,122,.24);
   border-radius:22px;
-  background:rgba(255,255,255,.05);
+  background:rgba(10,28,20,.82);
   backdrop-filter:blur(16px);
   box-shadow:0 14px 36px rgba(0,0,0,.28)
 }
@@ -83,35 +83,41 @@
   align-self:flex-start;
   gap:9px;
   margin-top:16px;
-  color:#f1cc7a;
+  padding:9px 8px 9px 16px;
+  border-radius:999px;
+  background:linear-gradient(135deg,#f1cc7a,#e6c280);
+  color:#173b32;
   font-size:12px;
-  font-weight:600;
+  font-weight:700;
   letter-spacing:.01em;
   text-decoration:none;
-  transition:color .2s ease
+  box-shadow:0 6px 18px rgba(230,194,128,.3),inset 0 1px 0 rgba(255,255,255,.45);
+  transition:transform .2s ease,box-shadow .2s ease
 }
 
 .next-cta i  {
   display:grid;
   place-items:center;
-  width:27px;
-  height:27px;
+  width:24px;
+  height:24px;
   border-radius:50%;
-  color:#e6c280;
+  background:rgba(23,59,50,.16);
+  color:#173b32;
   font-size:14px;
   transition:transform .2s ease
 }
 
 .next-cta:hover  {
-  color:#fff4d7
+  transform:translateY(-1px);
+  box-shadow:0 9px 22px rgba(230,194,128,.4),inset 0 1px 0 rgba(255,255,255,.45)
 }
 
 .next-cta:hover i  {
-  transform:translate(2px,-2px)
+  transform:translateX(2px)
 }
 
-.next-cta:active i  {
-  transform:scale(.94)
+.next-cta:active  {
+  transform:scale(.97)
 }
 
 </style>
