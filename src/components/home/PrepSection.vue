@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import HomeNav from './HomeNav.vue'
 
 interface PrepItem {
   label: string
@@ -28,7 +27,6 @@ const doneCount = computed(() => items.value.filter((i) => i.done).length)
       </div>
       <span>{{ doneCount }}/{{ TOTAL_PREP }} prêts</span>
     </div>
-    <HomeNav />
     <ul class="prep-list">
       <li v-for="item in items" :key="item.label">
         <button class="prep-row" type="button" :class="{ 'is-done': item.done }" @click="item.done = !item.done">
@@ -38,7 +36,7 @@ const doneCount = computed(() => items.value.filter((i) => i.done).length)
         </button>
       </li>
     </ul>
-    <RouterLink class="prep-link" to="/preparer">Voir toute la préparation <i class="mdi mdi-arrow-right" aria-hidden="true" /></RouterLink>
+    <RouterLink class="prep-link" to="/prepare">Voir toute la préparation <i class="mdi mdi-arrow-right" aria-hidden="true" /></RouterLink>
   </section>
 </template>
 

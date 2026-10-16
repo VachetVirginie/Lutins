@@ -5,7 +5,8 @@ import MagicSeal from '../components/MagicSeal.vue'
 const router = useRouter()
 
 function enter() {
-  router.push('/home')
+  sessionStorage.setItem('lutins-unlocked', '1')
+  router.push('/')
 }
 </script>
 

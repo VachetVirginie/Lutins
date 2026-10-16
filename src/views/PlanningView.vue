@@ -10,10 +10,10 @@ const phases = [
 ]
 
 const activities = [
-  { date: '2 déc', title: 'Farce du réveil', detail: 'Des empreintes de pas en farine jusqu’à la cuisine.' },
-  { date: '5 déc', title: 'Chasse au trésor', detail: 'Indices cachés dans la maison, trésor : chocolats.' },
-  { date: '9 déc', title: 'Nuit des guirlandes', detail: 'Le lutin enroule les câbles autour du sapin.' },
-  { date: '14 déc', title: 'Atelier biscuits', detail: 'Il prépare la pâte pendant la nuit.' },
+  { id: 'farce-reveil', date: '2 déc', title: 'Farce du réveil', detail: 'Des empreintes de pas en farine jusqu’à la cuisine.' },
+  { id: 'chasse-tresor', date: '5 déc', title: 'Chasse au trésor', detail: 'Indices cachés dans la maison, trésor : chocolats.' },
+  { id: 'nuit-guirlandes', date: '9 déc', title: 'Nuit des guirlandes', detail: 'Le lutin enroule les câbles autour du sapin.' },
+  { id: 'atelier-biscuits', date: '14 déc', title: 'Atelier biscuits', detail: 'Il prépare la pâte pendant la nuit.' },
 ]
 
 const events = [
@@ -36,8 +36,6 @@ const customizations = [
       <h1>Le grand voyage</h1>
       <p>Toute l’aventure, jour après jour, jusqu’au retour au Pôle Nord.</p>
     </header>
-    <HomeNav />
-
     <section class="app-card">
       <p class="home-overline">TIMELINE NARRATIVE</p>
       <h2>Les grandes étapes</h2>
@@ -57,10 +55,12 @@ const customizations = [
       <p class="home-overline">ACTIVITÉS</p>
       <h2>Farces prévues</h2>
       <ul class="row-list">
-        <li v-for="a in activities" :key="a.title">
-          <span class="date-chip">{{ a.date }}</span>
-          <div class="row-body"><strong>{{ a.title }}</strong><small>{{ a.detail }}</small></div>
-          <i class="mdi mdi-chevron-right row-chev" aria-hidden="true" />
+        <li v-for="a in activities" :key="a.id">
+          <RouterLink class="row-link" :to="`/activites/${a.id}`">
+            <span class="date-chip">{{ a.date }}</span>
+            <div class="row-body"><strong>{{ a.title }}</strong><small>{{ a.detail }}</small></div>
+            <i class="mdi mdi-chevron-right row-chev" aria-hidden="true" />
+          </RouterLink>
         </li>
       </ul>
     </section>
@@ -87,6 +87,7 @@ const customizations = [
         </li>
       </ul>
     </section>
+    <HomeNav />
   </main>
 </template>
 
@@ -112,6 +113,7 @@ const customizations = [
 /* ---- listes ---- */
 .row-list{list-style:none;margin:0;padding:0}
 .row-list li{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.row-link{display:flex;flex:1;align-items:center;gap:12px;text-decoration:none}
 .row-list li:last-child{border-bottom:0;padding-bottom:2px}
 .date-chip{flex:0 0 auto;min-width:44px;padding:6px 0;border:1px solid rgba(241,204,122,.35);border-radius:10px;background:rgba(241,204,122,.08);color:var(--color-gold);font-size:10px;font-weight:700;text-align:center}
 .ev-icon{display:grid;place-items:center;flex:0 0 auto;width:34px;height:34px;border-radius:12px;background:rgba(241,204,122,.1);color:var(--color-gold);font-size:17px}

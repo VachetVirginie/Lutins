@@ -57,8 +57,6 @@ const progress = computed(() => Math.round((doneCount.value / allItems.value.len
       <h1>Tout prévoir</h1>
       <p>Matériel, impressions et petites attentions avant l’arrivée.</p>
     </header>
-    <HomeNav />
-
     <section class="app-card countdown">
       <div class="count-left">
         <span class="count-badge">J-7</span>
@@ -106,6 +104,7 @@ const progress = computed(() => Math.round((doneCount.value / allItems.value.len
         </li>
       </ul>
     </section>
+    <HomeNav />
   </main>
 </template>
 

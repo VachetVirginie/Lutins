@@ -27,8 +27,6 @@ const notes = [
       <h1>La mémoire du voyage</h1>
       <p>Ce que votre famille a déjà vécu — et ce qu’il reste à écrire.</p>
     </header>
-    <HomeNav />
-
     <section class="app-card">
       <p class="home-overline">ACTIVITÉS RÉALISÉES</p>
       <h2>Déjà accompli</h2>
@@ -64,6 +62,7 @@ const notes = [
       </article>
       <button class="note-add" type="button"><i class="mdi mdi-plus" aria-hidden="true" /> Ajouter une note</button>
     </section>
+    <HomeNav />
   </main>
 </template>
 
