@@ -2,176 +2,66 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { HomeNav } from '../components/home'
-
-interface Sheet {
-  date: string
-  title: string
-  tagline: string
-  duration: string
-  level: string
-  description: string
-  steps: string[]
-  material: { label: string; done: boolean }[]
-  tip: string
-}
-
-const sheets: Record<string, Sheet> = {
-  'jour-1-alerte-pole-nord': {
-    date: 'Jour 1',
-    title: 'Alerte du Pôle Nord',
-    tagline: 'Un premier courrier donne le signal du départ.',
-    duration: '15 min',
-    level: 'Essentiel',
-    description:
-      'L’aventure commence par un courrier officiel du Pôle Nord : le Père Noël annonce qu’un lutin a été choisi pour rejoindre votre maison. Le voyage durera 70 jours — cette lettre plante le décor et fait naître l’attente.',
-    steps: [
-      'Imprimer ou écrire le courrier du Pôle Nord.',
-      'Personnaliser le message (prénom des enfants, nom de la ville).',
-      'Glisser la lettre dans une belle enveloppe cachetée.',
-      'La déposer dans la boîte aux lettres ou sur le paillasson.',
-    ],
-    material: [
-      { label: 'Courrier du Pôle Nord (imprimé)', done: false },
-      { label: 'Enveloppe + cachet', done: false },
-      { label: 'Tampon ou cire dorée (facultatif)', done: false },
-    ],
-    tip: 'Cachet à la cire ou simple autocollant doré : le détail qui fait tout, les enfants examinent toujours l’enveloppe en premier.',
-  },
-  'jour-2-preparation-sac': {
-    date: 'Jour 2',
-    title: 'Préparation du sac',
-    tagline: 'Le lutin prépare son sac de voyage — carte et petit indice.',
-    duration: '10 min',
-    level: 'Facile',
-    description:
-      'Deuxième jour : le voyage devient concret. Une petite carte du trajet et un indice matériel (un bouton, un fil doré) montrent que le lutin fait déjà son sac pour vous rejoindre.',
-    steps: [
-      'Imprimer la carte du voyage (Pôle Nord → votre ville).',
-      'Ajouter un petit élément de voyage à côté (ficelle, bouton doré).',
-      'Poser le tout sur la table, comme tombé d’un sac.',
-    ],
-    material: [
-      { label: 'Carte du voyage (imprimée)', done: false },
-      { label: 'Petit bouton ou fil doré', done: false },
-    ],
-    tip: 'La carte gagne à être légèrement froissée et cornée — elle a fait un bout de route.',
-  },
-  'jour-3-depart-traineau': {
-    date: 'Jour 3',
-    title: 'Départ en traîneau',
-    tagline: 'Le grand départ : carte à compléter et coloriage.',
-    duration: '10 min',
-    level: 'Facile',
-    description:
-      'Le lutin a officiellement quitté le Pôle Nord en traîneau. Pour marquer le coup, les enfants reçoivent une carte à suivre jour après jour et un coloriage du départ.',
-    steps: [
-      'Imprimer la carte de suivi du voyage.',
-      'Imprimer le coloriage du traîneau.',
-      'Les disposer avec des crayons près du sapin ou dans la chambre.',
-    ],
-    material: [
-      { label: 'Carte de suivi (imprimée)', done: false },
-      { label: 'Coloriage traîneau (imprimé)', done: false },
-      { label: 'Crayons de couleur', done: true },
-    ],
-    tip: 'Prévoyez un petit cadre ou une pince pour accrocher la carte de suivi — elle servira pendant 70 jours.',
-  },
-  'jour-4-pause-gouter': {
-    date: 'Jour 4',
-    title: 'Première pause goûter',
-    tagline: 'Un mot du lutin depuis sa première halte.',
-    duration: '10 min',
-    level: 'Facile',
-    description:
-      'Le lutin écrit depuis sa première pause : un petit mot racontant le paysage traversé et annonçant la suite. Le courrier devient un rituel.',
-    steps: [
-      'Écrire ou imprimer le mot du lutin.',
-      'Signer d’une petite empreinte ou d’un dessin.',
-      'Le déposer au même endroit que la veille pour créer l’habitude.',
-    ],
-    material: [
-      { label: 'Mot du lutin (imprimé ou manuscrit)', done: false },
-      { label: 'Enveloppe', done: false },
-    ],
-    tip: 'Gardez toujours le même point de dépôt pour le courrier — le rituel rassure et fait venir les enfants d’eux-mêmes.',
-  },
-}
-
-function genericSheet(id: string): Sheet | undefined {
-  const m = /^jour-(\d+)/.exec(id)
-  if (!m) return undefined
-  return {
-    date: `Jour ${m[1]}`,
-    title: `Journée ${m[1]}`,
-    tagline: 'L’aventure continue vers Noël.',
-    duration: '10 min',
-    level: 'À venir',
-    description: 'Cette journée du voyage sera détaillée prochainement.',
-    steps: ['La fiche de cette journée arrive bientôt.'],
-    material: [],
-    tip: 'Revenez bientôt — le voyage continue.',
-  }
-}
+import { contentGapByDay } from '../data/contentGaps'
+import { dailySheetsByActivityId } from '../data/dailySheets'
 
 const route = useRoute()
-const sheet = computed(() => sheets[String(route.params.activityId)] ?? genericSheet(String(route.params.activityId)))
-const material = ref<Sheet['material']>([])
+const activityId = computed(() => String(route.params.activityId))
+const dayNumber = computed(() => Number(activityId.value.match(/jour-(\d+)/)?.[1] ?? 0))
+const sheet = computed(() => dailySheetsByActivityId[activityId.value] ?? dailySheetsByActivityId[`jour-${dayNumber.value}`])
+const gap = computed(() => contentGapByDay[dayNumber.value])
+const preparationDone = ref(false)
+const copied = ref(false)
 
-watch(sheet, (s) => { material.value = s ? s.material.map((m) => ({ ...m })) : [] }, { immediate: true })
+watch(sheet, () => { preparationDone.value = false }, { immediate: true })
 
-const doneCount = computed(() => material.value.filter((m) => m.done).length)
+async function copyMessage() {
+  if (!sheet.value) return
+  await navigator.clipboard?.writeText(sheet.value.message)
+  copied.value = true
+  setTimeout(() => (copied.value = false), 1800)
+}
 </script>
 
 <template>
-  <main class="app-screen">
+  <main class="app-screen activity-screen">
     <header class="activity-head">
       <RouterLink class="back-link" to="/planning"><i class="mdi mdi-arrow-left" aria-hidden="true" /> Planning</RouterLink>
       <template v-if="sheet">
-        <p class="home-overline">FICHE DU JOUR · {{ sheet.date.toUpperCase() }}</p>
+        <div class="activity-kicker"><span>FICHE DU JOUR</span><strong>J{{ sheet.day }}</strong></div>
         <h1>{{ sheet.title }}</h1>
-        <p class="activity-tagline">{{ sheet.tagline }}</p>
+        <p class="activity-date">{{ sheet.date }}</p>
       </template>
       <template v-else>
         <p class="home-overline">FICHE DU JOUR</p>
-        <h1>Introuvable</h1>
-        <p class="activity-tagline">Cette fiche n’existe pas encore.</p>
+        <h1>Fiche introuvable</h1>
       </template>
     </header>
 
     <template v-if="sheet">
-      <div class="activity-meta">
-        <span><i class="mdi mdi-timer-outline" aria-hidden="true" /> {{ sheet.duration }}</span>
-        <span><i class="mdi mdi-star-outline" aria-hidden="true" /> {{ sheet.level }}</span>
-      </div>
-
-      <section class="app-card">
-        <p class="home-overline">LA SCÈNE</p>
-        <p class="activity-desc">{{ sheet.description }}</p>
+      <section class="activity-message app-card" aria-labelledby="message-title">
+        <div class="section-label"><span id="message-title">LE TEXTE À UTILISER</span><i class="mdi mdi-message-text-outline" aria-hidden="true" /></div>
+        <blockquote>{{ sheet.message }}</blockquote>
+        <button class="copy-button" type="button" @click="copyMessage"><i class="mdi" :class="copied ? 'mdi-check' : 'mdi-content-copy'" aria-hidden="true" /> {{ copied ? 'Copié !' : 'Copier le texte' }}</button>
       </section>
 
-      <section class="app-card">
-        <p class="home-overline">MATÉRIEL · {{ doneCount }}/{{ material.length }}</p>
-        <ul class="mat-list">
-          <li v-for="m in material" :key="m.label">
-            <button class="mat-row" type="button" :class="{ 'is-done': m.done }" @click="m.done = !m.done">
-              <span class="mat-check"><i v-if="m.done" class="mdi mdi-check" aria-hidden="true" /></span>
-              <strong>{{ m.label }}</strong>
-            </button>
-          </li>
-        </ul>
+      <section class="app-card" aria-labelledby="prep-title">
+        <div class="section-label"><span id="prep-title">PRÉPARATION ADULTE</span><i class="mdi mdi-eye-off-outline" aria-hidden="true" /></div>
+        <p class="activity-copy">{{ sheet.adultPreparation }}</p>
+        <button class="done-row" type="button" :class="{ done: preparationDone }" @click="preparationDone = !preparationDone"><span class="done-check"><i v-if="preparationDone" class="mdi mdi-check" aria-hidden="true" /></span><span>{{ preparationDone ? 'Préparation terminée' : 'Marquer la préparation comme faite' }}</span></button>
       </section>
 
-      <section class="app-card">
-        <p class="home-overline">MISE EN PLACE</p>
-        <ol class="step-list">
-          <li v-for="(s, i) in sheet.steps" :key="i"><span class="step-num">{{ i + 1 }}</span>{{ s }}</li>
-        </ol>
+      <section v-if="sheet.assets.length" class="app-card" aria-labelledby="assets-title">
+        <div class="section-label"><span id="assets-title">DANS LE KIT</span><i class="mdi mdi-file-image-outline" aria-hidden="true" /></div>
+        <div class="asset-grid"><a v-for="asset in sheet.assets" :key="asset.file" class="asset-item" :href="asset.file" target="_blank" rel="noreferrer"><img :src="asset.file" :alt="asset.label" loading="lazy"><span>{{ asset.label }}</span><small>Annexe · p. {{ asset.page }}</small></a></div>
       </section>
 
-      <aside class="activity-tip">
-        <i class="mdi mdi-lightbulb-on-outline" aria-hidden="true" />
-        <p><strong>Astuce du lutin.</strong> {{ sheet.tip }}</p>
-      </aside>
+      <section v-if="sheet.gifts.length" class="app-card" aria-labelledby="gift-title">
+        <div class="section-label"><span id="gift-title">CADEAU, ALIMENT OU SURPRISE</span><i class="mdi mdi-gift-outline" aria-hidden="true" /></div>
+        <ul class="simple-list"><li v-for="gift in sheet.gifts" :key="gift"><i class="mdi mdi-circle-small" aria-hidden="true" />{{ gift }}</li></ul>
+      </section>
+
+      <aside v-if="gap" class="content-gap" aria-label="Élément à produire"><i class="mdi mdi-image-plus-outline" aria-hidden="true" /><div><strong>Visuel de scène à créer</strong><p>{{ gap.detail }}</p></div></aside>
     </template>
 
     <HomeNav />
@@ -179,28 +69,223 @@ const doneCount = computed(() => material.value.filter((m) => m.done).length)
 </template>
 
 <style scoped>
-.activity-head{margin-top:6px}
-.back-link{display:inline-flex;align-items:center;gap:5px;margin-bottom:16px;color:rgba(255,255,255,.6);font-size:12px;text-decoration:none}
-.back-link:hover{color:#e6c280}
-.activity-head h1{margin:6px 0 0;font:500 30px/1.05 var(--font-serif);letter-spacing:-.02em;color:#f7efdb}
-.activity-tagline{margin:8px 0 0;color:#a9bcae;font-size:13px;line-height:1.5}
-.activity-meta{display:flex;gap:10px;margin-top:14px}
-.activity-meta span{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border:1px solid rgba(241,204,122,.3);border-radius:999px;background:rgba(241,204,122,.06);color:#e6c280;font-size:11px;font-weight:600}
-.activity-meta i{font-size:14px}
-.activity-desc{margin:8px 0 0;font-size:13px;line-height:1.65;color:rgba(255,255,255,.78)}
-.mat-list{list-style:none;margin:8px 0 0;padding:0;border-top:1px solid rgba(255,255,255,.05)}
-.mat-row{display:flex;align-items:center;gap:12px;width:100%;padding:11px 2px;border:0;border-bottom:1px solid rgba(255,255,255,.05);background:none;text-align:left;cursor:pointer}
-.mat-list li:last-child .mat-row{border-bottom:0}
-.mat-check{display:grid;place-items:center;width:22px;height:22px;flex:0 0 auto;border:1.5px solid rgba(255,255,255,.3);border-radius:50%;background:transparent;color:#1c3a30;font-size:12px;transition:background .25s,border-color .25s}
-.mat-row.is-done .mat-check{background:#e6c280;border-color:#e6c280}
-.mat-row strong{font-size:14px;font-weight:500;color:#fff;transition:color .25s}
-.mat-row.is-done strong{color:rgba(255,255,255,.45)}
-.step-list{list-style:none;margin:8px 0 0;padding:0;counter-reset:steps}
-.step-list li{display:flex;gap:11px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px;line-height:1.55;color:rgba(255,255,255,.78)}
-.step-list li:last-child{border-bottom:0}
-.step-num{display:grid;place-items:center;flex:0 0 auto;width:22px;height:22px;margin-top:1px;border-radius:50%;background:rgba(241,204,122,.14);color:#e6c280;font-size:11px;font-weight:700}
-.activity-tip{display:flex;gap:11px;margin-top:22px;padding:15px 16px;border:1px solid rgba(255,215,0,.3);border-radius:18px;background:linear-gradient(180deg,rgba(255,215,0,.08),rgba(255,215,0,.03));box-shadow:0 0 24px rgba(255,215,0,.08)}
-.activity-tip i{flex:0 0 auto;margin-top:2px;color:#ffd700;font-size:19px}
-.activity-tip p{margin:0;font-size:12px;line-height:1.55;color:rgba(255,255,255,.8)}
-.activity-tip strong{color:#ffe9a8}
+.activity-screen {
+  padding-bottom:calc(100px + env(safe-area-inset-bottom))
+}
+
+.activity-head {
+  margin-top:6px
+}
+
+.back-link {
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  margin-bottom:22px;
+  color:rgba(255,255,255,.62);
+  font-size:12px;
+  text-decoration:none
+}
+
+.back-link:hover {
+  color:#e6c280
+}
+
+.activity-kicker {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:#e6c280;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.16em
+}
+
+.activity-kicker strong {
+  padding:4px 7px;
+  border:1px solid #e6c28066;
+  border-radius:7px;
+  font-size:9px
+}
+
+.activity-head h1 {
+  margin:10px 0 0;
+  font:500 30px/1.05 var(--font-serif);
+  letter-spacing:-.02em;
+  color:#f7efdb
+}
+
+.activity-date {
+  margin:8px 0 0;
+  color:#a9bcae;
+  font-size:12px;
+  text-transform:capitalize
+}
+
+.app-card {
+  margin-top:18px
+}
+
+.section-label {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  color:#e6c280;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.15em
+}
+
+.section-label i {
+  font-size:17px;
+  font-weight:400
+}
+
+.activity-message {
+  background:linear-gradient(145deg,rgba(230,194,128,.14),rgba(255,255,255,.04))
+}
+
+.activity-message blockquote {
+  margin:16px 0 18px;
+  color:#fff5df;
+  font:400 19px/1.42 var(--font-serif)
+}
+
+.copy-button {
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:8px 0;
+  border:0;
+  background:none;
+  color:#e6c280;
+  font-size:11px;
+  cursor:pointer
+}
+
+.activity-copy {
+  margin:14px 0 0;
+  color:rgba(255,255,255,.8);
+  font-size:14px;
+  line-height:1.65
+}
+
+.done-row {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  margin-top:18px;
+  padding:11px 0 0;
+  border:0;
+  border-top:1px solid #ffffff12;
+  background:none;
+  color:#a9bcae;
+  text-align:left;
+  font-size:12px;
+  cursor:pointer
+}
+
+.done-check {
+  display:grid;
+  place-items:center;
+  width:21px;
+  height:21px;
+  border:1px solid #ffffff45;
+  border-radius:50%;
+  color:#173b32
+}
+
+.done-row.done {
+  color:#e6c280
+}
+
+.done-row.done .done-check {
+  border-color:#e6c280;
+  background:#e6c280
+}
+
+.asset-grid {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin-top:14px
+}
+
+.asset-item {
+  display:grid;
+  gap:5px;
+  color:#fff;
+  text-decoration:none
+}
+
+.asset-item img {
+  width:100%;
+  aspect-ratio:1.42;
+  border-radius:12px;
+  object-fit:cover;
+  background:#f6f0df
+}
+
+.asset-item span {
+  font-size:12px;
+  line-height:1.25
+}
+
+.asset-item small {
+  color:#a9bcae;
+  font-size:10px
+}
+
+.simple-list {
+  list-style:none;
+  margin:14px 0 0;
+  padding:0
+}
+
+.simple-list li {
+  display:flex;
+  align-items:center;
+  gap:5px;
+  padding:5px 0;
+  color:rgba(255,255,255,.82);
+  font-size:13px
+}
+
+.simple-list i {
+  color:#e6c280;
+  font-size:16px
+}
+
+.content-gap {
+  display:flex;
+  gap:11px;
+  margin-top:18px;
+  padding:14px;
+  border:1px dashed #e6c28066;
+  border-radius:16px;
+  background:#e6c28008;
+  color:#e6c280
+}
+
+.content-gap>i {
+  font-size:20px
+}
+
+.content-gap strong {
+  font-size:12px
+}
+
+.content-gap p {
+  margin:4px 0 0;
+  color:#a9bcae;
+  font-size:11px;
+  line-height:1.45
+}
+
+.back-link:focus-visible,.copy-button:focus-visible,.done-row:focus-visible,.asset-item:focus-visible {
+  outline:2px solid #ffe9a8;
+  outline-offset:3px
+}
+
 </style>

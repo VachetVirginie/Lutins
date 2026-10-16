@@ -1,17 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { preparationNext7Days } from '../../data/adventure'
 
-interface PrepItem {
-  label: string
-  detail: string
-  done: boolean
-}
-
-const TOTAL_PREP = 1
-
-const items = ref<PrepItem[]>([
-  { label: 'Alerte du Pôle Nord', detail: 'Courrier essentiel · aujourd’hui', done: false },
-])
+const items = ref(preparationNext7Days.map((item) => ({ ...item, done: false })))
+const TOTAL_PREP = items.value.length
 
 const doneCount = computed(() => items.value.filter((i) => i.done).length)
 </script>
@@ -26,32 +18,145 @@ const doneCount = computed(() => items.value.filter((i) => i.done).length)
       <span>{{ doneCount }}/{{ TOTAL_PREP }} prêts</span>
     </div>
     <ul class="prep-list">
-      <li v-for="item in items" :key="item.label">
-        <button class="prep-row" type="button" :class="{ 'is-done': item.done }" @click="item.done = !item.done">
+      <li v-for="item in items" :key="item.id">
+        <div class="prep-row" :class="{ 'is-done': item.done }">
+          <button class="prep-check-button" type="button" :aria-label="item.done ? `Marquer ${item.title} comme non prêt` : `Marquer ${item.title} comme prêt`" @click="item.done = !item.done">
           <span class="prep-check"><i v-if="item.done" class="mdi mdi-check" aria-hidden="true" /></span>
-          <span class="prep-text"><strong>{{ item.label }}</strong><small>{{ item.detail }}</small></span>
-          <i class="prep-chevron mdi mdi-chevron-right" aria-hidden="true" />
-        </button>
+          </button>
+          <RouterLink class="prep-text" :to="`/activites/${item.activityId}`">
+            <strong>{{ item.title }}</strong><small>{{ item.day }} · {{ item.due }}</small>
+          </RouterLink>
+          <RouterLink class="prep-chevron" :to="`/activites/${item.activityId}`" :aria-label="`Ouvrir la fiche ${item.day}`"><i class="mdi mdi-arrow-up-right" aria-hidden="true" /></RouterLink>
+        </div>
       </li>
     </ul>
-    <RouterLink class="prep-link" to="/prepare">Voir toute la préparation <i class="mdi mdi-arrow-right" aria-hidden="true" /></RouterLink>
+    <RouterLink class="prep-link" to="/prepare">Voir la liste par jour <i class="mdi mdi-arrow-right" aria-hidden="true" /></RouterLink>
   </section>
 </template>
 
 <style scoped>
-.home-prep{margin-top:28px}
-.section-heading{display:flex;align-items:flex-end;justify-content:space-between}
-.section-heading .home-overline{font-size:11px;letter-spacing:.12em;color:rgba(255,255,255,.6)}
-.home-prep h2{margin:6px 0 0;font:500 26px var(--font-serif);color:#fff}
-.section-heading>span{font-size:13px;color:#e6c280}
-.prep-list{list-style:none;margin:14px 0 0;padding:0;border-top:1px solid rgba(255,255,255,.05)}
-.prep-row{display:flex;align-items:center;gap:13px;width:100%;padding:13px 2px;border:0;border-bottom:1px solid rgba(255,255,255,.05);background:none;text-align:left;cursor:pointer}
-.prep-check{display:grid;place-items:center;width:24px;height:24px;flex:0 0 auto;border:1.5px solid rgba(255,255,255,.3);border-radius:50%;background:transparent;color:#1c3a30;font-size:13px;transition:background .25s,border-color .25s,box-shadow .25s}
-.prep-row.is-done .prep-check{background:#e6c280;border-color:#e6c280;box-shadow:0 0 10px rgba(230,194,128,.4)}
-.prep-text{flex:1;display:grid;gap:3px}
-.prep-text strong{font-size:16px;font-weight:500;color:#fff;transition:color .25s}
-.prep-text small{font-size:11px;color:rgba(255,255,255,.5)}
-.prep-row.is-done .prep-text strong{color:rgba(255,255,255,.45)}
-.prep-chevron{color:rgba(255,255,255,.5);font-size:15px}
-.prep-link{display:flex;align-items:center;gap:7px;margin-top:16px;color:#e6c280;font-size:12px;text-decoration:none}
+.home-prep  {
+  margin-top:28px
+}
+
+.section-heading  {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between
+}
+
+.section-heading .home-overline  {
+  font-size:11px;
+  letter-spacing:.12em;
+  color:rgba(255,255,255,.6)
+}
+
+.home-prep h2  {
+  margin:6px 0 0;
+  font:500 26px var(--font-serif);
+  color:#fff
+}
+
+.section-heading>span  {
+  font-size:13px;
+  color:#e6c280
+}
+
+.prep-list  {
+  list-style:none;
+  margin:14px 0 0;
+  padding:0;
+  border-top:1px solid rgba(255,255,255,.05)
+}
+
+.prep-row  {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  padding:11px 2px;
+  border-bottom:1px solid rgba(255,255,255,.05)
+}
+
+.prep-check-button  {
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+  width:28px;
+  height:28px;
+  padding:0;
+  border:0;
+  background:none;
+  cursor:pointer
+}
+
+.prep-check  {
+  display:grid;
+  place-items:center;
+  width:22px;
+  height:22px;
+  border:1.5px solid rgba(255,255,255,.3);
+  border-radius:50%;
+  background:transparent;
+  color:#1c3a30;
+  font-size:13px;
+  transition:background .25s,border-color .25s,box-shadow .25s
+}
+
+.prep-row.is-done .prep-check  {
+  background:#e6c280;
+  border-color:#e6c280;
+  box-shadow:0 0 10px rgba(230,194,128,.4)
+}
+
+.prep-text  {
+  flex:1;
+  display:grid;
+  gap:3px;
+  text-decoration:none
+}
+
+.prep-text strong  {
+  font-size:16px;
+  font-weight:500;
+  color:#fff;
+  transition:color .25s
+}
+
+.prep-text small  {
+  font-size:11px;
+  color:rgba(255,255,255,.5)
+}
+
+.prep-row.is-done .prep-text strong  {
+  color:rgba(255,255,255,.45)
+}
+
+.prep-chevron  {
+  display:grid;
+  place-items:center;
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  color:rgba(255,255,255,.5);
+  font-size:15px;
+  text-decoration:none
+}
+
+.prep-check-button:focus-visible,.prep-text:focus-visible,.prep-chevron:focus-visible  {
+  outline:2px solid #ffe9a8;
+  outline-offset:3px;
+  border-radius:6px
+}
+
+.prep-link  {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin-top:16px;
+  color:#e6c280;
+  font-size:12px;
+  text-decoration:none
+}
+
 </style>

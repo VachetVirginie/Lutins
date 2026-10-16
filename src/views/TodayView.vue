@@ -43,5 +43,212 @@ function toggle(key: ActionKey) {
 </template>
 
 <style scoped>
-.today-screen{min-height:100svh;max-width:540px;margin:auto;padding:calc(22px + env(safe-area-inset-top)) 22px calc(92px + env(safe-area-inset-bottom));background:var(--color-night);color:#fff}.today-header{padding-top:4px}.back-link{display:inline-flex;align-items:center;gap:4px;color:var(--color-gold);font-size:12px;text-decoration:none}.today-overline{margin:0;color:var(--color-gold);font-size:9px;font-weight:700;letter-spacing:.18em}.today-header>.today-overline{margin-top:30px}.today-header h1{margin:8px 0 8px;font:500 38px/.95 var(--font-serif);color:#f8f0dd;letter-spacing:-.04em}.today-intro{max-width:320px;margin:0;color:#a9bcae;font-size:14px;line-height:1.5}.today-progress{margin:26px 0 30px;padding:14px 0;border-top:1px solid rgba(255,255,255,.12);border-bottom:1px solid rgba(255,255,255,.12);color:#a9bcae;font-size:11px}.today-progress strong{color:#f5d78f;font-weight:600}.today-progress div{height:4px;margin-top:9px;background:rgba(255,255,255,.12);border-radius:8px;overflow:hidden}.today-progress i{display:block;height:100%;background:#e6c280;border-radius:8px;transition:width .25s}.today-section-heading h2{margin:6px 0 14px;font:500 25px var(--font-serif);color:#f5edd9}.today-action,.resource-row{display:flex;align-items:center;gap:12px;width:100%;padding:14px 0;border:0;border-bottom:1px solid rgba(255,255,255,.08);background:transparent;color:#fff;text-align:left}.today-action-icon,.resource-icon{display:grid;place-items:center;flex:0 0 auto;width:38px;height:38px;border:1px solid rgba(241,204,122,.3);border-radius:12px;color:var(--color-gold)}.today-action>span:nth-child(2),.resource-row>span:nth-child(2){flex:1;display:grid;gap:3px}.today-action strong,.resource-row strong{font-size:14px;font-weight:600}.today-action small,.resource-row small{font-size:11px;color:rgba(255,255,255,.5)}.today-action>.mdi:last-child,.resource-row button{color:rgba(255,255,255,.55);font-size:18px}.today-action.done strong{color:rgba(255,255,255,.48);text-decoration:line-through}.today-action.done .today-action-icon{background:#e6c280;color:#173b32}.today-resource{margin-top:30px}.resource-row button{border:0;background:none}.check-resource{display:inline-flex;align-items:center;gap:7px;margin-top:13px;border:0;background:none;color:#e6c280;font-size:11px}.check-resource.done{color:#9ebca3}.gather-list{display:flex;flex-wrap:wrap;gap:8px}.gather-list span{display:inline-flex;align-items:center;gap:6px;padding:9px 11px;border-radius:10px;background:rgba(255,255,255,.07);color:#dce3d9;font-size:12px}.gather-list i{color:var(--color-gold)}.today-footer{margin-top:34px;padding-top:18px;border-top:1px solid rgba(255,255,255,.1)}.today-footer p{margin:0;color:#849b8d;font-size:12px;line-height:1.5}.today-footer a{display:inline-flex;align-items:center;gap:7px;margin-top:15px;color:var(--color-gold);font-size:12px;text-decoration:none}
+.today-screen  {
+  min-height:100svh;
+  max-width:540px;
+  margin:auto;
+  padding:calc(22px + env(safe-area-inset-top)) 22px calc(92px + env(safe-area-inset-bottom));
+  background:var(--color-night);
+  color:#fff
+}
+
+.today-header  {
+  padding-top:4px
+}
+
+.back-link  {
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  color:var(--color-gold);
+  font-size:12px;
+  text-decoration:none
+}
+
+.today-overline  {
+  margin:0;
+  color:var(--color-gold);
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.18em
+}
+
+.today-header>.today-overline  {
+  margin-top:30px
+}
+
+.today-header h1  {
+  margin:8px 0 8px;
+  font:500 38px/.95 var(--font-serif);
+  color:#f8f0dd;
+  letter-spacing:-.04em
+}
+
+.today-intro  {
+  max-width:320px;
+  margin:0;
+  color:#a9bcae;
+  font-size:14px;
+  line-height:1.5
+}
+
+.today-progress  {
+  margin:26px 0 30px;
+  padding:14px 0;
+  border-top:1px solid rgba(255,255,255,.12);
+  border-bottom:1px solid rgba(255,255,255,.12);
+  color:#a9bcae;
+  font-size:11px
+}
+
+.today-progress strong  {
+  color:#f5d78f;
+  font-weight:600
+}
+
+.today-progress div  {
+  height:4px;
+  margin-top:9px;
+  background:rgba(255,255,255,.12);
+  border-radius:8px;
+  overflow:hidden
+}
+
+.today-progress i  {
+  display:block;
+  height:100%;
+  background:#e6c280;
+  border-radius:8px;
+  transition:width .25s
+}
+
+.today-section-heading h2  {
+  margin:6px 0 14px;
+  font:500 25px var(--font-serif);
+  color:#f5edd9
+}
+
+.today-action,.resource-row  {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  width:100%;
+  padding:14px 0;
+  border:0;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  background:transparent;
+  color:#fff;
+  text-align:left
+}
+
+.today-action-icon,.resource-icon  {
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+  width:38px;
+  height:38px;
+  border:1px solid rgba(241,204,122,.3);
+  border-radius:12px;
+  color:var(--color-gold)
+}
+
+.today-action>span:nth-child(2),.resource-row>span:nth-child(2)  {
+  flex:1;
+  display:grid;
+  gap:3px
+}
+
+.today-action strong,.resource-row strong  {
+  font-size:14px;
+  font-weight:600
+}
+
+.today-action small,.resource-row small  {
+  font-size:11px;
+  color:rgba(255,255,255,.5)
+}
+
+.today-action>.mdi:last-child,.resource-row button  {
+  color:rgba(255,255,255,.55);
+  font-size:18px
+}
+
+.today-action.done strong  {
+  color:rgba(255,255,255,.48);
+  text-decoration:line-through
+}
+
+.today-action.done .today-action-icon  {
+  background:#e6c280;
+  color:#173b32
+}
+
+.today-resource  {
+  margin-top:30px
+}
+
+.resource-row button  {
+  border:0;
+  background:none
+}
+
+.check-resource  {
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  margin-top:13px;
+  border:0;
+  background:none;
+  color:#e6c280;
+  font-size:11px
+}
+
+.check-resource.done  {
+  color:#9ebca3
+}
+
+.gather-list  {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px
+}
+
+.gather-list span  {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:9px 11px;
+  border-radius:10px;
+  background:rgba(255,255,255,.07);
+  color:#dce3d9;
+  font-size:12px
+}
+
+.gather-list i  {
+  color:var(--color-gold)
+}
+
+.today-footer  {
+  margin-top:34px;
+  padding-top:18px;
+  border-top:1px solid rgba(255,255,255,.1)
+}
+
+.today-footer p  {
+  margin:0;
+  color:#849b8d;
+  font-size:12px;
+  line-height:1.5
+}
+
+.today-footer a  {
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  margin-top:15px;
+  color:var(--color-gold);
+  font-size:12px;
+  text-decoration:none
+}
+
 </style>

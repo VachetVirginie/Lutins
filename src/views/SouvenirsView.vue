@@ -67,31 +67,167 @@ const notes = [
 </template>
 
 <style scoped>
-/* ---- activités réalisées ---- */
-.done-list{list-style:none;margin:0;padding:0}
-.done-list li{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.05)}
-.done-list li:last-child{border-bottom:0;padding-bottom:2px}
-.done-check{display:grid;place-items:center;flex:0 0 auto;width:22px;height:22px;margin-top:1px;border-radius:50%;background:rgba(230,194,128,.16);color:#e6c280;font-size:12px;box-shadow:0 0 8px rgba(230,194,128,.25)}
-.done-body{display:grid;gap:2px}
-.done-body strong{font-size:14px;font-weight:600;color:#fff}
-.done-body small{font-size:11px;color:rgba(255,255,255,.5)}
+/* ---- activités réalisées ---- */ .done-list  {
+  list-style:none;
+  margin:0;
+  padding:0
+}
 
-/* ---- photos ---- */
-.photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:2px}
-.photo-grid figure{position:relative;margin:0;border-radius:14px;overflow:hidden;border:1px solid rgba(241,204,122,.22);box-shadow:0 8px 20px rgba(0,0,0,.3)}
-.photo-grid img{display:block;width:100%;aspect-ratio:1;object-fit:cover}
-.photo-grid figcaption{position:absolute;left:0;right:0;bottom:0;padding:16px 9px 7px;background:linear-gradient(180deg,transparent,rgba(7,20,14,.85));color:#f5edd9;font-size:10px;font-weight:600;letter-spacing:.04em}
-.photo-add{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;aspect-ratio:1;border:1.5px dashed rgba(241,204,122,.4);border-radius:14px;background:rgba(241,204,122,.04);color:var(--color-gold);font-size:10px;font-weight:600;letter-spacing:.06em;cursor:pointer;transition:background .25s,border-color .25s}
-.photo-add:hover{background:rgba(241,204,122,.1)}
-.photo-add i{font-size:22px}
+.done-list li  {
+  display:flex;
+  gap:12px;
+  padding:11px 0;
+  border-bottom:1px solid rgba(255,255,255,.05)
+}
 
-/* ---- notes ---- */
-.note{padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)}
-.note header{display:flex;align-items:baseline;gap:8px}
-.note header strong{font-size:13px;font-weight:700;color:#e6c280}
-.note header small{font-size:10px;color:rgba(255,255,255,.4)}
-.note p{margin:5px 0 0;font-size:13px;line-height:1.55;color:rgba(255,255,255,.75)}
-.note-add{display:flex;align-items:center;gap:7px;margin-top:14px;padding:10px 16px;border:1px solid rgba(241,204,122,.35);border-radius:999px;background:rgba(241,204,122,.06);color:#e6c280;font-size:12px;font-weight:600;cursor:pointer;transition:background .25s}
-.note-add:hover{background:rgba(241,204,122,.12)}
-.note-add i{font-size:14px}
+.done-list li:last-child  {
+  border-bottom:0;
+  padding-bottom:2px
+}
+
+.done-check  {
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+  width:22px;
+  height:22px;
+  margin-top:1px;
+  border-radius:50%;
+  background:rgba(230,194,128,.16);
+  color:#e6c280;
+  font-size:12px;
+  box-shadow:0 0 8px rgba(230,194,128,.25)
+}
+
+.done-body  {
+  display:grid;
+  gap:2px
+}
+
+.done-body strong  {
+  font-size:14px;
+  font-weight:600;
+  color:#fff
+}
+
+.done-body small  {
+  font-size:11px;
+  color:rgba(255,255,255,.5)
+}
+
+/* ---- photos ---- */ .photo-grid  {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:2px
+}
+
+.photo-grid figure  {
+  position:relative;
+  margin:0;
+  border-radius:14px;
+  overflow:hidden;
+  border:1px solid rgba(241,204,122,.22);
+  box-shadow:0 8px 20px rgba(0,0,0,.3)
+}
+
+.photo-grid img  {
+  display:block;
+  width:100%;
+  aspect-ratio:1;
+  object-fit:cover
+}
+
+.photo-grid figcaption  {
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  padding:16px 9px 7px;
+  background:linear-gradient(180deg,transparent,rgba(7,20,14,.85));
+  color:#f5edd9;
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:.04em
+}
+
+.photo-add  {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  aspect-ratio:1;
+  border:1.5px dashed rgba(241,204,122,.4);
+  border-radius:14px;
+  background:rgba(241,204,122,.04);
+  color:var(--color-gold);
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:.06em;
+  cursor:pointer;
+  transition:background .25s,border-color .25s
+}
+
+.photo-add:hover  {
+  background:rgba(241,204,122,.1)
+}
+
+.photo-add i  {
+  font-size:22px
+}
+
+/* ---- notes ---- */ .note  {
+  padding:12px 0;
+  border-bottom:1px solid rgba(255,255,255,.05)
+}
+
+.note header  {
+  display:flex;
+  align-items:baseline;
+  gap:8px
+}
+
+.note header strong  {
+  font-size:13px;
+  font-weight:700;
+  color:#e6c280
+}
+
+.note header small  {
+  font-size:10px;
+  color:rgba(255,255,255,.4)
+}
+
+.note p  {
+  margin:5px 0 0;
+  font-size:13px;
+  line-height:1.55;
+  color:rgba(255,255,255,.75)
+}
+
+.note-add  {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin-top:14px;
+  padding:10px 16px;
+  border:1px solid rgba(241,204,122,.35);
+  border-radius:999px;
+  background:rgba(241,204,122,.06);
+  color:#e6c280;
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer;
+  transition:background .25s
+}
+
+.note-add:hover  {
+  background:rgba(241,204,122,.12)
+}
+
+.note-add i  {
+  font-size:14px
+}
+
 </style>

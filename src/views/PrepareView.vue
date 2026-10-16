@@ -1,132 +1,177 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { HomeNav } from '../components/home'
+import { preparationNext7Days } from '../data/adventure'
 
-interface Item {
-  label: string
-  detail: string
-  done: boolean
-}
-
-const tasks = ref<Item[]>([
-  { label: 'Écrire la lettre de bienvenue', detail: 'Échéance · J-6', done: true },
-  { label: 'Préparer la scène du salon', detail: 'Échéance · J-3', done: false },
-  { label: 'Cacher le sac du lutin', detail: 'Échéance · J-2', done: false },
-  { label: 'Briefer les grands-parents', detail: 'Échéance · J-7', done: true },
-])
-
-const material = ref<{ group: string; items: Item[] }[]>([
-  {
-    group: 'Papeterie',
-    items: [
-      { label: 'Papier cartonné doré', detail: 'Pour la carte du voyage', done: true },
-      { label: 'Encre rouge & plume', detail: 'Pour les lettres du lutin', done: false },
-    ],
-  },
-  {
-    group: 'Gourmandises',
-    items: [
-      { label: 'Biscuits de Noël', detail: 'Farce du matin J+3', done: false },
-      { label: 'Mini marshmallows', detail: 'Scène du chocolat chaud', done: false },
-    ],
-  },
-  {
-    group: 'Décor',
-    items: [
-      { label: 'Petite échelle', detail: 'Accès à l’étagère du salon', done: true },
-      { label: 'Fil doré', detail: 'Décors suspendus', done: false },
-    ],
-  },
-])
-
-const prints = ref<Item[]>([
-  { label: 'Carte du voyage', detail: 'A5 · recto-verso', done: true },
-  { label: 'Lettre du Père Noël', detail: 'A4 · parchemin', done: false },
-  { label: 'Étiquettes cadeaux', detail: 'Planche de 8', done: false },
-])
-
-const allItems = computed(() => [...tasks.value, ...material.value.flatMap((g) => g.items), ...prints.value])
-const doneCount = computed(() => allItems.value.filter((i) => i.done).length)
-const progress = computed(() => Math.round((doneCount.value / allItems.value.length) * 100))
+type Filter = 'all' | 'print' | 'buy' | 'gather'
+interface UpcomingItem { id: string; day: string; title: string; type: Exclude<Filter, 'all'>; detail: string; activityId: string; done: boolean }
+const filter = ref<Filter>('all')
+const kindLabels: Record<Exclude<Filter, 'all'>, string> = { print: 'À imprimer', buy: 'À acheter', gather: 'À rassembler' }
+const items = ref<UpcomingItem[]>(preparationNext7Days.map((item) => ({
+  ...item,
+  type: item.kind,
+  day: `${item.day} · ${item.due.toLowerCase()}`,
+  detail: kindLabels[item.kind],
+  done: false,
+})))
+const visibleItems = computed(() => items.value.filter((item) => filter.value === 'all' || item.type === filter.value))
+const filters: { id: Filter; label: string }[] = [
+  { id: 'all', label: 'Tout' }, { id: 'print', label: 'À imprimer' }, { id: 'buy', label: 'À acheter' }, { id: 'gather', label: 'À rassembler' },
+]
 </script>
 
 <template>
-  <main class="app-screen">
-    <header class="app-header">
-      <p class="home-overline">PRÉPARATION</p>
-      <h1>Tout prévoir</h1>
-      <p>Matériel, impressions et petites attentions avant l’arrivée.</p>
-    </header>
-    <section class="app-card countdown">
-      <div class="count-left">
-        <span class="count-badge">J-7</span>
-        <div><strong>Arrivée dans 7 jours</strong><small>{{ doneCount }}/{{ allItems.length }} prêts</small></div>
-      </div>
-      <div class="count-bar"><i :style="{ width: progress + '%' }" /></div>
-    </section>
-
-    <section class="app-card">
-      <p class="home-overline">TÂCHES</p>
-      <h2>Cette semaine</h2>
-      <ul class="prep-list">
-        <li v-for="item in tasks" :key="item.label">
-          <button class="prep-row" type="button" :class="{ 'is-done': item.done }" @click="item.done = !item.done">
-            <span class="prep-check"><i v-if="item.done" class="mdi mdi-check" aria-hidden="true" /></span>
-            <span class="prep-text"><strong>{{ item.label }}</strong><small>{{ item.detail }}</small></span>
-          </button>
-        </li>
-      </ul>
-    </section>
-
-    <section v-for="g in material" :key="g.group" class="app-card">
-      <p class="home-overline">MATÉRIEL</p>
-      <h2>{{ g.group }}</h2>
-      <ul class="prep-list">
-        <li v-for="item in g.items" :key="item.label">
-          <button class="prep-row" type="button" :class="{ 'is-done': item.done }" @click="item.done = !item.done">
-            <span class="prep-check"><i v-if="item.done" class="mdi mdi-check" aria-hidden="true" /></span>
-            <span class="prep-text"><strong>{{ item.label }}</strong><small>{{ item.detail }}</small></span>
-          </button>
-        </li>
-      </ul>
-    </section>
-
-    <section class="app-card">
-      <p class="home-overline">IMPRESSIONS</p>
-      <h2>À imprimer</h2>
-      <ul class="prep-list">
-        <li v-for="item in prints" :key="item.label">
-          <button class="prep-row" type="button" :class="{ 'is-done': item.done }" @click="item.done = !item.done">
-            <span class="prep-check"><i v-if="item.done" class="mdi mdi-check" aria-hidden="true" /></span>
-            <span class="prep-text"><strong>{{ item.label }}</strong><small>{{ item.detail }}</small></span>
-            <i class="mdi mdi-printer-outline print-ico" aria-hidden="true" />
-          </button>
-        </li>
-      </ul>
-    </section>
+  <main class="prepare-screen">
+    <header class="prepare-header"><RouterLink class="back-link" to="/"><i class="mdi mdi-chevron-left" /> Aventure</RouterLink><p class="prepare-overline">ANTICIPER SANS SE PRESSER</p><h1>À prévoir</h1><p>Les prochains éléments, du plus urgent au moins urgent.</p></header>
+    <div class="prepare-filters" aria-label="Filtrer les éléments"><button v-for="item in filters" :key="item.id" type="button" :class="{ active: filter === item.id }" @click="filter = item.id">{{ item.label }}</button></div>
+    <section class="prepare-list" aria-label="Éléments à prévoir"><div v-if="visibleItems.length === 0" class="prepare-empty">Aucun élément dans ce filtre.</div><article v-for="item in visibleItems" :key="item.id" class="prepare-item" :class="{ done: item.done }"><button class="prepare-check" type="button" :aria-label="item.done ? `Marquer ${item.title} comme non terminé` : `Marquer ${item.title} comme terminé`" @click="item.done = !item.done"><i class="mdi" :class="item.done ? 'mdi-check' : 'mdi-circle-outline'" /></button><div class="prepare-item-copy"><span class="prepare-day">{{ item.day }}</span><strong>{{ item.title }}</strong><small>{{ item.detail }}</small></div><RouterLink class="prepare-link" :to="`/activites/${item.activityId}`" :aria-label="`Ouvrir la journée liée à ${item.title}`"><i class="mdi mdi-arrow-up-right" /></RouterLink></article></section>
+    <p class="prepare-note">Chaque élément reste lié à sa journée. Quand la journée est prête, son matériel passe automatiquement en terminé.</p>
     <HomeNav />
   </main>
 </template>
 
 <style scoped>
-/* ---- échéance ---- */
-.countdown{display:grid;gap:14px}
-.count-left{display:flex;align-items:center;gap:14px}
-.count-badge{display:grid;place-items:center;width:52px;height:52px;flex:0 0 auto;border-radius:16px;background:linear-gradient(180deg,#f5d78f,#d9ac54);color:#1c3a30;font:700 15px var(--font-serif);box-shadow:0 8px 20px rgba(217,172,84,.35)}
-.count-left strong{display:block;font:500 17px var(--font-serif);color:#f5edd9}
-.count-left small{font-size:12px;color:#e6c280}
-.count-bar{height:5px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden}
-.count-bar i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#ffd700,#ffe9a8);box-shadow:0 0 8px rgba(255,215,0,.6);transition:width .4s ease}
+.prepare-screen  {
+  min-height:100svh;
+  max-width:540px;
+  margin:auto;
+  padding:calc(22px + env(safe-area-inset-top)) 22px calc(92px + env(safe-area-inset-bottom));
+  background:var(--color-night);
+  color:#fff
+}
 
-/* ---- checklists ---- */
-.prep-list{list-style:none;margin:0;padding:0;border-top:1px solid rgba(255,255,255,.05)}
-.prep-row{display:flex;align-items:center;gap:13px;width:100%;padding:12px 2px;border:0;border-bottom:1px solid rgba(255,255,255,.05);background:none;text-align:left;cursor:pointer}
-.prep-list li:last-child .prep-row{border-bottom:0}
-.prep-check{display:grid;place-items:center;width:24px;height:24px;flex:0 0 auto;border:1.5px solid rgba(255,255,255,.3);border-radius:50%;background:transparent;color:#1c3a30;font-size:13px;transition:background .25s,border-color .25s,box-shadow .25s}
-.prep-row.is-done .prep-check{background:#e6c280;border-color:#e6c280;box-shadow:0 0 10px rgba(230,194,128,.4)}
-.prep-text{flex:1;display:grid;gap:3px}
-.prep-text strong{font-size:15px;font-weight:500;color:#fff;transition:color .25s}
-.prep-text small{font-size:11px;color:rgba(255,255,255,.5)}
-.prep-row.is-done .prep-text strong{color:rgba(255,255,255,.45)}
-.print-ico{color:rgba(255,255,255,.45);font-size:17px}
+.prepare-header  {
+  padding-top:4px
+}
+
+.back-link  {
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  color:var(--color-gold);
+  font-size:12px;
+  text-decoration:none
+}
+
+.prepare-overline  {
+  margin:28px 0 0;
+  color:var(--color-gold);
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.18em
+}
+
+.prepare-header h1  {
+  margin:8px 0;
+  color:#f8f0dd;
+  font:500 38px/.95 var(--font-serif)
+}
+
+.prepare-header>p:last-child  {
+  max-width:300px;
+  margin:0;
+  color:#a9bcae;
+  font-size:14px;
+  line-height:1.5
+}
+
+.prepare-filters  {
+  display:flex;
+  gap:7px;
+  margin:26px 0 18px;
+  overflow-x:auto;
+  padding-bottom:2px
+}
+
+.prepare-filters button  {
+  flex:0 0 auto;
+  padding:8px 12px;
+  border:1px solid #ffffff25;
+  border-radius:999px;
+  background:#ffffff08;
+  color:#a9bcae;
+  font-size:11px
+}
+
+.prepare-filters button.active  {
+  border-color:#e6c280;
+  background:#e6c280;
+  color:#173b32;
+  font-weight:600
+}
+
+.prepare-list  {
+  border-top:1px solid #ffffff1f
+}
+
+.prepare-item  {
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:14px 0;
+  border-bottom:1px solid #ffffff18
+}
+
+.prepare-check  {
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+  width:25px;
+  height:25px;
+  border:0;
+  background:none;
+  color:#e6c280;
+  font-size:21px
+}
+
+.prepare-item.done .prepare-check  {
+  color:#9ebca3
+}
+
+.prepare-item-copy  {
+  display:grid;
+  flex:1;
+  gap:3px
+}
+
+.prepare-day  {
+  color:#e6c280;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.1em
+}
+
+.prepare-item strong  {
+  font-size:14px;
+  font-weight:600
+}
+
+.prepare-item small  {
+  color:#a9bcae;
+  font-size:11px
+}
+
+.prepare-item.done strong  {
+  color:#8ba195;
+  text-decoration:line-through
+}
+
+.prepare-link  {
+  display:grid;
+  place-items:center;
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  background:#ffffff0b;
+  color:#e6c280;
+  text-decoration:none
+}
+
+.prepare-note  {
+  margin:24px 0;
+  color:#718a7b;
+  font-size:11px;
+  line-height:1.5
+}
+
 </style>
