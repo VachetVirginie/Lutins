@@ -1,0 +1,12 @@
+/* Final art-direction pass: fewer elements, stronger hierarchy, clearer entry gesture. */
+.opening-copy{padding-top:clamp(28px,6vh,58px);transform:none}
+.opening-chapter{margin-bottom:30px;opacity:.82}
+.opening-kicker{margin-top:0;font-size:14px;letter-spacing:.01em}
+.opening-copy h1{max-width:300px;font-size:clamp(40px,10vw,58px);line-height:.93;letter-spacing:-.065em}
+.opening-subtitle{max-width:235px;margin-top:22px;font-size:14px;line-height:1.4;opacity:.82}
+.opening-entry{max-width:300px;margin-left:auto;margin-right:28px}
+.opening-entry p{display:none}
+.opening-slider{min-height:58px;padding-left:19px;border:1px solid rgba(241,204,122,.5);background:rgba(10,38,31,.78);backdrop-filter:blur(18px);color:#fffaf0;font-size:14px;font-weight:600;box-shadow:0 12px 30px rgba(0,0,0,.28)}
+.opening-slider b{width:46px;height:46px;background:#e9c574;color:#173b32}
+.opening-footer{display:none}
+@media(max-width:380px){.opening-entry{margin-right:24px}.opening-copy h1{font-size:40px}}

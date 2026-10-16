@@ -1,0 +1,2 @@
+.opening-entry{bottom:calc(154px + env(safe-area-inset-bottom))}
+@media(max-height:700px){.opening-entry{bottom:calc(132px + env(safe-area-inset-bottom))}}

@@ -1,0 +1,11 @@
+/* Mobile finish: respect the device safe area and keep the thumb action clear. */
+.opening-header{padding-top:calc(30px + env(safe-area-inset-top));padding-left:28px;padding-right:28px}
+.opening-copy{padding-left:32px;padding-right:32px}
+.opening-copy h1{max-width:390px}
+.opening-kicker,.opening-subtitle{max-width:310px}
+.opening-entry{left:28px;right:28px;bottom:calc(116px + env(safe-area-inset-bottom))}
+.opening-entry p{padding-left:3px;color:#fff;opacity:.95}
+.opening-slider{min-height:74px;padding-left:25px}
+.opening-slider b{width:56px;height:56px;font-size:22px}
+.opening-footer{left:28px;right:28px;bottom:calc(34px + env(safe-area-inset-bottom))}
+@media (max-width:380px){.opening-copy{padding-left:26px;padding-right:26px}.opening-entry{left:24px;right:24px}.opening-header{padding-left:24px;padding-right:24px}}

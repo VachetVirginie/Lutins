@@ -1,0 +1,6 @@
+.opening-copy{padding-top:24vh;padding-bottom:28px}
+.opening-copy h1{line-height:.98;letter-spacing:-.06em}
+.opening-subtitle{margin-top:28px;margin-bottom:0;max-width:285px}
+.opening-entry{bottom:calc(122px + env(safe-area-inset-bottom));padding-top:12px}
+.opening-entry p{margin-bottom:21px;line-height:1.55}
+@media (max-height:700px){.opening-copy{padding-top:19vh}.opening-subtitle{margin-top:20px}.opening-entry{bottom:calc(104px + env(safe-area-inset-bottom))}}

@@ -1,0 +1,36 @@
+/* Mobile-first surface: the app is designed for a thumb, then widened for desktop. */
+html, body, #app, .v-application { min-height: 100%; }
+.story-screen { min-height: 100svh; min-height: 100dvh; padding-bottom: env(safe-area-inset-bottom); }
+.story-header { padding-top: calc(18px + env(safe-area-inset-top)); }
+.story-screen__chapter { padding-top: 12vh; }
+.story-intro { padding-top: 22px; }
+.story-intro h1 { font-size: clamp(58px, 17vw, 78px); }
+.story-intro__sub { font-size: 15px; }
+.reveal-hint { margin-top: 42px; min-height: 46px; }
+.story-footer { margin-top: 8vh; padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
+.prep-sheet { position: fixed; z-index: 5; right: 12px; bottom: calc(78px + env(safe-area-inset-bottom)); width: calc(100% - 24px); max-height: min(540px, calc(100dvh - 112px)); overflow: auto; }
+.prep-item { min-height: 54px; }
+.finish-button { min-height: 54px !important; }
+.story-footer button { min-height: 44px; }
+
+/* Mobile composition: image first, readable content in a dedicated lower panel. */
+@media (max-width: 799px) {
+  .story-screen__gradient { background: linear-gradient(180deg, rgba(10,27,23,.5) 0%, rgba(10,27,23,.02) 34%, rgba(10,27,23,.3) 50%, #142e28 70%); }
+  .story-screen__chapter { padding-top: 10vh; }
+  .story-intro { position: absolute; z-index: 2; left: 0; right: 0; bottom: 142px; padding: 25px 28px 20px; background: linear-gradient(180deg, rgba(20,46,40,0) 0%, rgba(20,46,40,.92) 24%, #142e28 100%); }
+  .story-intro__eyebrow { margin-bottom: 9px; font-size: 12px; }
+  .story-intro h1 { font-size: clamp(51px, 15vw, 70px); line-height: .86; letter-spacing: -.065em; }
+  .story-intro__sub { margin-top: 15px; font-size: 14px; line-height: 1.4; }
+  .reveal-hint { position: absolute; z-index: 3; left: 28px; right: 28px; bottom: 82px; width: auto; margin: 0; justify-content: space-between; }
+  .story-footer { position: absolute; z-index: 2; left: 28px; right: 28px; bottom: calc(12px + env(safe-area-inset-bottom)); margin: 0; padding: 0; }
+}
+
+@media (min-width: 800px) {
+  .story-screen__chapter { padding-top: 14vh; }
+  .story-intro h1 { font-size: clamp(76px, 9vw, 128px); }
+  .prep-sheet { position: absolute; right: max(28px, calc((100vw - 1180px) / 2)); bottom: 112px; width: 410px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .story-hero:hover .story-hero__visual img { transform: none; }
+}
