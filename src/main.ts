@@ -4,41 +4,8 @@ import '@mdi/font/css/materialdesignicons.css'
 import { createVuetify } from 'vuetify'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
 import App from './App.vue'
-import './styles.css'
-import './motion.css'
-import './art-direction.css'
-import './pwa.css'
-import './home.css'
-import './home-overrides.css'
-import './home-discovery.css'
-import './scene.css'
-import './fresh-home.css'
-import './opening-home.css'
-import './opening-tweaks.css'
-import './mobile-finish.css'
-import './hero-framing.css'
-import './spacing-fix.css'
-import './layout-correction.css'
-import './readability-fix.css'
-import './spacing-tight.css'
-import './opening-layout.css'
-import './app-home-polish.css'
-import './da-final-pass.css'
-import './magic-seal.css'
-import './fingerprint-pulse.css'
-import './opening-minimal-header.css'
-import './opening-no-header.css'
-import './seal-refinement.css'
-import './seal-clean.css'
-import './seal-fingerprint-fix.css'
-import './seal-fingerprint-visible.css'
-import './seal-fingerprint-scale.css'
-import './seal-real-fingerprint.css'
-import './seal-fingerprint-direct.css'
-import './seal-mdi-final.css'
-import './seal-mdi-source-fix.css'
-import './seal-mdi-direct-render.css'
-import './seal-fingerprint-position.css'
+import { router } from './router'
+import './styles/base.css'
 
 const vuetify = createVuetify({
   theme: {
@@ -61,7 +28,7 @@ const vuetify = createVuetify({
   icons: { defaultSet: 'mdi', aliases, sets: { mdi } },
 })
 
-createApp(App).use(vuetify).mount('#app')
+createApp(App).use(vuetify).use(router).mount('#app')
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'))

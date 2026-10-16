@@ -1,3 +1,0 @@
-.opening-entry{bottom:calc(92px + env(safe-area-inset-bottom));padding-top:0}
-.opening-entry p{margin-bottom:18px}
-@media (max-height:700px){.opening-entry{bottom:calc(78px + env(safe-area-inset-bottom))}}
