@@ -44,12 +44,9 @@ async function copyMessage() {
       <button class="back-link" type="button" @click="goBack"><i class="mdi mdi-chevron-left" aria-hidden="true" /> Retour</button>
       <template v-if="sheet">
         <div class="activity-hero">
-          <span class="day-medal" aria-hidden="true">J{{ sheet.day }}</span>
-          <div>
-            <p class="home-overline">FICHE DU JOUR</p>
-            <h1>{{ sheet.title }}</h1>
-            <p class="activity-date">{{ sheet.date }}</p>
-          </div>
+          <p class="home-overline">JOUR {{ sheet.day }} · FICHE DU JOUR</p>
+          <h1>{{ sheet.title }}</h1>
+          <p class="activity-date">{{ sheet.date }}</p>
         </div>
       </template>
       <template v-else>
@@ -61,8 +58,9 @@ async function copyMessage() {
     <template v-if="sheet">
       <!-- Le mot du lutin : parchemin chaud -->
       <section class="letter" aria-labelledby="message-title">
-        <i class="letter-quote mdi mdi-format-quote-open" aria-hidden="true" />
-        <div class="letter-label"><span id="message-title">LE MOT DU LUTIN</span><i class="mdi mdi-message-text-outline" aria-hidden="true" /></div>
+        <span class="wax-seal" aria-hidden="true"><b>J{{ sheet.day }}</b></span>
+        <span class="postmark" aria-hidden="true"><b>POSTE DU<br />PÔLE NORD</b><small>{{ sheet.date }}</small></span>
+        <div class="letter-label"><span id="message-title">LE MOT DU LUTIN</span></div>
         <blockquote>{{ sheet.message }}</blockquote>
         <div class="letter-foot">
           <span class="letter-sign">— depuis la route</span>
@@ -73,8 +71,9 @@ async function copyMessage() {
         </div>
       </section>
 
-      <section class="app-card prep-card" :class="{ done: preparationDone }" aria-labelledby="prep-title">
-        <div class="section-label"><span id="prep-title">LA VEILLE, CÔTÉ ADULTES</span><i class="mdi mdi-eye-off-outline" aria-hidden="true" /></div>
+      <section class="carnet" :class="{ done: preparationDone }" aria-labelledby="prep-title">
+        <i class="carnet-ribbon" aria-hidden="true" />
+        <div class="section-label"><span id="prep-title">LE CARNET SECRET DES LUTINS</span><i class="mdi mdi-book-lock-outline" aria-hidden="true" /></div>
         <p class="activity-copy">{{ sheet.adultPreparation }}</p>
         <button class="done-row" type="button" :class="{ done: preparationDone }" @click="togglePreparation">
           <span class="done-check"><i v-if="preparationDone" class="mdi mdi-check" aria-hidden="true" /></span>
@@ -185,22 +184,7 @@ async function copyMessage() {
 
 .activity-hero {
   display:flex;
-  align-items:center;
-  gap:16px
-}
-
-.day-medal {
-  display:grid;
-  place-items:center;
-  flex:0 0 auto;
-  width:62px;
-  height:62px;
-  border-radius:50%;
-  background:radial-gradient(circle at 35% 30%,#ffe9a8,#e6c280 55%,#b8914a);
-  color:#3d2b12;
-  font:700 17px var(--font-serif);
-  letter-spacing:-.01em;
-  box-shadow:0 0 0 4px rgba(230,194,128,.15),0 0 22px rgba(255,215,0,.35),inset 0 2px 3px rgba(255,255,255,.5),inset 0 -3px 6px rgba(120,80,20,.35)
+  flex-direction:column
 }
 
 .activity-hero h1 {
@@ -225,33 +209,111 @@ async function copyMessage() {
   color:#f7efdb
 }
 
-/* ---- le mot du lutin : parchemin ---- */
+/* ---- le mot du lutin : artefact parchemin ---- */
 .letter {
   position:relative;
-  margin-top:24px;
-  padding:22px 20px 18px;
-  border-radius:18px;
-  background:linear-gradient(160deg,#f8eed8,#efe0bd 70%,#e9d5ac);
+  margin-top:30px;
+  padding:34px 24px 20px;
+  border-radius:5px 20px 8px 26px / 20px 7px 26px 9px;
+  background:
+    radial-gradient(ellipse 60% 40% at 18% 10%,rgba(255,252,238,.75),transparent 60%),
+    radial-gradient(ellipse 50% 45% at 88% 92%,rgba(196,152,82,.28),transparent 60%),
+    repeating-linear-gradient(0deg,transparent 0 3px,rgba(120,80,30,.022) 3px 4px),
+    repeating-linear-gradient(90deg,transparent 0 5px,rgba(120,80,30,.018) 5px 6px),
+    linear-gradient(160deg,#f6ecd2 0%,#eedfb8 55%,#e2cd9e 100%);
   color:#3a2d18;
-  box-shadow:0 18px 40px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.7),inset 0 -1px 0 rgba(160,120,60,.25);
-  overflow:hidden
+  box-shadow:
+    0 22px 44px rgba(0,0,0,.5),
+    inset 0 0 0 1px rgba(150,110,50,.4),
+    inset 0 0 34px rgba(120,78,28,.22),
+    inset 0 1px 0 rgba(255,255,255,.65);
+  overflow:visible
+}
+
+/* bord "brûlé" irrégulier */
+.letter::after {
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  box-shadow:
+    inset 0 0 14px rgba(96,58,16,.3),
+    inset 0 -6px 18px rgba(120,72,22,.28),
+    inset 4px 0 14px rgba(96,58,16,.18);
+  pointer-events:none
 }
 
 .letter::before {
   content:'';
   position:absolute;
-  inset:6px;
-  border:1px solid rgba(140,105,45,.28);
-  border-radius:12px;
+  inset:8px;
+  border:1px solid rgba(140,105,45,.3);
+  border-radius:4px 14px 6px 18px / 14px 5px 18px 7px;
   pointer-events:none
 }
 
-.letter-quote {
+/* sceau de cire */
+.wax-seal {
   position:absolute;
-  top:14px;
-  right:16px;
-  color:rgba(140,105,45,.35);
-  font-size:30px
+  z-index:2;
+  top:-20px;
+  left:16px;
+  display:grid;
+  place-items:center;
+  width:62px;
+  height:62px;
+  border-radius:46% 54% 50% 50% / 52% 47% 55% 45%;
+  background:radial-gradient(circle at 34% 28%,#c1503a,#8a2b1a 52%,#5e150c 85%);
+  box-shadow:
+    0 8px 16px rgba(0,0,0,.45),
+    inset 0 2px 4px rgba(255,255,255,.3),
+    inset 0 -5px 9px rgba(0,0,0,.4);
+  transform:rotate(-7deg)
+}
+
+.wax-seal::before {
+  content:'';
+  position:absolute;
+  inset:7px;
+  border:2px solid rgba(255,222,190,.32);
+  border-radius:52% 48% 55% 45% / 48% 53% 47% 52%
+}
+
+.wax-seal b {
+  color:#f4d8c0;
+  font:700 19px/1 var(--font-literary);
+  letter-spacing:.02em;
+  text-shadow:0 -1px 1px rgba(0,0,0,.5),0 1px 0 rgba(255,220,190,.2)
+}
+
+/* tampon postal vintage */
+.postmark {
+  position:absolute;
+  z-index:1;
+  top:16px;
+  right:14px;
+  display:grid;
+  place-items:center;
+  align-content:center;
+  gap:3px;
+  width:88px;
+  height:88px;
+  border:2px solid rgba(96,62,20,.42);
+  border-radius:50%;
+  box-shadow:inset 0 0 0 1.5px rgba(96,62,20,.28);
+  color:rgba(96,62,20,.7);
+  font:700 7.5px/1.3 var(--font-sans);
+  letter-spacing:.13em;
+  text-align:center;
+  transform:rotate(10deg);
+  opacity:.6;
+  mix-blend-mode:multiply;
+  pointer-events:none
+}
+
+.postmark small {
+  font:italic 500 8.5px var(--font-literary);
+  letter-spacing:.02em
 }
 
 .letter-label {
@@ -264,22 +326,23 @@ async function copyMessage() {
   letter-spacing:.16em
 }
 
-.letter-label i {
-  font-size:16px;
-  font-weight:400
-}
-
 .letter blockquote {
-  margin:16px 0 0;
-  font:400 17px/1.55 var(--font-serif);
-  color:#3d2f16
+  margin:18px 0 0;
+  font:italic 500 19px/1.62 var(--font-literary);
+  color:#39290f
 }
 
+/* lettrine à la feuille d'or */
 .letter blockquote::first-letter {
   float:left;
-  margin:3px 8px 0 0;
-  font:500 44px/.8 var(--font-serif);
-  color:#9a742e
+  margin:6px 10px 2px 0;
+  padding:2px 4px;
+  background:linear-gradient(160deg,#ffe9a8 0%,#d9ad55 45%,#a67d34 75%,#7a5a20 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  font:700 52px/.75 var(--font-literary);
+  -webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 1px 0 rgba(255,246,214,.6)) drop-shadow(0 0 6px rgba(212,175,95,.35))
 }
 
 .letter-foot {
@@ -325,6 +388,49 @@ async function copyMessage() {
   box-shadow:none
 }
 
+/* ---- carnet secret des lutins ---- */
+.carnet {
+  position:relative;
+  margin-top:22px;
+  padding:20px 20px 16px;
+  border:1px dashed rgba(230,194,128,.4);
+  border-radius:6px 16px 10px 18px / 16px 6px 18px 10px;
+  background:
+    repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,0,0,.06) 3px 4px),
+    linear-gradient(150deg,#3d2f1d 0%,#322513 55%,#2a1d0e 100%);
+  box-shadow:0 14px 34px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,240,210,.1);
+  color:#e8d9b8;
+  transition:border-color .3s,box-shadow .3s
+}
+
+.carnet .section-label {
+  color:#e6c280
+}
+
+.carnet.done {
+  border-color:rgba(230,194,128,.6);
+  box-shadow:0 14px 34px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,240,210,.1),0 0 26px rgba(255,215,0,.14)
+}
+
+.carnet-ribbon {
+  position:absolute;
+  top:-7px;
+  right:30px;
+  width:15px;
+  height:42px;
+  background:linear-gradient(180deg,#b03a2b,#7e2417);
+  clip-path:polygon(0 0,100% 0,100% 100%,50% 80%,0 100%);
+  box-shadow:0 3px 6px rgba(0,0,0,.35)
+}
+
+.carnet .activity-copy {
+  color:rgba(240,225,190,.92)
+}
+
+.carnet .done-row {
+  border-top:1px dashed rgba(230,194,128,.25)
+}
+
 /* ---- sections verre ---- */
 .app-card {
   margin-top:18px
@@ -343,11 +449,6 @@ async function copyMessage() {
 .section-label i {
   font-size:17px;
   font-weight:400
-}
-
-.prep-card.done {
-  border-color:rgba(230,194,128,.45);
-  box-shadow:0 14px 36px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.07),0 0 24px rgba(255,215,0,.12)
 }
 
 .activity-copy {

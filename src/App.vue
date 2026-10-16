@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import AmbientDust from './components/AmbientDust.vue'
 
 const router = useRouter()
 const fromName = ref<string>()
@@ -15,6 +16,7 @@ const transitionName = computed(() => (fromName.value === 'opening' ? 'page' : '
 
 <template>
   <v-app class="app-shell">
+    <AmbientDust />
     <router-view v-slot="{ Component, route }">
       <transition :name="transitionName" mode="out-in">
         <component :is="Component" :key="route.path" />
