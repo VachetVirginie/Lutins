@@ -243,7 +243,7 @@ function printAsset(file: string) {
   padding:0;
   border:0;
   background:none;
-  color:rgba(255,255,255,.62);
+  color:rgba(255,255,255,.8);
   font-family:inherit;
   font-size:12px;
   cursor:pointer;
@@ -259,19 +259,24 @@ function printAsset(file: string) {
   flex-direction:column
 }
 
+.activity-hero .home-overline {
+  font-size:11px;
+  letter-spacing:.14em
+}
+
 .activity-hero h1 {
   margin:6px 0 0;
-  font:500 27px/1.08 var(--font-serif);
+  font:500 26px/1.08 var(--font-serif);
   letter-spacing:-.02em;
-  color:#f7efdb
+  color:#fff
 }
 
 .activity-date {
   margin:9px 0 0;
   color:var(--color-gold);
-  font-size:10px;
+  font-size:12px;
   font-weight:600;
-  letter-spacing:.15em;
+  letter-spacing:.1em;
   text-transform:uppercase
 }
 
@@ -384,7 +389,7 @@ function printAsset(file: string) {
 .wax-seal {
   position:absolute;
   z-index:2;
-  top:-20px;
+  top:-10px;
   left:16px;
   display:grid;
   place-items:center;
@@ -434,7 +439,7 @@ function printAsset(file: string) {
   font:700 7.5px/1.3 var(--font-sans);
   letter-spacing:.13em;
   text-align:center;
-  transform:rotate(10deg);
+  transform:rotate(-12deg);
   opacity:.6;
   mix-blend-mode:multiply;
   pointer-events:none
@@ -458,7 +463,7 @@ function printAsset(file: string) {
 .letter blockquote {
   margin:18px 0 0;
   font:italic 500 19px/1.62 var(--font-literary);
-  color:#39290f
+  color:#3a2818
 }
 
 /* lettrine à la feuille d'or */
@@ -496,8 +501,8 @@ function printAsset(file: string) {
   padding:9px 16px;
   border:1px solid #8c6b3d;
   border-radius:999px;
-  background:linear-gradient(135deg,#e6c280,#d4af5f);
-  color:#3a2d18;
+  background:#e6c280;
+  color:#3a2818;
   font-size:11px;
   font-weight:700;
   cursor:pointer;
@@ -522,11 +527,11 @@ function printAsset(file: string) {
   position:relative;
   margin-top:22px;
   padding:20px 20px 16px;
-  border:1px dashed rgba(230,194,128,.4);
+  border:1px dashed rgba(230,194,128,.3);
   border-radius:6px 16px 10px 18px / 16px 6px 18px 10px;
   background:
     repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,0,0,.06) 3px 4px),
-    linear-gradient(150deg,#3d2f1d 0%,#322513 55%,#2a1d0e 100%);
+    linear-gradient(150deg,#2a1c10 0%,#231710 55%,#1a100b 100%);
   box-shadow:0 14px 34px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,240,210,.1);
   color:#e8d9b8;
   transition:border-color .3s,box-shadow .3s
@@ -569,8 +574,8 @@ function printAsset(file: string) {
 
 .carnet-ribbon {
   position:absolute;
-  top:-7px;
-  right:30px;
+  top:0;
+  right:24px;
   width:15px;
   height:42px;
   background:linear-gradient(180deg,#b03a2b,#7e2417);
@@ -588,7 +593,11 @@ function printAsset(file: string) {
 
 /* ---- sections verre ---- */
 .app-card {
-  margin-top:18px
+  margin-top:18px;
+  border-color:rgba(255,255,255,.1);
+  border-radius:16px;
+  background:rgba(255,255,255,.05);
+  backdrop-filter:blur(12px)
 }
 
 .section-label {
@@ -634,10 +643,25 @@ function printAsset(file: string) {
   place-items:center;
   width:21px;
   height:21px;
-  border:1px solid #ffffff45;
+  border:1.5px solid #e6c280;
   border-radius:50%;
   color:#173b32;
   transition:background .25s,box-shadow .25s,border-color .25s
+}
+
+.done-check i {
+  animation:check-pop .3s var(--spring)
+}
+
+@keyframes check-pop {
+  from {
+    transform:scale(.4);
+    opacity:0
+  }
+  to {
+    transform:scale(1);
+    opacity:1
+  }
 }
 
 .done-row.done {
@@ -861,10 +885,10 @@ function printAsset(file: string) {
   gap:11px;
   margin-top:18px;
   padding:14px;
-  border:1px dashed #e6c28066;
+  border:1px dashed rgba(255,255,255,.2);
   border-radius:16px;
-  background:#e6c28008;
-  color:#e6c280
+  background:rgba(255,255,255,.03);
+  color:rgba(255,255,255,.7)
 }
 
 .content-gap>i {

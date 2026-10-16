@@ -1,4 +1,8 @@
-export interface KitAsset { file: string; label: string; page: number }
+export interface KitAsset {
+  file: string
+  label: string
+  page: number
+}
 
 export interface DailySheet {
   day: number
@@ -13,838 +17,904 @@ export interface DailySheet {
 /** Source éditoriale vérifiée dans Le-voyage-des-lutins-Louis-70-jours.pdf. */
 export const dailySheets: Record<number, DailySheet> = {
   1: {
-    "day": 1,
-    "date": "SAMEDI 17 OCTOBRE 2026",
-    "title": "L'Alerte du Pôle Nord",
-    "adultPreparation": "Glisser la lettre dans la boîte aux lettres (dans une enveloppe rouge ou kraft, avec un tampon ou dessin de flocon).",
-    "message": "Ho Ho Ho ! Bonjour mon cher Louis, Je t’écris cette lettre en urgence depuis le Pôle Nord. Ce matin, en faisant l’appel dans l’atelier de jouets, un de mes lutins manquait à l’appel ! Après vérification, il a laissé un petit mot : il paraît qu’il a entendu dire que tu étais un petit garçon très courageux et rigolo à Lyon, et il a décidé de s’échapper pour venir te rencontrer ! Il est très gourmand et un brin farceur. Il s’est mis en route aujourd’hui même. Garde bien l’œil ouvert sur la boîte aux lettres, il risque de t’envoyer des nouvelles de son voyage... et prépare-toi à l’accueillir bientôt chez toi ! Avec toute mon affection, Le Père Noël",
-    "assets": [],
-    "gifts": []
+    day: 1,
+    date: 'SAMEDI 17 OCTOBRE 2026',
+    title: "L'Alerte du Pôle Nord",
+    adultPreparation:
+      'Glisser la lettre dans la boîte aux lettres (dans une belle enveloppe rouge ou kraft, scellée d’un tampon ou d’un dessin de flocon).',
+    message:
+      'Ho Ho Ho ! Bonjour mon cher Louis,\n\nJe t’écris cette lettre en urgence depuis le Pôle Nord. Ce matin, en faisant l’appel dans l’atelier de jouets, un de mes lutins manquait à l’appel ! Après vérification, il a laissé un petit mot : il paraît qu’il a entendu dire que tu étais un petit garçon très courageux et rigolo à Lyon, et il a décidé de s’échapper pour venir te rencontrer ! Il est très gourmand et un brin farceur. Il s’est mis en route aujourd’hui même.\n\nGarde bien l’œil ouvert sur la boîte aux lettres, il risque de t’envoyer des nouvelles de son voyage... et prépare-toi à l’accueillir bientôt chez toi !\n\nAvec toute mon affection,\nLe Père Noël',
+    assets: [],
+    gifts: [],
   },
   2: {
-    "day": 2,
-    "date": "DIMANCHE 18 OCTOBRE 2026",
-    "title": "La Préparation du Sac",
-    "adultPreparation": "Imprimer une image d'un petit sac à dos au pied d'un sapin enneigé. À joindre : Carte A : sac à dos (annexes).",
-    "message": "Coucou Louis ! C'est moi, le lutin ! Le Père Noël t'a écrit ? Je prépare mon sac avec du pain d'épices pour le grand voyage vers Lyon !",
-    "assets": [
+    day: 2,
+    date: 'DIMANCHE 18 OCTOBRE 2026',
+    title: 'La Préparation du Sac',
+    adultPreparation:
+      'Glisser dans la boîte aux lettres l’illustration imprimée du sac de voyage. À joindre : Carte A (sac à dos).',
+    message:
+      "Coucou Louis ! C'est moi, le lutin ! Le Père Noël t'a écrit ? Je prépare mon sac avec un bon morceau de pain d'épices pour le grand voyage vers Lyon !",
+    assets: [
       {
-        "file": "/assets/printables/annexe-74.png",
-        "label": "Carte du sac de voyage",
-        "page": 74
-      }
+        file: '/assets/printables/annexe-74.png',
+        label: 'Carte du sac de voyage',
+        page: 74,
+      },
     ],
-    "gifts": [
-      "Pain d’épices"
-    ]
+    gifts: ['Pain d’épices'],
   },
   3: {
-    "day": 3,
-    "date": "LUNDI 19 OCTOBRE 2026",
-    "title": "Le Départ en Traîneau",
-    "adultPreparation": "Une carte imprimée avec une illustration de paysages enneigés + un coloriage de lutin à faire. À joindre : Carte H : Pôle Nord + coloriage (annexes).",
-    "message": "Je monte à bord du traîneau d'entraînement ! Prochaine étape : la banquise. Je t'ai mis un coloriage de moi pour que tu puisses décorer ta chambre !",
-    "assets": [
+    day: 3,
+    date: 'LUNDI 19 OCTOBRE 2026',
+    title: 'Le Départ en Traîneau',
+    adultPreparation:
+      'Déposer la carte des paysages enneigés ainsi que le coloriage du lutin. À joindre : Carte H (Pôle Nord) + Coloriage.',
+    message:
+      "Je monte à bord du traîneau d'entraînement ! Prochaine étape : la traversée de la banquise. Je t'ai glissé un coloriage de moi pour que tu puisses décorer ta chambre !",
+    assets: [
       {
-        "file": "/assets/printables/annexe-81.png",
-        "label": "Carte du départ du Pôle Nord",
-        "page": 81
+        file: '/assets/printables/annexe-81.png',
+        label: 'Carte du départ du Pôle Nord',
+        page: 81,
       },
       {
-        "file": "/assets/printables/annexe-82.png",
-        "label": "Coloriage du lutin",
-        "page": 82
-      }
+        file: '/assets/printables/annexe-82.png',
+        label: 'Coloriage du lutin',
+        page: 82,
+      },
     ],
-    "gifts": []
+    gifts: [],
   },
   4: {
-    "day": 4,
-    "date": "MARDI 20 OCTOBRE 2026",
-    "title": "La Première Pause goûter",
-    "adultPreparation": "Petit papier plié dans la boîte aux lettres.",
-    "message": "Brrr, il fait très froid sur la banquise ! J'ai dû m'arrêter pour manger un biscuit. Et toi, tu as pris un bon goûter aujourd'hui ?",
-    "assets": [],
-    "gifts": [
-      "Biscuit"
-    ]
+    day: 4,
+    date: 'MARDI 20 OCTOBRE 2026',
+    title: 'La Première Pause goûter',
+    adultPreparation:
+      'Glisser un petit mot soigneusement plié dans la boîte aux lettres.',
+    message:
+      "Brrr, il fait très froid sur la banquise ! J'ai dû m'arrêter un instant pour déguster un délicieux biscuit. Et toi, tu as pris un bon goûter aujourd'hui ?",
+    assets: [],
+    gifts: ['Biscuit'],
   },
   5: {
-    "day": 5,
-    "date": "MERCREDI 21 OCTOBRE 2026",
-    "title": "Le Crayon Magique",
-    "adultPreparation": "Déposer un crayon de couleur rigolo ou un stylo 4 couleurs dans la boîte.",
-    "message": "Un petit outil magique pour que tu puisses me faire des dessins pendant que je voyage !",
-    "assets": [],
-    "gifts": [
-      "Crayon de couleur rigolo ou stylo 4 couleurs"
-    ]
+    day: 5,
+    date: 'MERCREDI 21 OCTOBRE 2026',
+    title: 'Le Crayon Magique',
+    adultPreparation:
+      'Déposer un crayon de couleur rigolo ou un stylo 4 couleurs magique dans la boîte.',
+    message:
+      'Voici un outil magique pour que tu puisses me dessiner de beaux chefs-d’œuvre pendant que je voyage !',
+    assets: [],
+    gifts: ['Crayon de couleur rigolo ou stylo 4 couleurs'],
   },
   6: {
-    "day": 6,
-    "date": "JEUDI 22 OCTOBRE 2026",
-    "title": "La Boussole du Lutin",
-    "adultPreparation": "Une petite boussole jouet ou un dessin de boussole. À joindre : Boussole (annexes).",
-    "message": "Ma boussole m’aide à m’orienter : son aiguille indique le nord. Pour rejoindre Lyon, je poursuis mon voyage vers le sud !",
-    "assets": [
+    day: 6,
+    date: 'JEUDI 22 OCTOBRE 2026',
+    title: 'La Boussole du Lutin',
+    adultPreparation:
+      'Déposer une petite boussole jouet ou l’illustration de boussole. À joindre : Carte Boussole.',
+    message:
+      'Ma boussole m’aide à m’orienter : son aiguille indique le nord. Pour rejoindre Lyon, je poursuis mon voyage tout droit vers le sud !',
+    assets: [
       {
-        "file": "/assets/printables/annexe-83.png",
-        "label": "Boussole du voyageur",
-        "page": 83
-      }
+        file: '/assets/printables/annexe-83.png',
+        label: 'Boussole du voyageur',
+        page: 83,
+      },
     ],
-    "gifts": [
-      "Petite boussole jouet (optionnelle)"
-    ]
+    gifts: ['Petite boussole jouet (optionnelle)'],
   },
   7: {
-    "day": 7,
-    "date": "VENDREDI 23 OCTOBRE 2026",
-    "title": "Traversée des Montagnes",
-    "adultPreparation": "Déposer la photo dans la boîte. À joindre : Carte B : montagnes (annexes).",
-    "message": "J'escalade des montagnes géantes ! Mes petites jambes de lutin sont fatiguées, mais je pense à toi et ça me donne du courage.",
-    "assets": [
+    day: 7,
+    date: 'VENDREDI 23 OCTOBRE 2026',
+    title: 'Traversée des Montagnes',
+    adultPreparation:
+      'Déposer la carte des montagnes enneigées dans la boîte. À joindre : Carte B (montagnes).',
+    message:
+      'J’escalade de magnifiques montagnes géantes ! Mes petites jambes de lutin sont un peu fatiguées, mais penser à toi me donne tout le courage nécessaire.',
+    assets: [
       {
-        "file": "/assets/printables/annexe-75.png",
-        "label": "Carte des montagnes enneigées",
-        "page": 75
-      }
+        file: '/assets/printables/annexe-75.png',
+        label: 'Carte des montagnes enneigées',
+        page: 75,
+      },
     ],
-    "gifts": []
+    gifts: [],
   },
   8: {
-    "day": 8,
-    "date": "SAMEDI 24 OCTOBRE 2026",
-    "title": "La Pause Chocolat Chaud",
-    "adultPreparation": "Un sachet de chocolat en poudre et quelques mini-marshmallows dans un petit sac congélation.",
-    "message": "Réchauffons-nous ensemble ! Demande à maman ou papa de te faire un chocolat chaud avec ces marshmallows. Moi, j'en ai bu un grand bol !",
-    "assets": [],
-    "gifts": [
-      "Chocolat en poudre",
-      "Mini-marshmallows"
-    ]
+    day: 8,
+    date: 'SAMEDI 24 OCTOBRE 2026',
+    title: 'La Pause Chocolat Chaud',
+    adultPreparation:
+      'Glisser un sachet de chocolat en poudre et quelques mini-marshmallows dans un petit sachet festif.',
+    message:
+      'Réchauffons-nous ensemble ! Demande à maman ou papa de te préparer un bon chocolat chaud avec ces marshmallows. Moi, j’en ai bu un grand bol fumant !',
+    assets: [],
+    gifts: ['Chocolat en poudre', 'Mini-marshmallows'],
   },
   9: {
-    "day": 9,
-    "date": "DIMANCHE 25 OCTOBRE 2026",
-    "title": "Le Bateau des Glaces",
-    "adultPreparation": "Fabriquer un petit bateau en papier plié et le glisser dans la boîte. À joindre : Bateau en papier (annexes).",
-    "message": "J'ai dû prendre un bateau pour traverser l'océan d'eau glacée. Tu peux faire voguer ce bateau dans ton bain ce soir !",
-    "assets": [
+    day: 9,
+    date: 'DIMANCHE 25 OCTOBRE 2026',
+    title: 'Le Bateau des Glaces',
+    adultPreparation:
+      'Fabriquer un petit bateau en papier plié et le glisser dans la boîte. À joindre : Bateau en papier.',
+    message:
+      "J'ai dû monter à bord d'un bateau pour traverser l'océan d'eau glacée. Tu peux faire voguer ce petit bateau dans ton bain ce soir !",
+    assets: [
       {
-        "file": "/assets/printables/annexe-84.png",
-        "label": "Bateau en papier",
-        "page": 84
-      }
+        file: '/assets/printables/annexe-84.png',
+        label: 'Bateau en papier',
+        page: 84,
+      },
     ],
-    "gifts": []
+    gifts: [],
   },
   10: {
-    "day": 10,
-    "date": "LUNDI 26 OCTOBRE 2026",
-    "title": "L'Étoile du Soir",
-    "adultPreparation": "Déposer une étoile lumineuse dans la boîte. À joindre : Étoiles (annexes).",
-    "message": "Quand la nuit tombe, je regarde les étoiles pour trouver mon chemin. Colle cette étoile près de ton lit !",
-    "assets": [
+    day: 10,
+    date: 'LUNDI 26 OCTOBRE 2026',
+    title: "L'Étoile du Soir",
+    adultPreparation:
+      'Déposer une petite étoile lumineuse ou phosphorescente dans la boîte. À joindre : Planche d’étoiles.',
+    message:
+      'Quand la nuit tombe, je contemple les étoiles pour retrouver mon chemin. Colle cette étoile au-dessus de ton lit pour qu’elle veille sur tes rêves !',
+    assets: [
       {
-        "file": "/assets/printables/annexe-85.png",
-        "label": "Étoiles et clé magique",
-        "page": 85
-      }
+        file: '/assets/printables/annexe-85.png',
+        label: 'Étoiles et clé magique',
+        page: 85,
+      },
     ],
-    "gifts": [
-      "Étoile lumineuse"
-    ]
+    gifts: ['Étoile lumineuse'],
   },
   11: {
-    "day": 11,
-    "date": "MARDI 27 OCTOBRE 2026",
-    "title": "La Tempête de Neige",
-    "adultPreparation": "Enveloppe contenant du coton effiloché.",
-    "message": "Ouh la la ! Une grosse tempête de neige m'a ralenti aujourd'hui ! Je me suis caché sous un sapin.",
-    "assets": [],
-    "gifts": []
+    day: 11,
+    date: 'MARDI 27 OCTOBRE 2026',
+    title: 'La Tempête de Neige',
+    adultPreparation: 'Glisser dans l’enveloppe du coton effiloché comme un flocon de neige.',
+    message:
+      'Ouh la la ! Une grosse tempête de neige m’a ralenti aujourd’hui ! Je me suis réfugié sous un grand sapin bien à l’abri.',
+    assets: [],
+    gifts: [],
   },
   12: {
-    "day": 12,
-    "date": "MERCREDI 28 OCTOBRE 2026",
-    "title": "L'Escale chez les Monstres Gentils",
-    "adultPreparation": "Une carte imprimée avec un petit monstre rigolo et coloré. À joindre : Carte C : monstres gentils (annexes).",
-    "message": "Je suis arrivé dans une forêt magique où la fête d'Halloween se prépare. J'ai rencontré des monstres très gentils qui adorent les bonbons !",
-    "assets": [
+    day: 12,
+    date: 'MERCREDI 28 OCTOBRE 2026',
+    title: 'L’Escale chez les Monstres Gentils',
+    adultPreparation:
+      'Imprimer et déposer la carte du monstre rigolo. À joindre : Carte C (monstres gentils).',
+    message:
+      "Je suis arrivé dans une forêt enchantée où l'on prépare la fête d'Halloween. J'y ai rencontré des monstres très gentils qui adorent les bonbons !",
+    assets: [
       {
-        "file": "/assets/printables/annexe-76.png",
-        "label": "Carte des monstres gentils",
-        "page": 76
-      }
+        file: '/assets/printables/annexe-76.png',
+        label: 'Carte des monstres gentils',
+        page: 76,
+      },
     ],
-    "gifts": []
+    gifts: [],
   },
   13: {
-    "day": 13,
-    "date": "JEUDI 29 OCTOBRE 2026",
-    "title": "La Rencontre du Lutin de Nîmes !",
-    "adultPreparation": "Image imprimée montrant deux lutins avec des panneaux \"Nîmes\" et \"Lyon\". À joindre : Carte D : rencontre (annexes).",
-    "message": "Incroyable Louis ! J'ai croisé un autre lutin du Père Noël ! Il m'a dit qu'il filait vers Nîmes pour aller chez Papi et Mamie Coco ! On a mangé un bout de pain d'épices ensemble. Lui prend le chemin de Nîmes, et moi je continue vers Lyon !",
-    "assets": [
+    day: 13,
+    date: 'JEUDI 29 OCTOBRE 2026',
+    title: 'La Rencontre du Lutin de Nîmes !',
+    adultPreparation:
+      'Déposer l’image montrant les deux lutins avec leurs panneaux indicateurs. À joindre : Carte D (rencontre).',
+    message:
+      'Incroyable Louis ! J’ai croisé un autre lutin du Père Noël ! Il m’a confié qu’il filait vers Nîmes pour aller chez Papi et Mamie Coco ! On a partagé un morceau de pain d’épices. Lui prend le chemin du sud-ouest, et moi je poursuis droit vers Lyon !',
+    assets: [
       {
-        "file": "/assets/printables/annexe-77.png",
-        "label": "Carte de la rencontre des deux chemins",
-        "page": 77
-      }
+        file: '/assets/printables/annexe-77.png',
+        label: 'Carte de la rencontre des deux chemins',
+        page: 77,
+      },
     ],
-    "gifts": [
-      "Pain d’épices"
-    ]
+    gifts: ['Pain d’épices'],
   },
   14: {
-    "day": 14,
-    "date": "VENDREDI 30 OCTOBRE 2026",
-    "title": "L'Emporte-Pièce Citrouille",
-    "adultPreparation": "Un emporte-pièce en forme de citrouille ou de fantôme.",
-    "message": "Un petit cadeau de la part du lutin de Nîmes et de moi ! Préparez des gâteaux rigolos pour ce week-end !",
-    "assets": [],
-    "gifts": [
-      "Emporte-pièce citrouille ou fantôme"
-    ]
+    day: 14,
+    date: 'VENDREDI 30 OCTOBRE 2026',
+    title: "L'Emporte-Pièce Citrouille",
+    adultPreparation: 'Déposer un emporte-pièce en forme de citrouille ou de fantôme.',
+    message:
+      'Un petit cadeau surprise de la part du lutin de Nîmes et de moi-même ! Préparez de délicieux gâteaux rigolos pour ce week-end !',
+    assets: [],
+    gifts: ['Emporte-pièce citrouille ou fantôme'],
   },
   15: {
-    "day": 15,
-    "date": "SAMEDI 31 OCTOBRE 2026",
-    "title": "La Distribution de Bonbons",
-    "adultPreparation": "Déposer 2 ou 3 bonbons d'Halloween dans la boîte.",
-    "message": "Joyeux Halloween Louis ! Je quitte la forêt des monstres et j'entre en France !",
-    "assets": [],
-    "gifts": [
-      "2 ou 3 bonbons d’Halloween"
-    ]
+    day: 15,
+    date: 'SAMEDI 31 OCTOBRE 2026',
+    title: 'La Distribution de Bonbons',
+    adultPreparation: "Déposer 2 ou 3 bonbons d'Halloween dans la boîte aux lettres.",
+    message:
+      'Joyeux Halloween Louis ! Je quitte la forêt des monstres et franchis enfin la frontière française !',
+    assets: [],
+    gifts: ['2 ou 3 bonbons d’Halloween'],
   },
   16: {
-    "day": 16,
-    "date": "DIMANCHE 1 NOVEMBRE 2026",
-    "title": "Arrivée en France",
-    "adultPreparation": "Photo imprimée d'une carte de France avec un tracé. À joindre : Parcours imaginaire (annexes).",
-    "message": "Ça y est, je suis en France ! C'est un très beau pays. Plus que quelques étapes avant d'arriver à Lyon !",
-    "assets": [
+    day: 16,
+    date: 'DIMANCHE 1 NOVEMBRE 2026',
+    title: 'Arrivée en France',
+    adultPreparation:
+      'Déposer l’illustration de la carte de France avec le tracé du voyage. À joindre : Carte du parcours.',
+    message:
+      'Ça y est, me voilà en France ! C’est un pays merveilleux. Plus que quelques étapes importantes avant d’arriver à Lyon !',
+    assets: [
       {
-        "file": "/assets/printables/annexe-86.png",
-        "label": "Parcours imaginaire",
-        "page": 86
-      }
+        file: '/assets/printables/annexe-86.png',
+        label: 'Parcours imaginaire',
+        page: 86,
+      },
     ],
-    "gifts": []
+    gifts: [],
   },
   17: {
-    "day": 17,
-    "date": "LUNDI 2 NOVEMBRE 2026",
-    "title": "Carte Postale de Paris",
-    "adultPreparation": "Glisser la carte postale dans la boîte. À joindre : Carte E : Paris (annexes).",
-    "message": "Coucou ! Je me suis arrêté à Paris. J'ai vu une immense tour en fer qui monte jusqu'au ciel ! Mais Lyon est encore un peu plus loin au sud.",
-    "assets": [],
-    "gifts": []
+    day: 17,
+    date: 'LUNDI 2 NOVEMBRE 2026',
+    title: 'Carte Postale de Paris',
+    adultPreparation: 'Glisser la carte postale parisienne dans la boîte aux lettres. À joindre : Carte E (Paris).',
+    message:
+      'Coucou ! Je me suis arrêté un instant à Paris. J’y ai admiré une immense tour en fer qui monte jusqu’aux nuages ! Mais Lyon m’attend un peu plus au sud.',
+    assets: [],
+    gifts: [],
   },
   18: {
-    "day": 18,
-    "date": "MARDI 3 NOVEMBRE 2026",
-    "title": "Le Ticket de Train Express",
-    "adultPreparation": "Déposer un faux billet de train nominatif pour le lutin. À joindre : Billet de train (annexes).",
-    "message": "Pour aller plus vite, j'ai décidé de prendre le train TGV ! Regarde mon billet, destination : Lyon Part-Dieu !",
-    "assets": [
+    day: 18,
+    date: 'MARDI 3 NOVEMBRE 2026',
+    title: 'Le Ticket de Train Express',
+    adultPreparation:
+      'Déposer le faux billet de train personnalisé pour le lutin. À joindre : Billet de train.',
+    message:
+      'Pour aller encore plus vite, j’ai décidé de monter à bord du grand train TGV ! Regarde mon billet : destination Lyon Part-Dieu !',
+    assets: [
       {
-        "file": "/assets/printables/annexe-87.png",
-        "label": "Billet du train des lutins",
-        "page": 87
-      }
+        file: '/assets/printables/annexe-87.png',
+        label: 'Billet du train des lutins',
+        page: 87,
+      },
     ],
-    "gifts": []
+    gifts: [],
   },
   19: {
-    "day": 19,
-    "date": "MERCREDI 4 NOVEMBRE 2026",
-    "title": "Le Wagon des Gourmandises",
-    "adultPreparation": "Un paquet de biscuits format individuel dans la boîte.",
-    "message": "Dans le train, le contrôleur m'a donné un gâteau. Je t'en ai gardé un pour ton goûter !",
-    "assets": [],
-    "gifts": [
-      "Biscuit individuel"
-    ]
+    day: 19,
+    date: 'MERCREDI 4 NOVEMBRE 2026',
+    title: 'Le Wagon des Gourmandises',
+    adultPreparation: 'Glisser un sachet de biscuit individuel dans la boîte.',
+    message:
+      'Dans le train, le contrôleur m’a offert un délicieux gâteau. Je t’en ai gardé un tout spécialement pour ton goûter !',
+    assets: [],
+    gifts: ['Biscuit individuel'],
   },
   20: {
-    "day": 20,
-    "date": "JEUDI 5 NOVEMBRE 2026",
-    "title": "Arrivée en Gare de Lyon",
-    "adultPreparation": "Image de train arrivant en gare. À joindre : Carte F : gare (annexes).",
-    "message": "Tchou tchou ! Le train s'arrête ! Le haut-parleur a dit 'Terminus, Lyon !'. Je suis enfin dans ta ville Louis !",
-    "assets": [
+    day: 20,
+    date: 'JEUDI 5 NOVEMBRE 2026',
+    title: 'Arrivée en Gare de Lyon',
+    adultPreparation:
+      'Glisser la carte montrant le train arrivant en gare. À joindre : Carte F (gare).',
+    message:
+      'Tchou tchou ! Le train entre en gare ! Le haut-parleur vient d’annoncer : "Terminus, Lyon !". Je suis enfin arrivé dans ta ville Louis !',
+    assets: [
       {
-        "file": "/assets/printables/annexe-79.png",
-        "label": "Carte de la gare de Lyon",
-        "page": 79
-      }
+        file: '/assets/printables/annexe-79.png',
+        label: 'Carte de la gare de Lyon',
+        page: 79,
+      },
     ],
-    "gifts": []
+    gifts: [],
   },
   21: {
-    "day": 21,
-    "date": "VENDREDI 6 NOVEMBRE 2026",
-    "title": "Carte Postale de Fourvière",
-    "adultPreparation": "Carte postale lyonnaise déposée dans la boîte. À joindre : Carte G : Lyon (annexes).",
-    "message": "Lyon est magnifique ! Je suis monté sur la grande colline pour voir la basilique et chercher le toit de ta maison !",
-    "assets": [
+    day: 21,
+    date: 'VENDREDI 6 NOVEMBRE 2026',
+    title: 'Carte Postale de Fourvière',
+    adultPreparation:
+      'Glisser la carte postale lyonnaise dans la boîte. À joindre : Carte G (Fourvière).',
+    message:
+      'Lyon est une ville magnifique ! Je suis monté tout en haut de la grande colline pour voir la basilique et apercevoir le toit de ta maison !',
+    assets: [
       {
-        "file": "/assets/printables/annexe-80.png",
-        "label": "Carte postale de Lyon",
-        "page": 80
-      }
+        file: '/assets/printables/annexe-80.png',
+        label: 'Carte postale de Lyon',
+        page: 80,
+      },
     ],
-    "gifts": []
+    gifts: [],
   },
   22: {
-    "day": 22,
-    "date": "SAMEDI 7 NOVEMBRE 2026",
-    "title": "La Traversée du Rhône",
-    "adultPreparation": "Un petit mot sur du papier bleu.",
-    "message": "J'ai dû traverser un grand pont au-dessus du fleuve. L'eau coulait très vite, j'ai bien serré mon bonnet !",
-    "assets": [],
-    "gifts": []
+    day: 22,
+    date: 'SAMEDI 7 NOVEMBRE 2026',
+    title: 'La Traversée du Rhône',
+    adultPreparation: 'Glisser un petit mot écrit sur un papier bleu.',
+    message:
+      'J’ai traversé un grand pont au-dessus du fleuve. L’eau coulait très vite, j’ai bien serré mon bonnet pour qu’il ne s’envole pas !',
+    assets: [],
+    gifts: [],
   },
   23: {
-    "day": 23,
-    "date": "DIMANCHE 8 NOVEMBRE 2026",
-    "title": "Le Plan de la Ville",
-    "adultPreparation": "Un dessin simplifié d'une carte avec une flèche rouge vers votre quartier. À joindre : Plan à personnaliser (annexes).",
-    "message": "J'ai demandé mon chemin à un pigeon lyonnais ! Il m'a dessiné cette carte pour trouver ton quartier.",
-    "assets": [
+    day: 23,
+    date: 'DIMANCHE 8 NOVEMBRE 2026',
+    title: 'Le Plan de la Ville',
+    adultPreparation:
+      'Déposer le dessin de carte avec une flèche rouge indiquant le quartier. À joindre : Plan à personnaliser.',
+    message:
+      'J’ai demandé mon chemin à un pigeon lyonnais très sympathique ! Il m’a dessiné ce plan pour trouver ton quartier.',
+    assets: [
       {
-        "file": "/assets/printables/annexe-88.png",
-        "label": "Plan du quartier",
-        "page": 88
-      }
+        file: '/assets/printables/annexe-88.png',
+        label: 'Plan du quartier',
+        page: 88,
+      },
     ],
-    "gifts": []
+    gifts: [],
   },
   24: {
-    "day": 24,
-    "date": "LUNDI 9 NOVEMBRE 2026",
-    "title": "Recherche du Nom de la Rue",
-    "adultPreparation": "Petit mot plié.",
-    "message": "Je suis entré dans ta rue ! Je lis les plaques avec le nom des rues. Je me rapproche de minute en minute !",
-    "assets": [],
-    "gifts": []
+    day: 24,
+    date: 'LUNDI 9 NOVEMBRE 2026',
+    title: 'Recherche du Nom de la Rue',
+    adultPreparation: 'Glisser le petit mot plié dans la boîte.',
+    message:
+      'Je suis entré dans ta rue ! Je lis attentivement chaque plaque sur les murs. Je me rapproche de toi de minute en minute !',
+    assets: [],
+    gifts: [],
   },
   25: {
-    "day": 25,
-    "date": "MARDI 10 NOVEMBRE 2026",
-    "title": "La Pause devant l'Immeuble/Maison",
-    "adultPreparation": "Prendre une photo rapide du portail ou de l'entrée de chez vous et l'imprimer. À joindre : Cadre photo (annexes).",
-    "message": "Regarde Louis ! Est-ce que ce n'est pas le portail de ta maison ça ? Je suis juste derrière !",
-    "assets": [
+    day: 25,
+    date: 'MARDI 10 NOVEMBRE 2026',
+    title: 'La Pause devant l’Entrée',
+    adultPreparation:
+      'Imprimer une photo du portail ou de l’entrée de la maison. À joindre : Cadre photo imprimable.',
+    message:
+      'Regarde Louis ! Est-ce que ce n’est pas le portail de ta maison ça ? Je suis juste derrière !',
+    assets: [
       {
-        "file": "/assets/printables/annexe-89.png",
-        "label": "Cadre photo de l’entrée",
-        "page": 89
-      }
+        file: '/assets/printables/annexe-89.png',
+        label: 'Cadre photo de l’entrée',
+        page: 89,
+      },
     ],
-    "gifts": []
+    gifts: [],
   },
   26: {
-    "day": 26,
-    "date": "MERCREDI 11 NOVEMBRE 2026",
-    "title": "L'Inspection du Paillasson",
-    "adultPreparation": "Déposer une mini-plume ou un brin de paille sur le paillasson devant la porte.",
-    "message": "Je me suis reposé cette nuit sur ton paillasson. C'était très confortable !",
-    "assets": [],
-    "gifts": []
+    day: 26,
+    date: 'MERCREDI 11 NOVEMBRE 2026',
+    title: 'L’Inspection du Paillasson',
+    adultPreparation: 'Déposer une mini-plume ou un brin de paille sur le paillasson de l’entrée.',
+    message:
+      'Je me suis reposé cette nuit sur ton paillasson. Il était drôlement confortable !',
+    assets: [],
+    gifts: [],
   },
   27: {
-    "day": 27,
-    "date": "JEUDI 12 NOVEMBRE 2026",
-    "title": "La Clé Magique",
-    "adultPreparation": "Une vieille clé ou une clé en plastique décorée déposée dans la boîte. À joindre : Clé magique (annexes).",
-    "message": "C'est la clé magique des lutins. Elle permet de passer sous les portes sans faire de bruit !",
-    "assets": [
+    day: 27,
+    date: 'JEUDI 12 NOVEMBRE 2026',
+    title: 'La Clé Magique',
+    adultPreparation:
+      'Déposer une clé décorée ou la clé imprimée dans la boîte. À joindre : Clé magique.',
+    message:
+      'Voici la clé magique des lutins. Elle nous permet de nous glisser sous les portes en toute discrétion !',
+    assets: [
       {
-        "file": "/assets/printables/annexe-85.png",
-        "label": "Étoiles et clé magique",
-        "page": 85
-      }
+        file: '/assets/printables/annexe-85.png',
+        label: 'Étoiles et clé magique',
+        page: 85,
+      },
     ],
-    "gifts": []
+    gifts: [],
   },
   28: {
-    "day": 28,
-    "date": "VENDREDI 13 NOVEMBRE 2026",
-    "title": "Les Traces de Pas",
-    "adultPreparation": "Faire 3 ou 4 petites empreintes de pas sur le pas de la porte avec un peu de farine ou de sucre glace. À joindre : Empreintes (annexes). Le mot ci-dessous est facultatif : le programme prévoit seulement les traces.",
-    "message": "Chut… mes petites bottes sont passées par ici !",
-    "assets": [
+    day: 28,
+    date: 'VENDREDI 13 NOVEMBRE 2026',
+    title: 'Les Traces de Pas',
+    adultPreparation:
+      'Réaliser 3 ou 4 petites empreintes de bottes sur le pas de la porte avec un peu de farine ou du pochoir fourni. À joindre : Pochoir des bottes.',
+    message: 'Chut… mes petites bottes sont passées par ici !',
+    assets: [
       {
-        "file": "/assets/printables/annexe-90.png",
-        "label": "Pochoir des petites bottes",
-        "page": 90
-      }
+        file: '/assets/printables/annexe-90.png',
+        label: 'Pochoir des petites bottes',
+        page: 90,
+      },
     ],
-    "gifts": []
+    gifts: [],
   },
   29: {
-    "day": 29,
-    "date": "SAMEDI 14 NOVEMBRE 2026",
-    "title": "Le Mot Sous la Porte",
-    "adultPreparation": "Glisser un papier sous la porte, visible depuis l'intérieur.",
-    "message": "Chut... Je suis caché juste de l'autre côté de la porte ! Demain matin, ouvre bien tes yeux dans le salon...",
-    "assets": [],
-    "gifts": []
+    day: 29,
+    date: 'SAMEDI 14 NOVEMBRE 2026',
+    title: 'Le Mot Sous la Porte',
+    adultPreparation: 'Glisser un petit mot sous la porte, visible depuis l’intérieur.',
+    message:
+      'Chut... Je suis caché juste de l’autre côté de la porte ! Demain matin, ouvre grand tes yeux dans le salon...',
+    assets: [],
+    gifts: [],
   },
   30: {
-    "day": 30,
-    "date": "DIMANCHE 15 NOVEMBRE 2026",
-    "title": "L'ARRIVÉE DU LUTIN !",
-    "adultPreparation": "Le lutin est assis au milieu du salon avec une boîte de biscuits et une pancarte.",
-    "message": "COUCOU LOUIS ! C'est moi ! On fête mon arrivée avec des biscuits ?",
-    "assets": [],
-    "gifts": [
-      "Biscuits"
-    ]
+    day: 30,
+    date: 'DIMANCHE 15 NOVEMBRE 2026',
+    title: 'L’ARRIVÉE DU LUTIN !',
+    adultPreparation:
+      'Mettre en scène le lutin assis au milieu du salon avec une boîte de biscuits et sa pancarte de bienvenue.',
+    message: 'COUCOU LOUIS ! C’est moi ! On fête mon arrivée avec des biscuits ?',
+    assets: [],
+    gifts: ['Biscuits'],
   },
   31: {
-    "day": 31,
-    "date": "LUNDI 16 NOVEMBRE 2026",
-    "title": "Le Lutin Momie",
-    "adultPreparation": "Le lutin est enroulé dans du papier toilette sur le canapé.",
-    "message": "Je voulais devenir une momie… mais je ressemble surtout à un rouleau de papier toilette !",
-    "assets": [],
-    "gifts": []
+    day: 31,
+    date: 'LUNDI 16 NOVEMBRE 2026',
+    title: 'Le Lutin Momie',
+    adultPreparation: 'Enrouler le lutin dans du papier toilette sur le canapé.',
+    message:
+      'Je voulais devenir une momie mystérieuse… mais je ressemble surtout à un gros rouleau de papier toilette !',
+    assets: [],
+    gifts: [],
   },
   32: {
-    "day": 32,
-    "date": "MARDI 17 NOVEMBRE 2026",
-    "title": "La Tyrolienne",
-    "adultPreparation": "Tendez une ficelle courte entre deux points bas et stables, hors du passage. Fixez seulement le lutin.",
-    "message": "Youhou Louis ! Je traverse le salon en tyrolienne. Quelle aventure !",
-    "assets": [],
-    "gifts": []
+    day: 32,
+    date: 'MARDI 17 NOVEMBRE 2026',
+    title: 'La Tyrolienne',
+    adultPreparation:
+      'Tendre une ficelle entre deux points bas et stables hors du passage, et y suspendre le lutin.',
+    message: 'Youhou Louis ! Je traverse le salon en tyrolienne. Quelle aventure sensationnelle !',
+    assets: [],
+    gifts: [],
   },
   33: {
-    "day": 33,
-    "date": "MERCREDI 18 NOVEMBRE 2026",
-    "title": "Le Lait Bleu",
-    "adultPreparation": "Colorez une petite portion de lait dans un verre, avec un colorant alimentaire adapté ; gardez le reste au frais.",
-    "message": "Oups ! Une goutte de magie bleue est tombée dans mon lait !",
-    "assets": [],
-    "gifts": [
-      "Colorant alimentaire adapté"
-    ]
+    day: 33,
+    date: 'MERCREDI 18 NOVEMBRE 2026',
+    title: 'Le Lait Bleu',
+    adultPreparation:
+      'Colorer une petite portion de lait avec du colorant alimentaire bleu dans un verre.',
+    message: 'Oups ! Une goutte de magie bleue est tombée dans mon verre de lait !',
+    assets: [],
+    gifts: ['Colorant alimentaire adapté'],
   },
   34: {
-    "day": 34,
-    "date": "JEUDI 19 NOVEMBRE 2026",
-    "title": "Scotché au Placard",
-    "adultPreparation": "Le lutin est plaqué contre la porte d'un placard de cuisine avec plusieurs bandes de ruban adhésif coloré (masking tape).",
-    "message": "Au secours Louis ! Le ruban m’a attrapé pendant mon exploration du placard !",
-    "assets": [],
-    "gifts": []
+    day: 34,
+    date: 'JEUDI 19 NOVEMBRE 2026',
+    title: 'Scotché au Placard',
+    adultPreparation:
+      'Plaquer le lutin contre la porte du placard de cuisine avec du ruban adhésif coloré (masking tape).',
+    message:
+      'Au secours Louis ! Le ruban magique m’a attrapé pendant mon exploration du placard !',
+    assets: [],
+    gifts: [],
   },
   35: {
-    "day": 35,
-    "date": "VENDREDI 20 NOVEMBRE 2026",
-    "title": "Les Yeux Rigolos sur les Fruits",
-    "adultPreparation": "Utilisez les yeux papier fournis ; retirez-les avant de laver et manger les fruits. À joindre : Yeux à découper (annexes).",
-    "message": "Bonjour Louis ! Aujourd’hui, même les fruits ont les yeux grands ouverts !",
-    "assets": [
+    day: 35,
+    date: 'VENDREDI 20 NOVEMBRE 2026',
+    title: 'Les Yeux Rigolos sur les Fruits',
+    adultPreparation:
+      'Coller les yeux en papier fournis sur les fruits de la corbeille. À joindre : Yeux à découper.',
+    message:
+      'Bonjour Louis ! Aujourd’hui, même les fruits de la cuisine ont les yeux grands ouverts !',
+    assets: [
       {
-        "file": "/assets/printables/annexe-91.png",
-        "label": "Yeux à découper",
-        "page": 91
-      }
+        file: '/assets/printables/annexe-91.png',
+        label: 'Yeux à découper',
+        page: 91,
+      },
     ],
-    "gifts": []
+    gifts: [],
   },
   36: {
-    "day": 36,
-    "date": "SAMEDI 21 NOVEMBRE 2026",
-    "title": "Le Dodo dans la Boîte à Mouchoirs",
-    "adultPreparation": "Le lutin dort à l'intérieur d'une boîte de mouchoirs, avec un mouchoir plié en guise de couette.",
-    "message": "Chut… Cette boîte est juste à ma taille. Bonne sieste, petit lutin !",
-    "assets": [],
-    "gifts": []
+    day: 36,
+    date: 'SAMEDI 21 NOVEMBRE 2026',
+    title: 'Le Dodo dans la Boîte à Mouchoirs',
+    adultPreparation:
+      'Installer le lutin endormi à l’intérieur d’une boîte de mouchoirs, enveloppé dans un mouchoir plié.',
+    message: 'Chut… Cette boîte est exactement à ma taille. Douce nuit, petit lutin !',
+    assets: [],
+    gifts: [],
   },
   37: {
-    "day": 37,
-    "date": "DIMANCHE 22 NOVEMBRE 2026",
-    "title": "L'Échange de Lit des Doudous",
-    "adultPreparation": "Le lutin dort dans le lit des doudous de Louis, et tous les doudous de Louis sont installés dans le lit du lutin (ou sur la chaise de Louis).",
-    "message": "Cette nuit, les doudous et moi avons échangé nos lits. Tu nous as retrouvés ?",
-    "assets": [],
-    "gifts": []
+    day: 37,
+    date: 'DIMANCHE 22 NOVEMBRE 2026',
+    title: 'L’Échange de Lit des Doudous',
+    adultPreparation:
+      'Placer le lutin dans le lit des doudous de Louis, et installer les doudous dans le lit du lutin.',
+    message:
+      'Cette nuit, les doudous et moi avons échangé nos lits ! Tu nous as retrouvés ?',
+    assets: [],
+    gifts: [],
   },
   38: {
-    "day": 38,
-    "date": "LUNDI 23 NOVEMBRE 2026",
-    "title": "La Glissade en Luge",
-    "adultPreparation": "Le lutin est assis sur un petit torchon ou un débarbouillette en haut du dossier du canapé, prêt à glisser.",
-    "message": "Prêt pour la glissade ? Mon torchon est devenu une luge !",
-    "assets": [],
-    "gifts": []
+    day: 38,
+    date: 'LUNDI 23 NOVEMBRE 2026',
+    title: 'La Glissade en Luge',
+    adultPreparation:
+      'Installer le lutin sur un petit torchon en haut du dossier du canapé, comme sur une luge.',
+    message: 'Prêt pour la grande glissade ? Mon torchon s’est transformé en luge !',
+    assets: [],
+    gifts: [],
   },
   39: {
-    "day": 39,
-    "date": "MARDI 24 NOVEMBRE 2026",
-    "title": "Piégé dans le Bocal de Gâteaux",
-    "adultPreparation": "Utilisez un bocal vide et propre ; gardez les biscuits séparément.",
-    "message": "Je cherchais un biscuit… et maintenant, je cherche la sortie !",
-    "assets": [],
-    "gifts": []
+    day: 39,
+    date: 'MARDI 24 NOVEMBRE 2026',
+    title: 'Piégé dans le Bocal de Gâteaux',
+    adultPreparation: 'Glisser le lutin à l’intérieur d’un bocal en verre vide et propre.',
+    message:
+      'Je cherchais un petit biscuit gourmand… et maintenant, je cherche la sortie !',
+    assets: [],
+    gifts: [],
   },
   40: {
-    "day": 40,
-    "date": "MERCREDI 25 NOVEMBRE 2026",
-    "title": "La Cape de Super-Héros",
-    "adultPreparation": "Attacher un serviette en papier rouge dans le dos du lutin comme une cape et le placer debout sur la table. À joindre : Écusson Super-Lutin (annexes).",
-    "message": "Super-Lutin est prêt ! Ma mission du jour : te faire sourire !",
-    "assets": [
+    day: 40,
+    date: 'MERCREDI 25 NOVEMBRE 2026',
+    title: 'La Cape de Super-Héros',
+    adultPreparation:
+      'Attacher une serviette en papier rouge dans le dos du lutin et l’installer sur la table. À joindre : Écusson Super-Lutin.',
+    message: 'Super-Lutin est prêt ! Ma mission prioritaire du jour : te faire sourire !',
+    assets: [
       {
-        "file": "/assets/printables/annexe-91.png",
-        "label": "Écusson Super-Lutin",
-        "page": 91
-      }
+        file: '/assets/printables/annexe-91.png',
+        label: 'Écusson Super-Lutin',
+        page: 91,
+      },
     ],
-    "gifts": []
+    gifts: [],
   },
   41: {
-    "day": 41,
-    "date": "JEUDI 26 NOVEMBRE 2026",
-    "title": "La Pêche dans le Lavabo",
-    "adultPreparation": "Remplir un peu le lavabo (ou une bassine) avec des poissons en plastique. Le lutin tient une paille comme canne à pêche. À joindre : Poissons (annexes).",
-    "message": "Silence, ça mord ! Tu crois que les poissons aiment les biscuits ?",
-    "assets": [
+    day: 41,
+    date: 'JEUDI 26 NOVEMBRE 2026',
+    title: 'La Pêche dans le Lavabo',
+    adultPreparation:
+      'Placer des petits poissons dans le lavabo et installer le lutin tenant une paille comme canne à pêche. À joindre : Poissons découpés.',
+    message: 'Silence, ça mord ! Tu penses que les poissons aiment le biscuit ?',
+    assets: [
       {
-        "file": "/assets/printables/annexe-91.png",
-        "label": "Poissons à découper",
-        "page": 91
-      }
+        file: '/assets/printables/annexe-91.png',
+        label: 'Poissons à découper',
+        page: 91,
+      },
     ],
-    "gifts": []
+    gifts: [],
   },
   42: {
-    "day": 42,
-    "date": "VENDREDI 27 NOVEMBRE 2026",
-    "title": "L'Heure de la Lecture",
-    "adultPreparation": "Le lutin est assis avec un livre pour enfants ouvert devant lui, entouré de 3 ou 4 peluches qui \"l'écoutent\".",
-    "message": "Installe-toi avec nous, Louis. Quelle histoire veux-tu lire aujourd’hui ?",
-    "assets": [],
-    "gifts": []
+    day: 42,
+    date: 'VENDREDI 27 NOVEMBRE 2026',
+    title: 'L’Heure de la Lecture',
+    adultPreparation:
+      'Placer le lutin devant un livre pour enfants ouvert, entouré de ses peluches attentives.',
+    message:
+      'Installe-toi confortablement avec nous, Louis. Quelle belle histoire veux-tu lire aujourd’hui ?',
+    assets: [],
+    gifts: [],
   },
   43: {
-    "day": 43,
-    "date": "SAMEDI 28 NOVEMBRE 2026",
-    "title": "Les Moustaches sur le Miroir",
-    "adultPreparation": "Testez un feutre adapté sur un coin du miroir ; essuyez ensuite.",
-    "message": "Regarde dans le miroir… Une moustache magique t’attend !",
-    "assets": [],
-    "gifts": []
+    day: 43,
+    date: 'SAMEDI 28 NOVEMBRE 2026',
+    title: 'Les Moustaches sur le Miroir',
+    adultPreparation:
+      'Dessiner une petite moustache au feutre effaçable sur le miroir à hauteur d’enfant.',
+    message: 'Regarde bien dans le miroir… Une moustache magique t’attend !',
+    assets: [],
+    gifts: [],
   },
   44: {
-    "day": 44,
-    "date": "DIMANCHE 29 NOVEMBRE 2026",
-    "title": "La Tour de Chaussures",
-    "adultPreparation": "Faites une petite tour stable de trois chaussures, au sol.",
-    "message": "J’ai construit une montagne de chaussures ! Tu retrouves les tiennes ?",
-    "assets": [],
-    "gifts": []
+    day: 44,
+    date: 'DIMANCHE 29 NOVEMBRE 2026',
+    title: 'La Tour de Chaussures',
+    adultPreparation: 'Empiler de manière stable trois chaussures au sol.',
+    message:
+      'J’ai construit une immense montagne de chaussures ! Sauras-tu retrouver les tiennes ?',
+    assets: [],
+    gifts: [],
   },
   45: {
-    "day": 45,
-    "date": "LUNDI 30 NOVEMBRE 2026",
-    "title": "L'Annonce du Père Noël",
-    "adultPreparation": "Le lutin tient une lettre dans ses mains.",
-    "message": "Louis ! Le Père Noël m'a envoyé un message : mon meilleur ami lutin s'est échappé à son tour du Pôle Nord ! Il arrive demain pour me rejoindre ici à Lyon !",
-    "assets": [],
-    "gifts": []
+    day: 45,
+    date: 'LUNDI 30 NOVEMBRE 2026',
+    title: 'L’Annonce du Père Noël',
+    adultPreparation: 'Placer une lettre entre les mains du lutin.',
+    message:
+      'Louis ! Le Père Noël m’a envoyé un message secret : mon meilleur ami lutin s’est échappé lui aussi du Pôle Nord ! Il arrive dès demain pour me rejoindre ici à Lyon !',
+    assets: [],
+    gifts: [],
   },
   46: {
-    "day": 46,
-    "date": "MARDI 1 DÉCEMBRE 2026",
-    "title": "L'ARRIVÉE DU 2ÈME LUTIN !",
-    "adultPreparation": "Le 1er lutin et le 2ème lutin sont côte à côte au milieu de confettis ou cotillons avec une banderole *\"BIENVENUE !\"*. À joindre : Banderole (annexes).",
-    "message": "Bienvenue à mon copain ! À deux, nous avons deux fois plus d’idées rigolotes !",
-    "assets": [
+    day: 46,
+    date: 'MARDI 1 DÉCEMBRE 2026',
+    title: 'L’ARRIVÉE DU 2ÈME LUTIN !',
+    adultPreparation:
+      'Installer les 2 lutins côte à côte entourés de confettis avec la banderole de bienvenue. À joindre : Banderole.',
+    message:
+      'Bienvenue à mon super copain ! À deux, nous aurons deux fois plus d’idées rigolotes à partager !',
+    assets: [
       {
-        "file": "/assets/printables/annexe-92.png",
-        "label": "Banderole de bienvenue",
-        "page": 92
-      }
+        file: '/assets/printables/annexe-92.png',
+        label: 'Banderole de bienvenue',
+        page: 92,
+      },
     ],
-    "gifts": []
+    gifts: [],
   },
   47: {
-    "day": 47,
-    "date": "MERCREDI 2 DÉCEMBRE 2026",
-    "title": "La Bataille de Boules de Neige",
-    "adultPreparation": "Utilisez des boules de papier si le coton ne convient pas.",
-    "message": "Bataille de neige au salon ! Qui se cache derrière le mur ?",
-    "assets": [],
-    "gifts": []
+    day: 47,
+    date: 'MERCREDI 2 DÉCEMBRE 2026',
+    title: 'La Bataille de Boules de Neige',
+    adultPreparation:
+      'Disposer des petites boules de coton ou de papier froissé entre les deux lutins.',
+    message: 'Grande bataille de neige au salon ! Qui se cache derrière le coussin ?',
+    assets: [],
+    gifts: [],
   },
   48: {
-    "day": 48,
-    "date": "JEUDI 3 DÉCEMBRE 2026",
-    "title": "Coincés dans les Céréales",
-    "adultPreparation": "Prenez une boîte vide et gardez les céréales propres à part.",
-    "message": "Nous cherchions le petit-déjeuner… et nous sommes tombés dans les céréales !",
-    "assets": [],
-    "gifts": [
-      "Céréales"
-    ]
+    day: 48,
+    date: 'JEUDI 3 DÉCEMBRE 2026',
+    title: 'Coincés dans les Céréales',
+    adultPreparation: 'Installer les deux lutins émergeant d’une boîte de céréales.',
+    message:
+      'Nous cherchions notre petit-déjeuner… et nous sommes tombés la tête la première dans le paquet de céréales !',
+    assets: [],
+    gifts: ['Céréales'],
   },
   49: {
-    "day": 49,
-    "date": "VENDREDI 4 DÉCEMBRE 2026",
-    "title": "La Soirée Pop-corn & Cinéma",
-    "adultPreparation": "Utilisez une collation adaptée à l’âge de Louis ; des boules de papier peuvent représenter le pop-corn. À joindre : Tickets de cinéma (annexes).",
-    "message": "Ce soir, séance de cinéma ! Louis, tu choisis le dessin animé ?",
-    "assets": [
+    day: 49,
+    date: 'VENDREDI 4 DÉCEMBRE 2026',
+    title: 'La Soirée Pop-corn & Cinéma',
+    adultPreparation:
+      'Disposer les deux lutins avec un bol de pop-corn et leurs tickets. À joindre : Tickets de cinéma.',
+    message:
+      'Ce soir, c’est grande séance de cinéma ! Louis, quel dessin animé choisis-tu ?',
+    assets: [
       {
-        "file": "/assets/printables/annexe-93.png",
-        "label": "Tickets de cinéma",
-        "page": 93
-      }
+        file: '/assets/printables/annexe-93.png',
+        label: 'Tickets de cinéma',
+        page: 93,
+      },
     ],
-    "gifts": [
-      "Collation adaptée à l’âge de Louis"
-    ]
+    gifts: ['Collation adaptée à l’âge de Louis'],
   },
   50: {
-    "day": 50,
-    "date": "SAMEDI 5 DÉCEMBRE 2026",
-    "title": "Les Chaussures Emballées",
-    "adultPreparation": "Les deux lutins ont enveloppé les chaussures de Louis dans du papier alu ou du papier cadeau.",
-    "message": "Surprise ! Tes chaussures se prennent pour des cadeaux !",
-    "assets": [],
-    "gifts": []
+    day: 50,
+    date: 'SAMEDI 5 DÉCEMBRE 2026',
+    title: 'Les Chaussures Emballées',
+    adultPreparation:
+      'Envelopper soigneusement les chaussures de Louis dans du papier cadeau ou alu.',
+    message: 'Surprise ! Ce matin, tes chaussures se prennent pour de vrais cadeaux de Noël !',
+    assets: [],
+    gifts: [],
   },
   51: {
-    "day": 51,
-    "date": "DIMANCHE 6 DÉCEMBRE 2026",
-    "title": "Les Pièces en Chocolat",
-    "adultPreparation": "Placez les chocolats emballés dans un petit sachet propre posé dans la chaussure.",
-    "message": "Bonne Saint-Nicolas, Louis ! Une petite gourmandise se cache dans tes chaussures.",
-    "assets": [],
-    "gifts": [
-      "Chocolats emballés"
-    ]
+    day: 51,
+    date: 'DIMANCHE 6 DÉCEMBRE 2026',
+    title: 'Les Pièces en Chocolat',
+    adultPreparation:
+      'Placer des pièces en chocolat emballées dans les chaussures de Louis.',
+    message:
+      'Bonne Saint-Nicolas, Louis ! Une douce surprise gourmande s’est glissée dans tes chaussures.',
+    assets: [],
+    gifts: ['Chocolats emballés'],
   },
   52: {
-    "day": 52,
-    "date": "LUNDI 7 DÉCEMBRE 2026",
-    "title": "Préparation de la Fête des Lumières (Lyon)",
-    "adultPreparation": "Installez des pots stables et des bougies LED uniquement, en retrait du bord.",
-    "message": "Demain, c’est le 8 décembre ! Préparons des lumignons pour faire briller notre fenêtre à Lyon.",
-    "assets": [],
-    "gifts": []
+    day: 52,
+    date: 'LUNDI 7 DÉCEMBRE 2026',
+    title: 'Préparation de la Fête des Lumières',
+    adultPreparation: 'Disposer des petits photophores avec bougies LED sur le bord de fenêtre.',
+    message:
+      'Demain, c’est le 8 décembre ! Préparons nos jolies bougies pour faire briller notre fenêtre à Lyon !',
+    assets: [],
+    gifts: [],
   },
   53: {
-    "day": 53,
-    "date": "MARDI 8 DÉCEMBRE 2026",
-    "title": "La Chaise Ligotée",
-    "adultPreparation": "Enroulez quelques bandes de papier autour du dossier ; retirez-les avant utilisation.",
-    "message": "Nous voulions décorer la chaise… Nous nous sommes un peu emmêlés !",
-    "assets": [],
-    "gifts": []
+    day: 53,
+    date: 'MARDI 8 DÉCEMBRE 2026',
+    title: 'La Chaise Ligotée',
+    adultPreparation: 'Enrouler du papier crépon ou du ruban autour des pieds de la chaise.',
+    message:
+      'Nous voulions décorer la chaise de la cuisine… et nous nous sommes un peu emmêlés les pinceaux !',
+    assets: [],
+    gifts: [],
   },
   54: {
-    "day": 54,
-    "date": "MERCREDI 9 DÉCEMBRE 2026",
-    "title": "La Course d'Autos",
-    "adultPreparation": "Les deux lutins sont installés chacun dans une voiture en plastique de Louis, alignés sur une ligne de départ tracée au ruban adhésif. À joindre : Départ et arrivée (annexes).",
-    "message": "À vos marques… prêts… partez ! La course des lutins commence !",
-    "assets": [
+    day: 54,
+    date: 'MERCREDI 9 DÉCEMBRE 2026',
+    title: "La Course d'Autos",
+    adultPreparation:
+      'Installer les deux lutins dans des voitures jouets sur une ligne de départ. À joindre : Panneau Départ/Arrivée.',
+    message:
+      'Attention… Prêts… Partez ! La grande course des lutins est officiellement lancée !',
+    assets: [
       {
-        "file": "/assets/printables/annexe-93.png",
-        "label": "Départ et arrivée",
-        "page": 93
-      }
+        file: '/assets/printables/annexe-93.png',
+        label: 'Départ et arrivée',
+        page: 93,
+      },
     ],
-    "gifts": []
+    gifts: [],
   },
   55: {
-    "day": 55,
-    "date": "JEUDI 10 DÉCEMBRE 2026",
-    "title": "Les Lutins Fantômes",
-    "adultPreparation": "Posez des mouchoirs avec les yeux dessinés sur les lutins : inutile de découper des chaussettes.",
-    "message": "Bouh ! Ce sont deux petits fantômes gentils qui te disent bonjour !",
-    "assets": [],
-    "gifts": []
+    day: 55,
+    date: 'JEUDI 10 DÉCEMBRE 2026',
+    title: 'Les Lutins Fantômes',
+    adultPreparation: 'Recouvrir les lutins d’un mouchoir en blanc avec deux yeux dessinés.',
+    message: 'Bouh ! Ce sont deux petits fantômes farceurs qui viennent te saluer !',
+    assets: [],
+    gifts: [],
   },
   56: {
-    "day": 56,
-    "date": "VENDREDI 11 DÉCEMBRE 2026",
-    "title": "L'Empreinte de Peinture",
-    "adultPreparation": "Faites les empreintes sur la feuille avec un tampon ou vos doigts ; gardez les peluches propres.",
-    "message": "Deux petites mains de lutins ont laissé leurs couleurs. À toi de créer un dessin !",
-    "assets": [],
-    "gifts": []
+    day: 56,
+    date: 'VENDREDI 11 DÉCEMBRE 2026',
+    title: 'L’Empreinte de Peinture',
+    adultPreparation: 'Déposer une feuille avec deux petites empreintes de mains colorées.',
+    message:
+      'Deux petites mains de lutins ont laissé leurs couleurs. À ton tour de nous faire un beau dessin !',
+    assets: [],
+    gifts: [],
   },
   57: {
-    "day": 57,
-    "date": "SAMEDI 12 DÉCEMBRE 2026",
-    "title": "Cachés dans le Sapin",
-    "adultPreparation": "Placez les lutins dans des branches basses et solides, loin des câbles.",
-    "message": "Coucou Louis ! Deux bonnets se cachent dans le sapin. À toi de les trouver !",
-    "assets": [],
-    "gifts": []
+    day: 57,
+    date: 'SAMEDI 12 DÉCEMBRE 2026',
+    title: 'Cachés dans le Sapin',
+    adultPreparation: 'Cacher les deux lutins dans les branches du sapin de Noël.',
+    message:
+      'Coucou Louis ! Deux petits bonnets rouges se sont cachés au milieu du sapin. Trouve-nous !',
+    assets: [],
+    gifts: [],
   },
   58: {
-    "day": 58,
-    "date": "DIMANCHE 13 DÉCEMBRE 2026",
-    "title": "La Cabane de Coussins",
-    "adultPreparation": "Monter une petite cabane avec les coussins du canapé. Les deux lutins sont cachés à l'intérieur avec une petite lampe torche.",
-    "message": "Bienvenue dans notre cabane ! Il reste une place pour ton imagination.",
-    "assets": [],
-    "gifts": []
+    day: 58,
+    date: 'DIMANCHE 13 DÉCEMBRE 2026',
+    title: 'La Cabane de Coussins',
+    adultPreparation:
+      'Monter une cabane avec les coussins du canapé et y cacher les lutins avec une veilleuse.',
+    message:
+      'Bienvenue dans notre cabane secrète ! Il reste une place douillette pour toi.',
+    assets: [],
+    gifts: [],
   },
   59: {
-    "day": 59,
-    "date": "LUNDI 14 DÉCEMBRE 2026",
-    "title": "Le Portrait des Lutins",
-    "adultPreparation": "Affichez une photo sur un appareil verrouillé en mode photo, ou utilisez le portrait imprimé. À joindre : Portrait souvenir (annexes).",
-    "message": "Cheeeese ! Nous avons fait notre portrait le plus rigolo !",
-    "assets": [
+    day: 59,
+    date: 'LUNDI 14 DÉCEMBRE 2026',
+    title: 'Le Portrait des Lutins',
+    adultPreparation:
+      'Affichez ou posez la photo souvenir des deux lutins. À joindre : Portrait souvenir.',
+    message: 'Cheeeese ! Nous avons tiré notre portrait le plus rigolo pour toi !',
+    assets: [
       {
-        "file": "/assets/printables/annexe-94.png",
-        "label": "Portrait souvenir des lutins",
-        "page": 94
-      }
+        file: '/assets/printables/annexe-94.png',
+        label: 'Portrait souvenir des lutins',
+        page: 94,
+      },
     ],
-    "gifts": []
+    gifts: [],
   },
   60: {
-    "day": 60,
-    "date": "MARDI 15 DÉCEMBRE 2026",
-    "title": "Le Départ du 2ème Lutin",
-    "adultPreparation": "Le 2ème lutin a disparu. Le 1er lutin tient une lettre d'adieu.",
-    "message": "Mon cher Louis, C’était fantastique de venir faire des farces à Lyon avec mon copain ! Le Père Noël a besoin de moi à l’atelier pour emballer les derniers jouets. Je suis reparti cette nuit au Pôle Nord. Mon copain reste avec toi jusqu’au grand soir ! À bientôt !",
-    "assets": [],
-    "gifts": []
+    day: 60,
+    date: 'MARDI 15 DÉCEMBRE 2026',
+    title: 'Le Départ du 2ème Lutin',
+    adultPreparation:
+      'Retirer le 2ème lutin et placer la lettre d’adieu entre les mains du 1er lutin.',
+    message:
+      'Mon cher Louis,\n\nC’était fantastique de venir faire des farces à Lyon avec mon copain ! Le Père Noël a besoin de moi à l’atelier pour emballer les derniers jouets. Je suis reparti cette nuit pour le Pôle Nord. Mon compagnon reste avec toi jusqu’au grand soir !\n\nÀ très bientôt !',
+    assets: [],
+    gifts: [],
   },
   61: {
-    "day": 61,
-    "date": "MERCREDI 16 DÉCEMBRE 2026",
-    "title": "La Nostalgie du Copain",
-    "adultPreparation": "Le lutin est assis en train de regarder une photo ou un dessin du 2ème lutin. À joindre : Portrait souvenir (annexes).",
-    "message": "Mon copain me manque un peu. Heureusement, il me reste plein de beaux souvenirs avec toi.",
-    "assets": [
+    day: 61,
+    date: 'MERCREDI 16 DÉCEMBRE 2026',
+    title: 'La Nostalgie du Copain',
+    adultPreparation:
+      'Mettre le lutin en scène en train de regarder le portrait souvenir. À joindre : Portrait souvenir.',
+    message:
+      'Mon copain me manque un peu aujourd’hui. Heureusement, il me reste tous nos magnifiques souvenirs partagés avec toi.',
+    assets: [
       {
-        "file": "/assets/printables/annexe-94.png",
-        "label": "Portrait souvenir des lutins",
-        "page": 94
-      }
+        file: '/assets/printables/annexe-94.png',
+        label: 'Portrait souvenir des lutins',
+        page: 94,
+      },
     ],
-    "gifts": []
+    gifts: [],
   },
   62: {
-    "day": 62,
-    "date": "JEUDI 17 DÉCEMBRE 2026",
-    "title": "La Vérification de la Liste",
-    "adultPreparation": "Déroulez la liste de petits bonheurs fournie. Invitez Louis à choisir une activité. À joindre : Liste de petits bonheurs (annexes).",
-    "message": "Louis, voici ta liste des petits bonheurs : partager, aider, rire et faire un câlin si tu en as envie !",
-    "assets": [
+    day: 62,
+    date: 'JEUDI 17 DÉCEMBRE 2026',
+    title: 'La Vérification de la Liste',
+    adultPreparation:
+      'Dérouler la liste des petits bonheurs. À joindre : Liste des petits bonheurs.',
+    message:
+      'Louis, voici ta liste magique des petits bonheurs : partager, aider, rire et faire un gros câlin !',
+    assets: [
       {
-        "file": "/assets/printables/annexe-95.png",
-        "label": "Liste des petits bonheurs",
-        "page": 95
-      }
+        file: '/assets/printables/annexe-95.png',
+        label: 'Liste des petits bonheurs',
+        page: 95,
+      },
     ],
-    "gifts": []
+    gifts: [],
   },
   63: {
-    "day": 63,
-    "date": "VENDREDI 18 DÉCEMBRE 2026",
-    "title": "La Patinoire en Farine",
-    "adultPreparation": "Utilisez un plateau de semoule ou une feuille blanche décorée ; les patins peuvent être en carton.",
-    "message": "La table est devenue une patinoire ! Regarde mes tout petits patins.",
-    "assets": [],
-    "gifts": []
+    day: 63,
+    date: 'VENDREDI 18 DÉCEMBRE 2026',
+    title: 'La Patinoire en Farine',
+    adultPreparation:
+      'Disposer un peu de farine/semoule sur un plateau pour simuler une patinoire.',
+    message: 'La table s’est transformée en patinoire ! Regarde mes tout petits patins à glace.',
+    assets: [],
+    gifts: [],
   },
   64: {
-    "day": 64,
-    "date": "SAMEDI 19 DÉCEMBRE 2026",
-    "title": "L'Écoute des Chants de Noël",
-    "adultPreparation": "Le lutin porte de petits écouteurs (ou du coton sur les oreilles) posé à côté de la radio ou d'une enceinte.",
-    "message": "J’écoute les chansons de Noël. On chante ensemble ?",
-    "assets": [],
-    "gifts": []
+    day: 64,
+    date: 'SAMEDI 19 DÉCEMBRE 2026',
+    title: 'L’Écoute des Chants de Noël',
+    adultPreparation: 'Installer le lutin avec de petits écouteurs près de l’enceinte.',
+    message: 'J’écoute les plus beaux chants de Noël. On chante tous ensemble ?',
+    assets: [],
+    gifts: [],
   },
   65: {
-    "day": 65,
-    "date": "DIMANCHE 20 DÉCEMBRE 2026",
-    "title": "Le Doudou Emballé",
-    "adultPreparation": "Emballez le doudou de façon facile à ouvrir et laissez-le disponible dès le réveil.",
-    "message": "Ton doudou s’est déguisé en cadeau ! Tu peux vite le déballer pour lui faire un câlin.",
-    "assets": [],
-    "gifts": []
+    day: 65,
+    date: 'DIMANCHE 20 DÉCEMBRE 2026',
+    title: 'Le Doudou Emballé',
+    adultPreparation: 'Emballer délicatement le doudou de Louis dans un papier cadeau facile à ouvrir.',
+    message:
+      'Ton doudou s’est déguisé en paquet cadeau ! Déballe-le vite pour lui faire un gros câlin.',
+    assets: [],
+    gifts: [],
   },
   66: {
-    "day": 66,
-    "date": "LUNDI 21 DÉCEMBRE 2026",
-    "title": "La Recette des Biscuits du Père Noël",
-    "adultPreparation": "Le lutin pose une carte recette simple pour préparer les sablés de Noël avec maman/papa. À joindre : Recette des sablés (annexes).",
-    "message": "Aujourd’hui, on prépare des sablés pour le Père Noël. À vos tabliers !",
-    "assets": [
+    day: 66,
+    date: 'LUNDI 21 DÉCEMBRE 2026',
+    title: 'La Recette des Biscuits du Père Noël',
+    adultPreparation:
+      'Poser la fiche recette des sablés avec les ingrédients. À joindre : Fiche recette.',
+    message:
+      'Aujourd’hui, nous préparons les sablés pour le Père Noël. Tous à vos tabliers !',
+    assets: [
       {
-        "file": "/assets/printables/annexe-96.png",
-        "label": "Recette des sablés",
-        "page": 96
-      }
+        file: '/assets/printables/annexe-96.png',
+        label: 'Recette des sablés',
+        page: 96,
+      },
     ],
-    "gifts": [
-      "Ingrédients des sablés"
-    ]
+    gifts: ['Ingrédients des sablés'],
   },
   67: {
-    "day": 67,
-    "date": "MARDI 22 DÉCEMBRE 2026",
-    "title": "Caché dans la Chaussette de Noël",
-    "adultPreparation": "Le lutin dépasse de la grande chaussette de Noël suspendue au mur ou au sapin.",
-    "message": "Je suis bien au chaud… Cherche un petit bonnet dans la chaussette de Noël !",
-    "assets": [],
-    "gifts": []
+    day: 67,
+    date: 'MARDI 22 DÉCEMBRE 2026',
+    title: 'Caché dans la Chaussette de Noël',
+    adultPreparation: 'Placer le lutin émergeant de la grande chaussette de Noël.',
+    message:
+      'Je suis bien au chaud… Viens vite chercher un petit bonnet rigolo dans la chaussette !',
+    assets: [],
+    gifts: [],
   },
   68: {
-    "day": 68,
-    "date": "MERCREDI 23 DÉCEMBRE 2026",
-    "title": "L'Avis de Passage du Père Noël",
-    "adultPreparation": "Le lutin tient une pancarte. À joindre : Plateau du Père Noël (annexes).",
-    "message": "Demain c'est le Réveillon ! N'oublie pas de préparer un verre de lait et un biscuit sous le sapin !",
-    "assets": [
+    day: 68,
+    date: 'MERCREDI 23 DÉCEMBRE 2026',
+    title: 'L’Avis de Passage du Père Noël',
+    adultPreparation:
+      'Déposer la pancarte d’avis de passage. À joindre : Plateau du Père Noël.',
+    message:
+      'Demain c’est le grand Réveillon ! N’oublie pas de disposer un verre de lait et un biscuit sous le sapin !',
+    assets: [
       {
-        "file": "/assets/printables/annexe-97.png",
-        "label": "Plateau du Père Noël",
-        "page": 97
-      }
+        file: '/assets/printables/annexe-97.png',
+        label: 'Plateau du Père Noël',
+        page: 97,
+      },
     ],
-    "gifts": [
-      "Lait et biscuit pour le Père Noël"
-    ]
+    gifts: ['Lait et biscuit pour le Père Noël'],
   },
   69: {
-    "day": 69,
-    "date": "JEUDI 24 DÉCEMBRE 2026",
-    "title": "Le Repos sous le Sapin",
-    "adultPreparation": "Le lutin est allongé sous le sapin, son petit sac de voyage fait à côté de lui, prêt à remonter dans le traîneau.",
-    "message": "Ce soir, je rentre au Pôle Nord avec le Père Noël. Merci pour toutes nos aventures, Louis. Je garde tes sourires dans mon sac !",
-    "assets": [],
-    "gifts": []
+    day: 69,
+    date: 'JEUDI 24 DÉCEMBRE 2026',
+    title: 'Le Repos sous le Sapin',
+    adultPreparation:
+      'Installer le lutin allongé sous le sapin avec son sac prêt pour le départ.',
+    message:
+      'Ce soir, je remonte dans le traîneau avec le Père Noël. Merci pour toutes nos merveilleuses aventures, Louis. Je garde tous tes sourires précieusement dans mon sac !',
+    assets: [],
+    gifts: [],
   },
   70: {
-    "day": 70,
-    "date": "VENDREDI 25 DÉCEMBRE 2026",
-    "title": "LA LETTRE FINALE DU PÈRE NOËL",
-    "adultPreparation": "Le lutin a disparu ! À sa place, les cadeaux de Noël et une grande lettre posée sur le verre de lait vide.",
-    "message": "Mon très cher Louis, Merci d’avoir si bien accueilli mes deux lutins ! Ton compagnon est remonté dans mon traîneau cette nuit pour rentrer au Pôle Nord avec moi. Il m’a raconté vos aventures à Lyon, vos fous rires et tes belles idées. Je te souhaite une merveilleuse journée de Noël, pleine de douceur et de moments partagés. Nous gardons de beaux souvenirs de toi dans notre atelier. Joyeux Noël Louis ! Le Père Noël",
-    "assets": [],
-    "gifts": [
-      "Cadeaux de Noël"
-    ]
+    day: 70,
+    date: 'VENDREDI 25 DÉCEMBRE 2026',
+    title: 'LA LETTRE FINALE DU PÈRE NOËL',
+    adultPreparation:
+      'Retirer le lutin et disposer la grande lettre finale du Père Noël à côté des cadeaux et du verre de lait vide.',
+    message:
+      'Mon très cher Louis,\n\nMerci d’avoir si chaleureusement accueilli mes deux lutins ! Ton compagnon de voyage est remonté dans mon traîneau cette nuit pour rentrer au Pôle Nord avec moi. Il m’a raconté toutes vos fabuleuses aventures à Lyon, vos fous rires et tes magnifiques idées.\n\nJe te souhaite une merveilleuse journée de Noël, pleine de douceur, de magie et de moments partagés en famille. Nous gardons un souvenir inoubliable de toi dans notre atelier.\n\nJoyeux Noël Louis !\n\nLe Père Noël',
+    assets: [],
+    gifts: ['Cadeaux de Noël'],
   },
 }
 
