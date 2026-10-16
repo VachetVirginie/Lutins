@@ -65,6 +65,27 @@ async function copyMessage() {
   copied.value = true
   setTimeout(() => (copied.value = false), 1800)
 }
+
+// Distinction d'usage : découper le mot, imprimer le support, écrire à la main
+function assetKind(label: string): string {
+  if (/coloriage/i.test(label)) return 'À imprimer puis colorier'
+  if (/carte|pancarte|image|illustration/i.test(label)) return 'À imprimer puis découper'
+  return 'À imprimer'
+}
+
+/** Imprime la fiche complète (lettre + annexes) via la vue d'impression */
+function printSheet() {
+  haptic(8)
+  window.print()
+}
+
+/** Imprime une seule annexe dans une fenêtre dédiée */
+function printAsset(file: string) {
+  const w = window.open('', '_blank')
+  if (!w) return
+  w.document.write(`<!doctype html><html><head><title>Annexe</title></head><body style="margin:0;display:grid;place-items:center;min-height:100vh;background:#fff"><img src="${file}" style="max-width:100%;max-height:100vh;object-fit:contain" onload="setTimeout(()=>window.print(),150)" /></body></html>`)
+  w.document.close()
+}
 </script>
 
 <template>
@@ -96,7 +117,7 @@ async function copyMessage() {
         <div class="letter-label"><span id="message-title">LE MOT DU LUTIN</span></div>
         <blockquote>{{ sheet.message }}</blockquote>
         <div class="letter-foot">
-          <span class="letter-sign">— depuis la route</span>
+          <span class="letter-sign">— depuis la route <em class="letter-usage">À découper et glisser</em></span>
           <button class="copy-button" type="button" :class="{ copied }" @click="copyMessage">
             <i class="mdi" :class="copied ? 'mdi-check' : 'mdi-content-copy'" aria-hidden="true" />
             {{ copied ? 'Copié !' : 'Copier le texte' }}
@@ -118,12 +139,17 @@ async function copyMessage() {
       <section v-if="sheet.assets.length" class="app-card" aria-labelledby="assets-title">
         <div class="section-label"><span id="assets-title">DANS LE KIT</span><i class="mdi mdi-printer-outline" aria-hidden="true" /></div>
         <div class="asset-grid">
-          <a v-for="asset in sheet.assets" :key="asset.file" class="asset-item" :href="asset.file" target="_blank" rel="noreferrer">
-            <img :src="asset.file" :alt="asset.label" loading="lazy">
+          <div v-for="asset in sheet.assets" :key="asset.file" class="asset-item">
+            <a class="asset-thumb" :href="asset.file" target="_blank" rel="noreferrer"><img :src="asset.file" :alt="asset.label" loading="lazy"></a>
             <span>{{ asset.label }}</span>
-            <small>Annexe · p. {{ asset.page }}</small>
-          </a>
+            <small>Annexe · p. {{ asset.page }} — {{ assetKind(asset.label) }}</small>
+            <div class="asset-actions">
+              <button type="button" @click="printAsset(asset.file)"><i class="mdi mdi-printer" aria-hidden="true" /> Imprimer</button>
+              <a :href="asset.file" download><i class="mdi mdi-download" aria-hidden="true" /> Télécharger</a>
+            </div>
+          </div>
         </div>
+        <button class="print-all" type="button" @click="printSheet"><i class="mdi mdi-printer-check" aria-hidden="true" /> Imprimer la fiche complète (lettre + annexes)</button>
       </section>
 
       <section v-if="sheet.gifts.length" class="app-card" aria-labelledby="gift-title">
@@ -135,6 +161,18 @@ async function copyMessage() {
 
       <aside v-if="gap" class="content-gap" aria-label="Élément à produire"><i class="mdi mdi-image-plus-outline" aria-hidden="true" /><div><strong>Visuel de scène à créer</strong><p>{{ gap.detail }}</p></div></aside>
     </template>
+
+    <!-- vue imprimable : lettre + annexes regroupés -->
+    <div v-if="sheet" class="print-sheet" aria-hidden="true">
+      <h1>J{{ sheet.day }} · {{ sheet.title }}</h1>
+      <p class="print-date">{{ sheet.date }}</p>
+      <h2>Le mot du lutin <small>(à découper)</small></h2>
+      <p class="print-message">{{ sheet.message }}</p>
+      <template v-if="sheet.assets.length">
+        <h2>Annexes <small>(à imprimer)</small></h2>
+        <div class="print-assets"><figure v-for="asset in sheet.assets" :key="asset.file"><img :src="asset.file" :alt="asset.label"><figcaption>{{ asset.label }} — p. {{ asset.page }}</figcaption></figure></div>
+      </template>
+    </div>
 
   </main>
 </template>
@@ -627,7 +665,7 @@ async function copyMessage() {
   text-decoration:none
 }
 
-.asset-item img {
+.asset-thumb img {
   width:100%;
   aspect-ratio:1.42;
   border:1px solid rgba(241,204,122,.25);
@@ -637,7 +675,7 @@ async function copyMessage() {
   transition:transform .25s ease
 }
 
-.asset-item:hover img {
+.asset-thumb:hover img {
   transform:scale(1.02)
 }
 
@@ -649,6 +687,144 @@ async function copyMessage() {
 .asset-item small {
   color:#a9bcae;
   font-size:10px
+}
+
+.asset-actions {
+  display:flex;
+  gap:6px;
+  margin-top:3px
+}
+
+.asset-actions button,.asset-actions a {
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  flex:1;
+  justify-content:center;
+  padding:7px 8px;
+  border:1px solid rgba(230,194,128,.35);
+  border-radius:999px;
+  background:rgba(230,194,128,.1);
+  color:#e6c280;
+  font-family:inherit;
+  font-size:10px;
+  font-weight:600;
+  cursor:pointer;
+  text-decoration:none;
+  transition:background .25s,transform .35s var(--spring)
+}
+
+.asset-actions button:hover,.asset-actions a:hover {
+  background:rgba(230,194,128,.2)
+}
+
+.asset-actions button:active,.asset-actions a:active {
+  transform:scale(.94)
+}
+
+/* impression fiche complète */
+.print-all {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  width:100%;
+  margin-top:14px;
+  padding:12px;
+  border:1px solid rgba(230,194,128,.45);
+  border-radius:14px;
+  background:rgba(230,194,128,.12);
+  color:#ffe9a8;
+  font-family:inherit;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+  transition:background .25s,transform .35s var(--spring)
+}
+
+.print-all:hover {
+  background:rgba(230,194,128,.2)
+}
+
+.print-all:active {
+  transform:scale(.97)
+}
+
+.letter-usage {
+  display:block;
+  margin-top:2px;
+  color:#8a6a2f;
+  font:italic 500 10px var(--font-literary);
+  letter-spacing:.04em;
+  opacity:.85
+}
+
+/* ---- vue imprimable (écran : masquée, print : seule visible) ---- */
+.print-sheet {
+  display:none
+}
+
+@media print {
+  .print-sheet {
+    display:block;
+    padding:12px 4mm;
+    color:#222;
+    background:#fff;
+    font-family:Georgia,serif
+  }
+
+  .print-sheet h1 {
+    margin:0;
+    font-size:20pt
+  }
+
+  .print-date {
+    margin:2mm 0 6mm;
+    font-size:9pt;
+    letter-spacing:.14em;
+    text-transform:uppercase
+  }
+
+  .print-sheet h2 {
+    margin:7mm 0 3mm;
+    font-size:12pt;
+    border-bottom:1px solid #999
+  }
+
+  .print-sheet h2 small {
+    font-weight:400;
+    font-style:italic;
+    color:#666
+  }
+
+  .print-message {
+    padding:4mm;
+    border:1.5px dashed #8a6a2f;
+    font-size:11pt;
+    line-height:1.6;
+    white-space:pre-line
+  }
+
+  .print-assets {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:5mm
+  }
+
+  .print-assets figure {
+    margin:0;
+    break-inside:avoid
+  }
+
+  .print-assets img {
+    width:100%;
+    border:1px solid #ccc
+  }
+
+  .print-assets figcaption {
+    font-size:8pt;
+    color:#555
+  }
 }
 
 /* ---- cadeaux ---- */

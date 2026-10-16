@@ -13,7 +13,7 @@ const fillPct = computed(() => (currentAdventure.currentDay / currentAdventure.t
       <h2>Le voyage<br /><em>commence.</em></h2>
       <p>Une première étape vers Noël.</p>
     </div>
-    <div class="progress-orb" :style="{ '--fill': fillPct + '%' }"><strong>{{ currentAdventure.currentDay }}</strong><span>/ {{ currentAdventure.totalDays }}</span><small>JOURS</small></div>
+    <div class="progress-orb" :style="{ '--fill': fillPct + '%' }"><i class="orb-spark" aria-hidden="true" /><strong>{{ currentAdventure.currentDay }}</strong><span>/ {{ currentAdventure.totalDays }}</span><small>JOURS</small></div>
   </section>
 </template>
 
@@ -24,12 +24,13 @@ const fillPct = computed(() => (currentAdventure.currentDay / currentAdventure.t
   align-items:center;
   justify-content:space-between;
   gap:14px;
+  margin-top:14px;
   padding:24px 22px;
-  border:1px solid rgba(241,204,122,.26);
+  border:1px solid rgba(241,204,122,.3);
   border-radius:26px;
-  background:rgba(255,255,255,.05);
+  background:radial-gradient(ellipse 60% 90% at 88% 8%,rgba(255,205,110,.14),transparent 60%),linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.02) 60%);
   backdrop-filter:blur(18px);
-  box-shadow:0 18px 45px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.08)
+  box-shadow:0 18px 45px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -14px 30px rgba(10,25,18,.35)
 }
 
 .progress-copy h2  {
@@ -60,6 +61,51 @@ const fillPct = computed(() => (currentAdventure.currentDay / currentAdventure.t
   width:96px;
   height:96px;
   flex:0 0 auto
+}
+
+.progress-orb::after  {
+  content:'';
+  position:absolute;
+  inset:-16px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,205,110,.32),rgba(255,190,80,.1) 55%,transparent 72%);
+  animation:orb-breathe 4s ease-in-out infinite
+}
+
+.orb-spark  {
+  position:absolute;
+  inset:-4px;
+  animation:orb-orbit 7s linear infinite
+}
+
+.orb-spark::before  {
+  content:'';
+  position:absolute;
+  left:50%;
+  top:0;
+  width:5px;
+  height:5px;
+  margin-left:-2.5px;
+  border-radius:50%;
+  background:#fff3c2;
+  box-shadow:0 0 8px #ffd97a,0 0 18px rgba(255,200,90,.8)
+}
+
+@keyframes orb-orbit  {
+  to  {
+    transform:rotate(360deg)
+  }
+}
+
+@keyframes orb-breathe  {
+  0%,100%  {
+    opacity:.65;
+    transform:scale(.94)
+  }
+  50%  {
+    opacity:1;
+    transform:scale(1.05)
+  }
 }
 
 .progress-orb::before  {

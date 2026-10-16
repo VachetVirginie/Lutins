@@ -1,22 +1,26 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { preparationNext7Days } from '../../data/adventure'
+import { currentAdventure } from '../../data/adventure'
 import { dailySheets } from '../../data/dailySheets'
+import { preparationCatalog } from '../../data/preparationCatalog'
 
-const items = ref(preparationNext7Days.map((item) => ({ ...item, done: false })))
+const horizonEnd = currentAdventure.currentDay + 6
+const items = ref(preparationCatalog
+  .filter((item) => item.day >= currentAdventure.currentDay && item.day <= horizonEnd)
+  .map((item) => ({ ...item, done: false })))
 const TOTAL_PREP = items.value.length
 const isOpen = ref(false)
 const doneCount = computed(() => items.value.filter((item) => item.done).length)
 
 const upcomingDays = computed(() => Array.from({ length: 7 }, (_, index) => {
-  const day = index + 1
-  const dayItems = items.value.filter((item) => item.day === `J${day}`)
+  const day = Math.min(currentAdventure.currentDay + index, currentAdventure.totalDays)
+  const dayItems = items.value.filter((item) => item.day === day)
   return {
     day,
-    title: dailySheets[day].title,
+    title: dailySheets[day]?.title ?? `Jour ${day}`,
     detail: dayItems.length ? `${dayItems.length} élément${dayItems.length > 1 ? 's' : ''} à préparer` : 'Voir la fiche du jour',
     done: dayItems.length > 0 && dayItems.every((item) => item.done),
-    activityId: day === 1 ? 'jour-1-alerte-pole-nord' : day === 2 ? 'jour-2-preparation-sac' : day === 3 ? 'jour-3-depart-traineau' : day === 4 ? 'jour-4-pause-gouter' : `jour-${day}`,
+    activityId: `jour-${day}`,
   }
 }))
 </script>
@@ -24,7 +28,7 @@ const upcomingDays = computed(() => Array.from({ length: 7 }, (_, index) => {
 <template>
   <section class="home-prep" :class="{ collapsed: !isOpen }">
     <button class="section-heading" type="button" :aria-expanded="isOpen" aria-controls="upcoming-preparation" @click="isOpen = !isOpen">
-      <div><p class="home-overline">DANS LES 7 PROCHAINS JOURS</p><h2>À anticiper</h2></div>
+      <div><p class="home-overline">DANS LES 7 PROCHAINS JOURS</p><h2>Matériel nécessaire</h2></div>
       <span>{{ doneCount }}/{{ TOTAL_PREP }} prêts</span><i class="section-toggle mdi" :class="isOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'" aria-hidden="true" />
     </button>
     <div id="upcoming-preparation" class="prep-body" :class="{ open: isOpen }">

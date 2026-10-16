@@ -22,19 +22,20 @@ const transitionName = computed(() => (fromName.value === 'opening' ? 'page' : '
 </script>
 
 <template>
-  <v-app class="app-shell">
+  <div class="app-shell">
     <AmbientDust />
     <router-view v-slot="{ Component, route }">
       <transition :name="transitionName" mode="out-in">
         <component :is="Component" :key="route.path" />
       </transition>
     </router-view>
-  </v-app>
+  </div>
 </template>
 
 <style scoped>
 .app-shell  {
-  background:var(--color-night)!important
+  min-height:100svh;
+  background:var(--color-night)
 }
 
 .page-enter-active  {

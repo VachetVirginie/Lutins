@@ -18,7 +18,7 @@
   /* Seal accent (rgb triplet for alpha variants) */   --rgb-seal:237,200,115;
   font-family:var(--font-sans);
   color:var(--color-ink);
-  background:var(--color-cream);
+  background:var(--color-night);
   font-synthesis:none;
 }
 
@@ -26,18 +26,39 @@
   box-sizing:border-box
 }
 
-html,body,#app,.v-application  {
+html,body,#app  {
   min-height:100%
 }
 
 body  {
   margin:0;
   min-width:320px;
-  background:var(--color-cream)
+  background:var(--color-night)
 }
 
 button  {
   font:inherit
+}
+
+/* Impression : seule la feuille imprimable reste visible */
+@media print  {
+  body *  {
+    visibility:hidden
+  }
+  .print-sheet,.print-sheet *  {
+    visibility:visible
+  }
+  .print-sheet  {
+    position:fixed;
+    inset:0;
+    display:block;
+    overflow:visible;
+    background:#fff;
+    color:#222
+  }
+  .ambient-dust  {
+    display:none
+  }
 }
 
 /* Shared typographic pattern used across home sections */ .home-overline  {

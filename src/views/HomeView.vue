@@ -4,9 +4,75 @@ import { NextStep, PrepSection, ProgressHero, StoryPhase } from '../components/h
 
 <template>
   <main class="app-screen">
+    <svg class="home-ornament" viewBox="0 0 60 96" aria-hidden="true">
+      <defs>
+        <radialGradient id="orn-ball" cx="36%" cy="30%" r="80%">
+          <stop offset="0%" stop-color="#fff4cf" />
+          <stop offset="42%" stop-color="#f1cc7a" />
+          <stop offset="100%" stop-color="#9c6f2e" />
+        </radialGradient>
+      </defs>
+      <line class="orn-thread" x1="30" y1="-4" x2="30" y2="32" />
+      <rect class="orn-cap" x="24" y="32" width="12" height="8" rx="2.5" />
+      <circle class="orn-ball" cx="30" cy="62" r="22" fill="url(#orn-ball)" />
+      <ellipse class="orn-shine" cx="22" cy="52" rx="6.5" ry="4" transform="rotate(-28 22 52)" />
+      <path class="orn-glitter" d="M40 50 L41.6 54 L45.6 55.6 L41.6 57.2 L40 61.2 L38.4 57.2 L34.4 55.6 L38.4 54 Z" />
+    </svg>
     <ProgressHero />
     <StoryPhase />
     <NextStep />
     <PrepSection />
   </main>
 </template>
+
+<style scoped>
+.home-ornament {
+  display:block;
+  position:relative;
+  z-index:3;
+  width:44px;
+  margin:-4px auto -36px;
+  overflow:visible;
+  transform-origin:50% 0;
+  animation:orn-sway 7s ease-in-out infinite;
+  filter:drop-shadow(0 0 9px rgba(255,215,120,.75)) drop-shadow(0 5px 14px rgba(255,180,70,.4))
+}
+
+@keyframes orn-sway {
+  0%,100% {
+    transform:rotate(-2.4deg)
+  }
+  50% {
+    transform:rotate(2.4deg)
+  }
+}
+
+.orn-thread {
+  stroke:rgba(241,204,122,.55);
+  stroke-width:1
+}
+
+.orn-cap {
+  fill:#b98a3e
+}
+
+.orn-shine {
+  fill:rgba(255,255,255,.55)
+}
+
+.orn-glitter {
+  fill:#fff8dd;
+  animation:orn-twinkle 2.8s ease-in-out infinite
+}
+
+@keyframes orn-twinkle {
+  0%,100% {
+    opacity:.3;
+    transform:scale(.85)
+  }
+  50% {
+    opacity:1;
+    transform:scale(1.05)
+  }
+}
+</style>

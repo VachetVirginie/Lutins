@@ -18,11 +18,11 @@
   grid-template-columns:38% 62%;
   margin-top:26px;
   overflow:hidden;
-  border:1px solid rgba(241,204,122,.24);
+  border:1px solid rgba(241,204,122,.3);
   border-radius:22px;
-  background:rgba(10,28,20,.82);
+  background:linear-gradient(150deg,rgba(255,255,255,.05),transparent 45%),rgba(10,28,20,.82);
   backdrop-filter:blur(16px);
-  box-shadow:0 14px 36px rgba(0,0,0,.28)
+  box-shadow:0 14px 36px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.09)
 }
 
 .next-art  {

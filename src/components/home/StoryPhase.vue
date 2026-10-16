@@ -4,8 +4,8 @@ import { currentAdventure, narrativeMilestones } from '../../data/adventure'
 
 const STEP = 58
 const PAD_X = 60
-const TRACK_W = PAD_X * 2 + STEP * 69
-const TOTAL_DAYS = 70
+const TOTAL_DAYS = currentAdventure.totalDays
+const TRACK_W = PAD_X * 2 + STEP * (TOTAL_DAYS - 1)
 
 const milestoneByDay = new Map<number, string>(narrativeMilestones.map((m) => [m.day, m.title]))
 
@@ -62,6 +62,7 @@ const wavePath = computed(() => {
         >
           <template v-if="n.state === 'active'">
             <i class="elf-halo" aria-hidden="true" />
+            <i v-for="s in 3" :key="s" class="elf-spark" :class="`elf-spark--${s}`" aria-hidden="true" />
             <img class="phase-elf" src="/assets/imgs/lutin.png" alt="" />
           </template>
           <b class="node-dot" aria-hidden="true" />
@@ -385,7 +386,63 @@ const wavePath = computed(() => {
   border-radius:50%;
   background:radial-gradient(ellipse,rgba(255,215,0,.75),rgba(255,180,60,.25) 55%,transparent 75%);
   filter:blur(3px);
-  mix-blend-mode:screen
+  mix-blend-mode:screen;
+  animation:halo-breathe 3.4s ease-in-out infinite
+}
+
+@keyframes halo-breathe {
+  0%,100% {
+    transform:translateX(-50%) scale(.92);
+    opacity:.75
+  }
+  50% {
+    transform:translateX(-50%) scale(1.12);
+    opacity:1
+  }
+}
+
+/* étincelles en orbite autour du lutin */
+.elf-spark {
+  position:absolute;
+  left:50%;
+  top:-30px;
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  background:#ffe9a8;
+  box-shadow:0 0 7px #ffd97a;
+  animation:elf-orbit 5s ease-in-out infinite
+}
+
+.elf-spark--2 {
+  animation-delay:-1.7s;
+  width:3px;
+  height:3px
+}
+
+.elf-spark--3 {
+  animation-delay:-3.4s;
+  width:2px;
+  height:2px
+}
+
+@keyframes elf-orbit {
+  0%,100% {
+    transform:translate(-28px,4px) scale(.7);
+    opacity:.3
+  }
+  25% {
+    transform:translate(-6px,-14px) scale(1.1);
+    opacity:1
+  }
+  50% {
+    transform:translate(22px,-8px) scale(.8);
+    opacity:.6
+  }
+  75% {
+    transform:translate(-2px,10px) scale(1.15);
+    opacity:.95
+  }
 }
 
 .phase-elf {
