@@ -27,7 +27,8 @@ const upcomingDays = computed(() => Array.from({ length: 7 }, (_, index) => {
       <div><p class="home-overline">DANS LES 7 PROCHAINS JOURS</p><h2>À anticiper</h2></div>
       <span>{{ doneCount }}/{{ TOTAL_PREP }} prêts</span><i class="section-toggle mdi" :class="isOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'" aria-hidden="true" />
     </button>
-    <div v-show="isOpen" id="upcoming-preparation">
+    <div id="upcoming-preparation" class="prep-body" :class="{ open: isOpen }">
+      <div class="prep-inner">
       <ul class="prep-list">
         <li v-for="day in upcomingDays" :key="day.day">
           <div class="prep-row" :class="{ 'is-done': day.done }">
@@ -37,11 +38,16 @@ const upcomingDays = computed(() => Array.from({ length: 7 }, (_, index) => {
           </div>
         </li>
       </ul>
+      </div>
     </div>
     <RouterLink class="prep-link" to="/prepare">Voir tout le kit par type <i class="mdi mdi-arrow-right" aria-hidden="true" /></RouterLink>
   </section>
 </template>
 
 <style scoped>
+.prep-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease-out}
+.prep-body.open{grid-template-rows:1fr}
+.prep-inner{overflow:hidden;min-height:0}
+
 .home-prep{margin-top:28px}.section-heading{display:flex;align-items:flex-end;justify-content:space-between;width:100%;padding:0;border:0;background:none;text-align:left;cursor:pointer}.section-heading .home-overline{font-size:11px;letter-spacing:.12em;color:rgba(255,255,255,.6)}.home-prep h2{margin:6px 0 0;font:500 26px var(--font-serif);color:#fff}.section-heading>span{margin-left:auto;font-size:13px;color:#e6c280}.section-toggle{margin-left:10px;color:#e6c280;font-size:18px}.prep-list{list-style:none;margin:14px 0 0;padding:0;border-top:1px solid rgba(255,255,255,.05)}.prep-row{display:flex;align-items:center;gap:10px;width:100%;padding:11px 2px;border-bottom:1px solid rgba(255,255,255,.05)}.prep-day{display:grid;place-items:center;flex:0 0 auto;width:29px;height:25px;border:1px solid #e6c28066;border-radius:8px;color:#e6c280;font-size:9px;font-weight:700}.prep-day.done{background:#e6c280;color:#173b32}.prep-text{flex:1;display:grid;gap:3px;text-decoration:none}.prep-text strong{font-size:14px;font-weight:500;color:#fff}.prep-text small{font-size:11px;color:rgba(255,255,255,.5)}.prep-row.is-done .prep-text strong{color:rgba(255,255,255,.45)}.prep-chevron{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;color:rgba(255,255,255,.5);font-size:15px;text-decoration:none}.prep-link{display:flex;align-items:center;gap:7px;margin-top:16px;color:#e6c280;font-size:12px;text-decoration:none}.section-heading:focus-visible,.prep-text:focus-visible,.prep-chevron:focus-visible{outline:2px solid #ffe9a8;outline-offset:3px;border-radius:6px}
 </style>

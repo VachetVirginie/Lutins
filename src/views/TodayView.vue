@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { currentAdventure } from '../data/adventure'
+import { haptic } from '../utils/haptics'
 
 const router = useRouter()
 
@@ -18,6 +19,7 @@ const isReady = computed(() => doneCount.value === 4)
 
 function toggle(key: ActionKey) {
   completed.value[key] = !completed.value[key]
+  haptic(10)
 }
 </script>
 

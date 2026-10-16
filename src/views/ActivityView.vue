@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { contentGapByDay } from '../data/contentGaps'
 import { dailySheetsByActivityId } from '../data/dailySheets'
+import { haptic } from '../utils/haptics'
 
 const route = useRoute()
 const router = useRouter()
@@ -20,15 +21,47 @@ const copied = ref(false)
 
 watch(sheet, () => { preparationDone.value = false }, { immediate: true })
 
+// Parallaxe gyroscopique : la lettre bouge de 2-3px, le sceau davantage (premier plan)
+const letterTilt = ref({ x: 0, y: 0 })
+
+function onTilt(e: DeviceOrientationEvent) {
+  if (e.gamma == null || e.beta == null) return
+  letterTilt.value = {
+    x: Math.max(-1, Math.min(1, e.gamma / 28)) * 3,
+    y: Math.max(-1, Math.min(1, (e.beta - 45) / 28)) * 2.5,
+  }
+}
+
+// iOS : requestPermission() exige un geste utilisateur → demandé au 1er toucher
+async function requestOrientation() {
+  const DOE = DeviceOrientationEvent as unknown as { requestPermission?: () => Promise<string> }
+  if (typeof DOE.requestPermission === 'function') {
+    try {
+      if (await DOE.requestPermission() === 'granted') window.addEventListener('deviceorientation', onTilt)
+    } catch { /* refusé : pas de tilt */ }
+  }
+}
+
+onMounted(() => {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  const DOE = DeviceOrientationEvent as unknown as { requestPermission?: unknown }
+  if (typeof DOE.requestPermission === 'function') {
+    window.addEventListener('pointerdown', requestOrientation, { once: true })
+  } else {
+    window.addEventListener('deviceorientation', onTilt)
+  }
+})
+onBeforeUnmount(() => window.removeEventListener('deviceorientation', onTilt))
+
 function togglePreparation() {
   preparationDone.value = !preparationDone.value
-  navigator.vibrate?.(12)
+  haptic(12)
 }
 
 async function copyMessage() {
   if (!sheet.value) return
   await navigator.clipboard?.writeText(sheet.value.message)
-  navigator.vibrate?.(8)
+  haptic(8)
   copied.value = true
   setTimeout(() => (copied.value = false), 1800)
 }
@@ -57,7 +90,7 @@ async function copyMessage() {
 
     <template v-if="sheet">
       <!-- Le mot du lutin : parchemin chaud -->
-      <section class="letter" aria-labelledby="message-title">
+      <section class="letter" :style="{ '--tx': letterTilt.x + 'px', '--ty': letterTilt.y + 'px' }" aria-labelledby="message-title">
         <span class="wax-seal" aria-hidden="true"><b>J{{ sheet.day }}</b></span>
         <span class="postmark" aria-hidden="true"><b>POSTE DU<br />PÔLE NORD</b><small>{{ sheet.date }}</small></span>
         <div class="letter-label"><span id="message-title">LE MOT DU LUTIN</span></div>
@@ -73,6 +106,7 @@ async function copyMessage() {
 
       <section class="carnet" :class="{ done: preparationDone }" aria-labelledby="prep-title">
         <i class="carnet-ribbon" aria-hidden="true" />
+        <i class="carnet-burst" aria-hidden="true" />
         <div class="section-label"><span id="prep-title">LE CARNET SECRET DES LUTINS</span><i class="mdi mdi-book-lock-outline" aria-hidden="true" /></div>
         <p class="activity-copy">{{ sheet.adultPreparation }}</p>
         <button class="done-row" type="button" :class="{ done: preparationDone }" @click="togglePreparation">
@@ -195,12 +229,12 @@ async function copyMessage() {
 }
 
 .activity-date {
-  margin:7px 0 0;
-  color:#a9bcae;
-  font-size:12px;
-  font-style:italic;
-  font-family:var(--font-serif);
-  text-transform:capitalize
+  margin:9px 0 0;
+  color:var(--color-gold);
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:.15em;
+  text-transform:uppercase
 }
 
 .activity-missing {
@@ -209,10 +243,66 @@ async function copyMessage() {
   color:#f7efdb
 }
 
+/* ---- entrées étagées (staggered) ---- */
+.activity-head {
+  animation:rise-in .55s var(--spring) both
+}
+
+.letter {
+  animation:letter-in .6s var(--spring) .1s both
+}
+
+.carnet {
+  animation:rise-in .6s var(--spring) .2s both
+}
+
+.app-card {
+  animation:rise-in .6s var(--spring) .28s both
+}
+
+.app-card + .app-card {
+  animation-delay:.34s
+}
+
+.content-gap {
+  animation:rise-in .6s var(--spring) .4s both
+}
+
+@keyframes rise-in {
+  from {
+    opacity:0;
+    transform:translateY(18px) scale(.985)
+  }
+  to {
+    opacity:1;
+    transform:none
+  }
+}
+
+/* la lettre finit sur sa pose gyroscopique pour ne pas casser le tilt */
+@keyframes letter-in {
+  from {
+    opacity:0;
+    transform:translateY(18px) scale(.985)
+  }
+  to {
+    opacity:1;
+    transform:translate3d(var(--tx,0),var(--ty,0),0)
+  }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .activity-head,.letter,.carnet,.app-card,.content-gap {
+    animation:none
+  }
+}
+
 /* ---- le mot du lutin : artefact parchemin ---- */
 .letter {
   position:relative;
   margin-top:30px;
+  transform:translate3d(var(--tx,0),var(--ty,0),0);
+  transition:transform .3s ease-out;
   padding:34px 24px 20px;
   border-radius:5px 20px 8px 26px / 20px 7px 26px 9px;
   background:
@@ -268,7 +358,8 @@ async function copyMessage() {
     0 8px 16px rgba(0,0,0,.45),
     inset 0 2px 4px rgba(255,255,255,.3),
     inset 0 -5px 9px rgba(0,0,0,.4);
-  transform:rotate(-7deg)
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,.5));
+  transform:rotate(-7deg) translate(calc(var(--tx,0)*1.7),calc(var(--ty,0)*1.7))
 }
 
 .wax-seal::before {
@@ -365,7 +456,7 @@ async function copyMessage() {
   align-items:center;
   gap:7px;
   padding:9px 16px;
-  border:1px solid #b98e3e;
+  border:1px solid #8c6b3d;
   border-radius:999px;
   background:linear-gradient(135deg,#e6c280,#d4af5f);
   color:#3a2d18;
@@ -410,6 +501,32 @@ async function copyMessage() {
 .carnet.done {
   border-color:rgba(230,194,128,.6);
   box-shadow:0 14px 34px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,240,210,.1),0 0 26px rgba(255,215,0,.14)
+}
+
+/* onde de lumière à la validation */
+.carnet-burst {
+  position:absolute;
+  inset:-30px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,233,168,.55) 0%,rgba(255,215,0,.25) 45%,transparent 70%);
+  mix-blend-mode:screen;
+  opacity:0;
+  pointer-events:none
+}
+
+.carnet.done .carnet-burst {
+  animation:carnet-burst .8s ease-out
+}
+
+@keyframes carnet-burst {
+  0% {
+    opacity:1;
+    transform:scale(.3)
+  }
+  100% {
+    opacity:0;
+    transform:scale(1.6)
+  }
 }
 
 .carnet-ribbon {

@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { preparationCatalog, type PreparationCategory } from '../data/preparationCatalog'
+import { haptic } from '../utils/haptics'
 
 const router = useRouter()
 
@@ -33,7 +34,7 @@ function toggle(id: string): void {
   if (next.has(id)) next.delete(id)
   else next.add(id)
   done.value = next
-  navigator.vibrate?.(12)
+  haptic(12)
 }
 </script>
 
@@ -206,7 +207,11 @@ function toggle(id: string): void {
   font-size:11px;
   font-weight:500;
   cursor:pointer;
-  transition:background .25s,color .25s,border-color .25s
+  transition:background .25s,color .25s,border-color .25s,transform .35s var(--spring)
+}
+
+.prepare-filters button:active {
+  transform:scale(.94)
 }
 
 .prepare-filters button i {
@@ -297,7 +302,16 @@ function toggle(id: string): void {
   color:#1c3a30;
   font-size:13px;
   cursor:pointer;
-  transition:background .25s,border-color .25s,box-shadow .25s
+  transition:background .25s,border-color .25s,box-shadow .25s,transform .35s var(--spring)
+}
+
+.prepare-check:active {
+  transform:scale(.85)
+}
+
+.prepare-item-copy:active {
+  transform:scale(.98);
+  transition:transform .35s var(--spring)
 }
 
 .prepare-item.done .prepare-check {

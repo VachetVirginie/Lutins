@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { haptic } from '../utils/haptics'
 
 const emit = defineEmits<{ unlocked: [] }>()
 
@@ -16,6 +17,7 @@ const orbitB = ref<HTMLElement>()
 
 let raf = 0
 let holdStart = 0
+let hapticStep = 0
 let flashTimer: number | undefined
 const orbitAnims: Animation[] = []
 
@@ -48,8 +50,15 @@ function startHold() {
   if (done.value || raf) return
   holding.value = true
   holdStart = performance.now()
+  hapticStep = 0
+  haptic(8)
   const tick = (now: number) => {
     progress.value = Math.min(100, ((now - holdStart) / HOLD_MS) * 100)
+    const step = Math.floor(progress.value / 25)
+    if (step > hapticStep) {
+      hapticStep = step
+      haptic(6)
+    }
     syncOrbitRate()
     if (progress.value >= 100) return completeUnlock()
     raf = requestAnimationFrame(tick)
@@ -74,7 +83,7 @@ function completeUnlock() {
   progress.value = 100
   done.value = true
   syncOrbitRate()
-  navigator.vibrate?.([15, 35, 15])
+  haptic([15, 35, 15])
   flashTimer = window.setTimeout(() => emit('unlocked'), FLASH_MS)
 }
 

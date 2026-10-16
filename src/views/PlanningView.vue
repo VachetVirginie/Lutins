@@ -238,7 +238,11 @@ const futurePath = computed(() => trailSegment(Math.max(CURRENT - 1, 0), TOTAL -
   border-radius:14px;
   background:rgba(255,255,255,.05);
   backdrop-filter:blur(10px);
-  transition:filter .3s,opacity .3s
+  transition:filter .3s,opacity .3s,transform .35s var(--spring)
+}
+
+.map-stop:active .stop-card {
+  transform:scale(.95)
 }
 
 .stop-card strong {

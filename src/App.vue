@@ -1,7 +1,14 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import AmbientDust from './components/AmbientDust.vue'
+
+// Lumière ambiante modulée selon l'heure : plus vive le jour, feutrée le soir
+onMounted(() => {
+  const h = new Date().getHours()
+  const glow = h >= 7 && h < 18 ? 0.11 : h >= 18 && h < 22 ? 0.08 : 0.05
+  document.documentElement.style.setProperty('--ambient-glow', String(glow))
+})
 
 const router = useRouter()
 const fromName = ref<string>()

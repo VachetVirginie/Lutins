@@ -92,7 +92,7 @@
   letter-spacing:.01em;
   text-decoration:none;
   box-shadow:0 6px 18px rgba(230,194,128,.3),inset 0 1px 0 rgba(255,255,255,.45);
-  transition:transform .2s ease,box-shadow .2s ease
+  transition:transform .35s var(--spring),box-shadow .2s ease
 }
 
 .next-cta i  {

@@ -22,6 +22,14 @@ const nodes = computed(() =>
 )
 
 const activeX = computed(() => nodes.value.find((n) => n.state === 'active')?.x ?? PAD_X)
+
+// La vague de points couvre tout le reste de la piste (échelle 1:1, points non déformés)
+const waveLen = computed(() => TRACK_W - activeX.value)
+const wavePath = computed(() => {
+  let d = 'M0 7'
+  for (let x = 20; x <= waveLen.value + 20; x += 20) d += ` Q${x - 10} 1 ${x} 7`
+  return d
+})
 </script>
 
 <template>
@@ -38,8 +46,8 @@ const activeX = computed(() => nodes.value.find((n) => n.state === 'active')?.x 
       <div class="phase-track" :style="{ width: TRACK_W + 'px' }">
         <i class="phase-line" />
         <i class="phase-fill" :style="{ width: activeX + 'px' }" />
-        <svg class="phase-wave" viewBox="0 0 600 14" preserveAspectRatio="none" aria-hidden="true" :style="{ left: activeX + 'px' }">
-          <path d="M0 7 Q10 1 20 7 T40 7 T60 7 T80 7 T100 7 T120 7 T140 7 T160 7 T180 7 T200 7 T220 7 T240 7 T260 7 T280 7 T300 7 T320 7 T340 7 T360 7 T380 7 T400 7 T420 7 T440 7 T460 7 T480 7 T500 7 T520 7 T540 7 T560 7 T580 7 T600 7" />
+        <svg class="phase-wave" :viewBox="`0 0 ${waveLen} 14`" :width="waveLen" height="14" aria-hidden="true" :style="{ left: activeX + 'px' }">
+          <path :d="wavePath" />
         </svg>
         <span v-for="n in 8" :key="n" class="phase-dust" aria-hidden="true" />
 
@@ -133,12 +141,11 @@ const activeX = computed(() => nodes.value.find((n) => n.state === 'active')?.x 
 /* sillage ondulé de points d'or vers les prochaines étapes */
 .phase-wave {
   position:absolute;
-  right:0;
   top:63px;
   height:14px;
   overflow:visible;
-  mask:linear-gradient(90deg,transparent 0%,#000 12%,#000 70%,transparent 96%);
-  -webkit-mask:linear-gradient(90deg,transparent 0%,#000 12%,#000 70%,transparent 96%)
+  mask:linear-gradient(90deg,transparent 0%,#000 4%,#000 96%,transparent 100%);
+  -webkit-mask:linear-gradient(90deg,transparent 0%,#000 4%,#000 96%,transparent 100%)
 }
 
 .phase-wave path {
