@@ -15,7 +15,7 @@ const TOTAL = currentAdventure.totalDays
 const ROW_H = 86
 const MAP_H = TOTAL * ROW_H + 60
 
-const milestoneByDay = new Map(narrativeMilestones.map((m) => [m.day, m]))
+const milestoneByDay = new Map<number, (typeof narrativeMilestones)[number]>(narrativeMilestones.map((m) => [m.day as number, m]))
 
 const stops = Array.from({ length: TOTAL }, (_, i) => {
   const day = i + 1

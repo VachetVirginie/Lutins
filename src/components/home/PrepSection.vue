@@ -37,8 +37,8 @@ const upcomingDays = computed(() => Array.from({ length: 7 }, (_, index) => {
           </div>
         </li>
       </ul>
-      <RouterLink class="prep-link" to="/prepare">Voir tout le kit par type <i class="mdi mdi-arrow-right" aria-hidden="true" /></RouterLink>
     </div>
+    <RouterLink class="prep-link" to="/prepare">Voir tout le kit par type <i class="mdi mdi-arrow-right" aria-hidden="true" /></RouterLink>
   </section>
 </template>
 
