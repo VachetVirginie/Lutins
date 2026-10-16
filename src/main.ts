@@ -33,6 +33,12 @@ import './seal-clean.css'
 import './seal-fingerprint-fix.css'
 import './seal-fingerprint-visible.css'
 import './seal-fingerprint-scale.css'
+import './seal-real-fingerprint.css'
+import './seal-fingerprint-direct.css'
+import './seal-mdi-final.css'
+import './seal-mdi-source-fix.css'
+import './seal-mdi-direct-render.css'
+import './seal-fingerprint-position.css'
 
 const vuetify = createVuetify({
   theme: {
