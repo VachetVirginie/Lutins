@@ -3,9 +3,9 @@
     <div class="phase-top">
       <div>
         <p class="home-overline">PHASE ACTUELLE</p>
-        <h2>La rencontre<i class="phase-dot" /></h2>
+        <h2>Le voyage<i class="phase-dot" /></h2>
       </div>
-      <span>JOUR 30</span>
+      <span>JOUR 1</span>
     </div>
     <div class="phase-track">
       <svg class="phase-wave" viewBox="0 0 200 14" preserveAspectRatio="none" aria-hidden="true">
@@ -18,7 +18,7 @@
       <b class="phase-marker phase-marker--next" />
       <b class="phase-marker phase-marker--end" />
     </div>
-    <div class="phase-labels"><span>Le voyage</span><strong>La rencontre</strong><span>Deux lutins</span></div>
+    <div class="phase-labels"><strong>Le voyage</strong><span>La rencontre</span><span>Les farces</span></div>
   </section>
 </template>
 

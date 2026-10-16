@@ -4,10 +4,10 @@
       <img src="/assets/created/journey-station.png" alt="Le trajet des lutins" /><span class="next-tag">PROCHAINE ÉTAPE</span>
     </div>
     <div class="next-copy">
-      <p class="home-overline">À DÉCOUVRIR BIENTÔT</p>
-      <h2>L’arrivée du premier lutin</h2>
-      <p>Le voyage touche à sa fin. Les farces quotidiennes vont commencer.</p>
-      <RouterLink class="next-cta" to="/planning">Ouvrir le planning <i class="mdi mdi-chevron-right" aria-hidden="true" /></RouterLink>
+      <p class="home-overline">À PRÉPARER AUJOURD’HUI</p>
+      <h2>Alerte du Pôle Nord</h2>
+      <p>Un premier courrier donne le signal du départ.</p>
+      <RouterLink class="next-cta" to="/aujourdhui">Ouvrir la journée <i class="mdi mdi-arrow-right" aria-hidden="true" /></RouterLink>
     </div>
   </section>
 </template>
@@ -21,7 +21,8 @@
 .next-copy{display:flex;flex-direction:column;justify-content:center;padding:18px 16px}
 .next-copy h2{margin:7px 0 6px;font:500 21px/1 var(--font-serif);color:#f5edd9}
 .next-copy p:not(.home-overline){margin:0;color:#a9bcae;font-size:12px;line-height:1.5}
-.next-cta{display:inline-flex;align-items:center;justify-content:center;gap:5px;margin-top:14px;padding:11px 16px;border-radius:999px;background:linear-gradient(180deg,#f5d78f,#d9ac54);color:#1c3a30;font-size:12px;font-weight:700;text-decoration:none;box-shadow:0 8px 20px rgba(217,172,84,.35);transition:transform .2s ease,box-shadow .2s ease}
-.next-cta:hover{transform:translateY(-1px);box-shadow:0 12px 26px rgba(217,172,84,.45)}
-.next-cta:active{transform:translateY(0) scale(.98)}
+.next-cta{display:inline-flex;align-items:center;align-self:flex-start;gap:9px;margin-top:16px;color:#f1cc7a;font-size:12px;font-weight:600;letter-spacing:.01em;text-decoration:none;transition:color .2s ease}
+.next-cta i{display:grid;place-items:center;width:27px;height:27px;border-radius:50%;color:#e6c280;font-size:14px;transition:transform .2s ease}
+.next-cta:hover{color:#fff4d7}.next-cta:hover i{transform:translate(2px,-2px)}
+.next-cta:active i{transform:scale(.94)}
 </style>

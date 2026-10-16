@@ -7,12 +7,10 @@ interface PrepItem {
   done: boolean
 }
 
-const TOTAL_PREP = 5
+const TOTAL_PREP = 1
 
 const items = ref<PrepItem[]>([
-  { label: 'Papier cartonné', detail: 'À acheter · dans 3 jours', done: false },
-  { label: 'Carte du voyage', detail: 'À imprimer · dans 5 jours', done: true },
-  { label: 'Biscuits', detail: 'À prévoir · dans 8 jours', done: true },
+  { label: 'Alerte du Pôle Nord', detail: 'Courrier essentiel · aujourd’hui', done: false },
 ])
 
 const doneCount = computed(() => items.value.filter((i) => i.done).length)

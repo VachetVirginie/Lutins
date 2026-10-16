@@ -2,11 +2,11 @@
   <section class="progress-hero">
     <i class="hero-spark hero-spark--tl" aria-hidden="true" /><i class="hero-spark hero-spark--br" aria-hidden="true" />
     <div class="progress-copy">
-      <p class="home-overline">DIMANCHE 15 NOVEMBRE</p>
-      <h2>Votre histoire<br /><em>est en route.</em></h2>
-      <p>Le voyage continue jusqu’à Noël.</p>
+      <p class="home-overline">JOUR 1 · DÉBUT DE L’AVENTURE</p>
+      <h2>Le voyage<br /><em>commence.</em></h2>
+      <p>Une première étape vers Noël.</p>
     </div>
-    <div class="progress-orb"><strong>30</strong><span>/ 70</span><small>JOURS</small></div>
+    <div class="progress-orb"><strong>1</strong><span>/ 70</span><small>JOURS</small></div>
   </section>
 </template>
 

@@ -2,30 +2,30 @@
 import { HomeNav } from '../components/home'
 
 const phases = [
-  { day: 'J1', title: 'Départ du Pôle Nord', detail: 'Le lutin quitte l’atelier du Père Noël.', done: true },
-  { day: 'J30', title: 'Le grand voyage', detail: 'En route vers votre maison.', active: true },
-  { day: 'J58', title: 'La rencontre', detail: 'Premier matin dans le salon.', done: false },
-  { day: 'J62', title: 'Deux lutins', detail: 'Un compagnon le rejoint.', done: false },
-  { day: 'J70', title: 'Retour au Pôle Nord', detail: 'Au revoir jusqu’à l’année prochaine.', done: false },
+  { day: 'J1', title: 'Alerte du Pôle Nord', detail: 'Un premier courrier donne le signal du départ.', active: true },
+  { day: 'J30', title: 'Arrivée du premier lutin', detail: 'La rencontre lance les farces quotidiennes.', done: false },
+  { day: 'J46', title: 'Arrivée du second lutin', detail: 'Un nouveau personnage rejoint l’aventure.', done: false },
+  { day: 'J60', title: 'Départ du second lutin', detail: 'Une transition importante dans le récit.', done: false },
+  { day: 'J70', title: 'Lettre finale du Père Noël', detail: 'La conclusion de l’aventure.', done: false },
 ]
 
 const activities = [
-  { id: 'farce-reveil', date: '2 déc', title: 'Farce du réveil', detail: 'Des empreintes de pas en farine jusqu’à la cuisine.' },
-  { id: 'chasse-tresor', date: '5 déc', title: 'Chasse au trésor', detail: 'Indices cachés dans la maison, trésor : chocolats.' },
-  { id: 'nuit-guirlandes', date: '9 déc', title: 'Nuit des guirlandes', detail: 'Le lutin enroule les câbles autour du sapin.' },
-  { id: 'atelier-biscuits', date: '14 déc', title: 'Atelier biscuits', detail: 'Il prépare la pâte pendant la nuit.' },
+  { id: 'jour-1-alerte-pole-nord', date: 'J1', title: 'Alerte du Pôle Nord', detail: 'Courrier essentiel · aujourd’hui.' },
+  { id: 'jour-2-preparation-sac', date: 'J2', title: 'Préparation du sac', detail: 'Carte et petit élément de voyage.' },
+  { id: 'jour-3-depart-traineau', date: 'J3', title: 'Départ en traîneau', detail: 'Carte et coloriage.' },
+  { id: 'jour-4-pause-gouter', date: 'J4', title: 'Première pause goûter', detail: 'Courrier.' },
 ]
 
 const events = [
-  { date: '1 déc', title: 'Arrivée du premier lutin', detail: 'Lettre de bienvenue + scène du salon.', icon: 'mdi-star-four-points' },
-  { date: '15 déc', title: 'Veillée contes', detail: 'Le lutin apporte un nouveau livre de Noël.', icon: 'mdi-book-open-variant' },
-  { date: '24 déc', title: 'Nuit du départ', detail: 'Note d’adieu posée près du sapin.', icon: 'mdi-moon-waning-crescent' },
+  { date: 'J30', title: 'Arrivée du premier lutin', detail: 'Événement essentiel.', icon: 'mdi-star-four-points' },
+  { date: 'J46', title: 'Arrivée du second lutin', detail: 'Événement essentiel.', icon: 'mdi-account-multiple-outline' },
+  { date: 'J70', title: 'Lettre finale du Père Noël', detail: 'Conclusion essentielle.', icon: 'mdi-email-heart-outline' },
 ]
 
 const customizations = [
-  { icon: 'mdi-tag-heart', title: 'Prénom du lutin', detail: 'Flocon — choisi en famille' },
-  { icon: 'mdi-home-heart', title: 'Règles de la maison', detail: 'On regarde, on ne touche pas' },
-  { icon: 'mdi-gift', title: 'Touches personnelles', detail: 'Références aux passions des enfants' },
+  { icon: 'mdi-tag-heart', title: 'Prénom du lutin', detail: 'À personnaliser' },
+  { icon: 'mdi-map-marker-outline', title: 'Ville et destination', detail: 'À personnaliser' },
+  { icon: 'mdi-calendar-edit-outline', title: 'Date de début', detail: 'À définir' },
 ]
 </script>
 

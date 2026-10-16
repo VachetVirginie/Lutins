@@ -10,8 +10,8 @@
 <script setup lang="ts">
 const items = [
   { label: 'Aventure', to: '/', icon: 'mdi-compass-rose' },
-  { label: 'Planning', to: '/planning', icon: 'mdi-map-outline' },
-  { label: 'Préparer', to: '/prepare', icon: 'mdi-clipboard-check-outline' },
+  { label: 'Aujourd’hui', to: '/aujourdhui', icon: 'mdi-calendar-today' },
+  { label: 'À prévoir', to: '/prepare', icon: 'mdi-clipboard-check-outline' },
   { label: 'Souvenirs', to: '/souvenirs', icon: 'mdi-image-multiple-outline' },
 ]
 </script>

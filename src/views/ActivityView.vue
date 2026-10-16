@@ -16,94 +16,105 @@ interface Sheet {
 }
 
 const sheets: Record<string, Sheet> = {
-  'farce-reveil': {
-    date: '2 décembre',
-    title: 'Farce du réveil',
-    tagline: 'Le lutin sème des empreintes de pas en farine jusqu’à la cuisine.',
-    duration: '10 min la veille',
+  'jour-1-alerte-pole-nord': {
+    date: 'Jour 1',
+    title: 'Alerte du Pôle Nord',
+    tagline: 'Un premier courrier donne le signal du départ.',
+    duration: '15 min',
+    level: 'Essentiel',
+    description:
+      'L’aventure commence par un courrier officiel du Pôle Nord : le Père Noël annonce qu’un lutin a été choisi pour rejoindre votre maison. Le voyage durera 70 jours — cette lettre plante le décor et fait naître l’attente.',
+    steps: [
+      'Imprimer ou écrire le courrier du Pôle Nord.',
+      'Personnaliser le message (prénom des enfants, nom de la ville).',
+      'Glisser la lettre dans une belle enveloppe cachetée.',
+      'La déposer dans la boîte aux lettres ou sur le paillasson.',
+    ],
+    material: [
+      { label: 'Courrier du Pôle Nord (imprimé)', done: false },
+      { label: 'Enveloppe + cachet', done: false },
+      { label: 'Tampon ou cire dorée (facultatif)', done: false },
+    ],
+    tip: 'Cachet à la cire ou simple autocollant doré : le détail qui fait tout, les enfants examinent toujours l’enveloppe en premier.',
+  },
+  'jour-2-preparation-sac': {
+    date: 'Jour 2',
+    title: 'Préparation du sac',
+    tagline: 'Le lutin prépare son sac de voyage — carte et petit indice.',
+    duration: '10 min',
     level: 'Facile',
     description:
-      'Pendant la nuit, le lutin s’est promené dans la farine et a laissé de petites empreintes depuis l’étagère du salon jusqu’au plan de travail de la cuisine. Au matin, les enfants suivent la piste pour découvrir ce qu’il a préparé.',
+      'Deuxième jour : le voyage devient concret. Une petite carte du trajet et un indice matériel (un bouton, un fil doré) montrent que le lutin fait déjà son sac pour vous rejoindre.',
     steps: [
-      'Verser un peu de farine dans une soucoupe.',
-      'Dessiner des traces de pas du bout du doigt (ou avec le poing fermé pour les semelles).',
-      'Tracer un chemin de l’étagère à la cuisine, en variant la direction.',
-      'Poser le lutin près du bol de farine, les pieds légèrement poudrés.',
+      'Imprimer la carte du voyage (Pôle Nord → votre ville).',
+      'Ajouter un petit élément de voyage à côté (ficelle, bouton doré).',
+      'Poser le tout sur la table, comme tombé d’un sac.',
     ],
     material: [
-      { label: 'Farine ou sucre glace', done: false },
-      { label: 'Soucoupe', done: true },
-      { label: 'Le lutin Flocon', done: true },
+      { label: 'Carte du voyage (imprimée)', done: false },
+      { label: 'Petit bouton ou fil doré', done: false },
     ],
-    tip: 'Une trace qui monte sur le rebord de la table rend la scène beaucoup plus crédible — les enfants adorent reconstituer le trajet.',
+    tip: 'La carte gagne à être légèrement froissée et cornée — elle a fait un bout de route.',
   },
-  'chasse-tresor': {
-    date: '5 décembre',
-    title: 'Chasse au trésor',
-    tagline: 'Des indices cachés dans la maison, un trésor de chocolats à la clé.',
-    duration: '20 min la veille',
-    level: 'Moyen',
-    description:
-      'Le lutin a glissé quatre petites énigmes dans la maison. Chaque indice mène au suivant et le dernier révèle une cachette remplie de chocolats pour le goûter.',
-    steps: [
-      'Écrire 4 énigmes courtes adaptées à l’âge des enfants.',
-      'Cacher les indices : sous un coussin, dans une chaussure, derrière le sapin, dans la boîte aux lettres.',
-      'Déposer le trésor (chocolats) dans la cachette finale.',
-      'Installer le lutin à côté du premier indice, une loupe en papier à la main.',
-    ],
-    material: [
-      { label: '4 cartes d’énigmes', done: false },
-      { label: 'Chocolats pour le trésor', done: false },
-      { label: 'Ruban doré (facultatif)', done: false },
-    ],
-    tip: 'Prévoyez un indice « de secours » verbal si les enfants calent — la magie doit rester légère.',
-  },
-  'nuit-guirlandes': {
-    date: '9 décembre',
-    title: 'Nuit des guirlandes',
-    tagline: 'Le lutin s’est emmêlé dans les câbles du sapin.',
-    duration: '5 min la veille',
+  'jour-3-depart-traineau': {
+    date: 'Jour 3',
+    title: 'Départ en traîneau',
+    tagline: 'Le grand départ : carte à compléter et coloriage.',
+    duration: '10 min',
     level: 'Facile',
     description:
-      'En voulant ajouter une guirlande, le lutin s’est retrouvé suspendu dans les câbles lumineux du sapin. Les enfants le découvrent coincé au petit matin.',
+      'Le lutin a officiellement quitté le Pôle Nord en traîneau. Pour marquer le coup, les enfants reçoivent une carte à suivre jour après jour et un coloriage du départ.',
     steps: [
-      'Dérouler une guirlande supplémentaire autour du sapin.',
-      'Suspendre le lutin par un fil doré dans les branches.',
-      'Éparpiller quelques boules autour de lui.',
-      'Laisser un petit mot : « À l’aide ! »',
+      'Imprimer la carte de suivi du voyage.',
+      'Imprimer le coloriage du traîneau.',
+      'Les disposer avec des crayons près du sapin ou dans la chambre.',
     ],
     material: [
-      { label: 'Guirlande lumineuse', done: true },
-      { label: 'Fil doré', done: false },
-      { label: 'Petit mot manuscrit', done: false },
+      { label: 'Carte de suivi (imprimée)', done: false },
+      { label: 'Coloriage traîneau (imprimé)', done: false },
+      { label: 'Crayons de couleur', done: true },
     ],
-    tip: 'Pensez à garder la guirlande éteinte la nuit — le rendu au réveil n’en sera que plus drôle.',
+    tip: 'Prévoyez un petit cadre ou une pince pour accrocher la carte de suivi — elle servira pendant 70 jours.',
   },
-  'atelier-biscuits': {
-    date: '14 décembre',
-    title: 'Atelier biscuits',
-    tagline: 'Le lutin a préparé la pâte pendant la nuit.',
-    duration: '15 min la veille',
+  'jour-4-pause-gouter': {
+    date: 'Jour 4',
+    title: 'Première pause goûter',
+    tagline: 'Un mot du lutin depuis sa première halte.',
+    duration: '10 min',
     level: 'Facile',
     description:
-      'Sur le plan de travail : un petit rouleau, des emporte-pièces et une pâte sablée entamée. Le lutin a déjà coupé trois étoiles — il ne reste qu’à finir la fournée ensemble.',
+      'Le lutin écrit depuis sa première pause : un petit mot racontant le paysage traversé et annonçant la suite. Le courrier devient un rituel.',
     steps: [
-      'Préparer (ou acheter) une pâte sablée la veille.',
-      'Disposer rouleau et emporte-pièces sur le plan de travail.',
-      'Couper 2-3 formes et saupoudrer légèrement de farine.',
-      'Poser le lutin, un peu de farine sur le bonnet.',
+      'Écrire ou imprimer le mot du lutin.',
+      'Signer d’une petite empreinte ou d’un dessin.',
+      'Le déposer au même endroit que la veille pour créer l’habitude.',
     ],
     material: [
-      { label: 'Pâte sablée', done: false },
-      { label: 'Emporte-pièces étoile', done: true },
-      { label: 'Petit rouleau', done: true },
+      { label: 'Mot du lutin (imprimé ou manuscrit)', done: false },
+      { label: 'Enveloppe', done: false },
     ],
-    tip: 'Planifiez cette farce un week-end : elle débouche naturellement sur un vrai atelier pâtisserie en famille.',
+    tip: 'Gardez toujours le même point de dépôt pour le courrier — le rituel rassure et fait venir les enfants d’eux-mêmes.',
   },
 }
 
+function genericSheet(id: string): Sheet | undefined {
+  const m = /^jour-(\d+)/.exec(id)
+  if (!m) return undefined
+  return {
+    date: `Jour ${m[1]}`,
+    title: `Journée ${m[1]}`,
+    tagline: 'L’aventure continue vers Noël.',
+    duration: '10 min',
+    level: 'À venir',
+    description: 'Cette journée du voyage sera détaillée prochainement.',
+    steps: ['La fiche de cette journée arrive bientôt.'],
+    material: [],
+    tip: 'Revenez bientôt — le voyage continue.',
+  }
+}
+
 const route = useRoute()
-const sheet = computed(() => sheets[String(route.params.activityId)])
+const sheet = computed(() => sheets[String(route.params.activityId)] ?? genericSheet(String(route.params.activityId)))
 const material = ref<Sheet['material']>([])
 
 watch(sheet, (s) => { material.value = s ? s.material.map((m) => ({ ...m })) : [] }, { immediate: true })
