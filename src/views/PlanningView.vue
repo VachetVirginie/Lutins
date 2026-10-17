@@ -466,7 +466,7 @@ onBeforeUnmount(() => {
   border-color:#ffe9a8;
   background:radial-gradient(circle,#fff3d1,#e6c280);
   box-shadow:0 0 18px rgba(255,215,0,.8),0 0 44px rgba(255,215,0,.35);
-  animation:node-pulse 2.2s ease-in-out infinite
+  animation:node-pulse 2.8s ease-in-out infinite
 }
 
 @keyframes node-pulse {
@@ -538,7 +538,7 @@ onBeforeUnmount(() => {
     radial-gradient(circle,#ffd97a 1px,transparent 1.6px);
   background-position:18% 34%,80% 16%,54% 6%;
   background-repeat:no-repeat;
-  animation:elf-glint 2.6s ease-in-out infinite;
+  animation:elf-glint 3.4s ease-in-out infinite;
   pointer-events:none
 }
 
@@ -570,7 +570,7 @@ onBeforeUnmount(() => {
   z-index:1;
   filter:drop-shadow(0 4px 10px rgba(0,0,0,.5)) drop-shadow(0 0 14px rgba(255,215,0,.4));
   pointer-events:none;
-  animation:elf-sway 4.2s ease-in-out infinite
+  animation:elf-sway 5s ease-in-out infinite
 }
 
 .map-stop:not(.on-left) .stop-elf {

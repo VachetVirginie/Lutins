@@ -107,15 +107,15 @@ function embark(id: string, ev: MouseEvent): void {
   document.body.appendChild(fly)
   fly.animate([
     { transform: 'translate3d(0,0,0) scale(1) rotate(0deg)', opacity: 1 },
-    { transform: `translate3d(${dx * 0.5}px,${dy * 0.5 - 50}px,0) scale(.75) rotate(8deg)`, opacity: 1, offset: 0.55 },
+    { transform: `translate3d(${dx * 0.5}px,${dy * 0.5 - 70}px,0) scale(.75) rotate(8deg)`, opacity: 1, offset: 0.55 },
     { transform: `translate3d(${dx}px,${dy}px,0) scale(.15) rotate(16deg)`, opacity: 0.4 },
-  ], { duration: 650, easing: 'cubic-bezier(.5,.05,.3,1)' }).onfinish = () => {
+  ], { duration: 950, easing: 'cubic-bezier(.5,.05,.3,1)' }).onfinish = () => {
     fly.remove()
     toEl.animate([
       { transform: 'scale(1)' },
       { transform: 'scale(1.09)' },
       { transform: 'scale(1)' },
-    ], { duration: 380, easing: 'cubic-bezier(.34,1.56,.64,1)' })
+    ], { duration: 520, easing: 'cubic-bezier(.34,1.56,.64,1)' })
   }
 }
 </script>
@@ -438,7 +438,7 @@ function embark(id: string, ev: MouseEvent): void {
   backdrop-filter:blur(12px);
   -webkit-backdrop-filter:blur(12px);
   box-shadow:0 10px 22px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.06);
-  animation:parcel-in .5s var(--spring) calc(var(--i,0)*45ms) both;
+  animation:parcel-in .7s var(--spring) calc(var(--i,0)*60ms) both;
   transition:opacity .3s
 }
 

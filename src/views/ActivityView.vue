@@ -40,7 +40,7 @@ function unseal() {
   window.setTimeout(() => {
     opened.value = true
     haptic(10)
-  }, 500)
+  }, 820)
 }
 
 // Feuilleter les dépêches : swipe horizontal = jour précédent / suivant
@@ -361,23 +361,23 @@ function printAsset(file: string) {
 }
 
 .letter {
-  animation:letter-in .6s var(--spring) .1s both
+  animation:letter-in .85s var(--spring) .2s both
 }
 
 .carnet {
-  animation:paper-in .6s var(--spring) .2s both
+  animation:paper-in .75s var(--spring) .3s both
 }
 
 .annexes {
-  animation:paper-in .6s var(--spring) .3s both
+  animation:paper-in .75s var(--spring) .42s both
 }
 
 .slip {
-  animation:paper-in .6s var(--spring) .38s both
+  animation:paper-in .75s var(--spring) .55s both
 }
 
 .gap-note {
-  animation:paper-in .6s var(--spring) .44s both
+  animation:paper-in .75s var(--spring) .66s both
 }
 
 @keyframes paper-in {
@@ -436,11 +436,11 @@ function printAsset(file: string) {
     linear-gradient(165deg,#dcba8a 0%,#c89d68 58%,#b2854f 100%);
   box-shadow:0 22px 44px rgba(0,0,0,.5),inset 0 0 0 1px rgba(150,105,50,.45),inset 0 1px 0 rgba(255,240,210,.35);
   overflow:hidden;
-  animation:rise-in .6s var(--spring) .1s both
+  animation:rise-in .7s var(--spring) .1s both
 }
 
 .envelope.is-cracking {
-  animation:rise-in .6s var(--spring) .1s both,env-away .45s ease-in .4s forwards
+  animation:rise-in .7s var(--spring) .1s both,env-away .6s ease-in .6s forwards
 }
 
 @keyframes env-away {
@@ -460,7 +460,7 @@ function printAsset(file: string) {
   background:linear-gradient(180deg,#e4c08f,#c2945c);
   clip-path:polygon(0 0,100% 0,50% 100%);
   transform-origin:50% 0;
-  transition:transform .5s cubic-bezier(.65,0,.3,1) .06s;
+  transition:transform .75s cubic-bezier(.65,0,.3,1) .15s;
   box-shadow:0 5px 9px rgba(70,42,12,.28)
 }
 
@@ -518,7 +518,7 @@ function printAsset(file: string) {
 }
 
 .is-cracking .env-seal {
-  animation:seal-crack .42s cubic-bezier(.2,.8,.3,1) forwards
+  animation:seal-crack .6s cubic-bezier(.2,.8,.3,1) forwards
 }
 
 @keyframes seal-crack {
@@ -553,7 +553,7 @@ function printAsset(file: string) {
 }
 
 .is-cracking .env-burst i {
-  animation:env-pop .65s cubic-bezier(.15,.6,.3,1) .08s forwards
+  animation:env-pop .85s cubic-bezier(.15,.6,.3,1) .12s forwards
 }
 
 @keyframes env-pop {
@@ -867,7 +867,7 @@ function printAsset(file: string) {
 }
 
 .carnet.done .carnet-stamp {
-  animation:stamp-in .45s cubic-bezier(.3,1.5,.5,1) both
+  animation:stamp-in .65s cubic-bezier(.3,1.5,.5,1) both
 }
 
 @keyframes stamp-in {
@@ -893,7 +893,7 @@ function printAsset(file: string) {
 }
 
 .carnet.done .carnet-burst {
-  animation:carnet-burst .8s ease-out
+  animation:carnet-burst 1.05s ease-out
 }
 
 @keyframes carnet-burst {
@@ -966,7 +966,7 @@ function printAsset(file: string) {
 }
 
 .done-check i {
-  animation:check-pop .3s var(--spring)
+  animation:check-pop .45s var(--spring)
 }
 
 @keyframes check-pop {
