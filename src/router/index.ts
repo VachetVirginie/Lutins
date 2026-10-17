@@ -12,6 +12,7 @@ export const router = createRouter({
     { path: '/aujourdhui', name: 'aujourdhui', redirect: () => `/activites/jour-${currentAdventure.currentDay}` },
     { path: '/prepare', name: 'preparer', component: () => import('../views/PrepareView.vue') },
     { path: '/souvenirs', name: 'souvenirs', component: () => import('../views/SouvenirsView.vue') },
+    { path: '/personnalisation', name: 'personnalisation', component: () => import('../views/PersonalizeView.vue') },
     { path: '/activites/:activityId', name: 'activite', component: () => import('../views/ActivityView.vue') },
     { path: '/entree', redirect: '/' },
     { path: '/preparer', redirect: '/prepare' },

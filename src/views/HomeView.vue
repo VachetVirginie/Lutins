@@ -45,6 +45,9 @@ const tomorrowTitle =
     <motion.footer v-if="tomorrowTitle" class="home-signoff" v-bind="reveal">
       <i aria-hidden="true" /><p>Et demain — <em>{{ tomorrowTitle }}</em></p><i aria-hidden="true" />
     </motion.footer>
+    <motion.div class="home-personalize" v-bind="reveal">
+      <RouterLink to="/personnalisation"><i class="mdi mdi-feather" aria-hidden="true" /> Personnaliser l'aventure</RouterLink>
+    </motion.div>
   </main>
 </template>
 
@@ -128,5 +131,32 @@ const tomorrowTitle =
 .home-signoff em {
   color:var(--color-gold);
   font-style:italic
+}
+
+/* l'entrée discrète vers le formulaire de l'expédition */
+.home-personalize {
+  display:flex;
+  justify-content:center;
+  margin-top:20px
+}
+
+.home-personalize a {
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:8px 15px;
+  border:1px dashed rgba(241,204,122,.35);
+  border-radius:999px;
+  color:#9db4a8;
+  font:600 11.5px var(--font-ui);
+  letter-spacing:.05em;
+  text-decoration:none;
+  transition:color .3s,border-color .3s;
+  -webkit-tap-highlight-color:transparent
+}
+
+.home-personalize a:active {
+  color:var(--color-gold);
+  border-color:rgba(241,204,122,.6)
 }
 </style>

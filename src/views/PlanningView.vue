@@ -56,18 +56,9 @@ function trailSegment(fromIdx: number, toIdx: number): string {
 const pastPath = computed(() => trailSegment(0, Math.max(CURRENT - 1, 0)))
 const futurePath = computed(() => trailSegment(Math.max(CURRENT - 1, 0), TOTAL - 1))
 
-/* ---- paysage de fond : les 4 actes du voyage en silhouettes ---- */
-const LANDSCAPE_H = MAP_H + 1440 // battement haut/bas absorbant la parallaxe
+/* ---- paysage de fond : la vallée de nuit glisse au fil du scroll ---- */
 
-const trees = [
-  { x: 24, y: 1080, s: 1.1 }, { x: 352, y: 1230, s: 0.9 }, { x: 30, y: 1620, s: 0.8 }, { x: 356, y: 1810, s: 1.2 },
-  { x: 26, y: 2210, s: 1 }, { x: 358, y: 2420, s: 0.85 }, { x: 28, y: 2740, s: 1.15 }, { x: 354, y: 2960, s: 0.75 },
-  { x: 30, y: 3620, s: 0.9 }, { x: 356, y: 3840, s: 1.05 }, { x: 26, y: 4180, s: 0.8 }, { x: 354, y: 4420, s: 1.1 },
-  { x: 28, y: 4740, s: 0.9 }, { x: 352, y: 4980, s: 1 }, { x: 30, y: 5760, s: 0.85 }, { x: 356, y: 5880, s: 1 },
-  { x: 30, y: 6380, s: 0.9 }, { x: 348, y: 6300, s: 1.05 },
-]
-
-// Parallaxe douce : le paysage dérive plus lentement que le sentier (transform → compositeur)
+// Parallaxe douce : l'image descend du château vers la lanterne (transform → compositeur)
 const landscapeEl = ref<HTMLElement>()
 let raf = 0
 
@@ -75,7 +66,7 @@ function onScroll() {
   if (raf) return
   raf = requestAnimationFrame(() => {
     raf = 0
-    if (landscapeEl.value) landscapeEl.value.style.transform = `translate3d(0, ${Math.min(700, window.scrollY * 0.12)}px, 0)`
+    if (landscapeEl.value) landscapeEl.value.style.transform = `translate3d(0, ${-Math.min(140, window.scrollY * 0.025)}px, 0)`
   })
 }
 
@@ -92,57 +83,11 @@ onBeforeUnmount(() => {
 
 <template>
   <main class="app-screen planning-screen">
+    <div class="planning-bg" aria-hidden="true"><img ref="landscapeEl" src="/assets/landscapes/journey-map.jpg" alt="" /></div>
     <header class="planning-header"><button class="back-link" type="button" @click="goBack"><i class="mdi mdi-chevron-left" aria-hidden="true" /> Retour</button><p class="planning-overline">LA CARTE DU VOYAGE</p><h1>Le planning</h1><p>La route des lutins, du premier courrier jusqu’au retour au Pôle Nord.</p></header>
     <section class="planning-progress"><div><strong>Jour {{ CURRENT }}</strong><span>sur {{ TOTAL }}</span></div><div class="planning-progress-bar"><i :style="{ width: (CURRENT / TOTAL) * 100 + '%' }" /></div><small>Le voyage commence</small></section>
 
     <section class="map" :style="{ height: MAP_H + 'px' }" aria-label="Carte des 70 jours">
-      <!-- couche 1 : le paysage du voyage, en silhouettes sous le sentier -->
-      <div ref="landscapeEl" class="map-landscape" aria-hidden="true">
-        <svg class="landscape-svg" :viewBox="`0 0 390 ${LANDSCAPE_H}`" preserveAspectRatio="none">
-          <defs>
-            <path id="pine" d="M0 -16 L7 -2 H3 L9 12 H-9 L-3 -2 H-7 Z" />
-          </defs>
-
-          <!-- aurore boréale au-dessus du départ -->
-          <path d="M0 620 C80 560 160 590 240 540 C300 502 350 520 390 500 V420 H0 Z" fill="rgba(90,190,150,.12)" />
-          <path d="M0 700 C90 650 170 675 260 630 C320 600 360 610 390 590 V480 C340 510 260 530 190 560 C110 595 50 580 0 610 Z" fill="rgba(120,220,180,.08)" />
-
-          <!-- étoiles du grand Nord -->
-          <g fill="rgba(235,240,220,.55)">
-            <circle cx="42" cy="500" r="1.4" /><circle cx="140" cy="468" r="1" /><circle cx="252" cy="528" r="1.2" /><circle cx="330" cy="486" r="1.6" /><circle cx="92" cy="606" r="1" />
-          </g>
-
-          <!-- montagnes enneigées du Pôle Nord -->
-          <path d="M-10 1140 L50 980 L95 1060 L150 920 L215 1070 L280 965 L345 1080 L400 1010 V1200 H-10 Z" fill="rgba(38,78,62,.5)" />
-          <path d="M40 995 L50 980 L62 998 M142 932 L150 920 L162 936 M272 976 L280 965 L292 980" stroke="rgba(225,240,235,.3)" stroke-width="2" fill="none" />
-
-          <!-- la forêt borde le sentier tout du long -->
-          <use v-for="(t, i) in trees" :key="i" href="#pine" :transform="`translate(${t.x} ${t.y}) scale(${t.s})`" fill="rgba(32,68,54,.55)" />
-
-          <!-- le train qui traverse la nuit -->
-          <g transform="translate(52 3560)" fill="rgba(38,78,62,.5)">
-            <path d="M0 12 h200 q14 0 22 8 l9 13 q-3 8 -15 8 h-216 q-10 0 -10 -10 v-9 q0 -10 10 -10 z" />
-            <circle cx="30" cy="44" r="4" /><circle cx="60" cy="44" r="4" /><circle cx="180" cy="44" r="4" /><circle cx="208" cy="44" r="4" />
-          </g>
-          <g transform="translate(52 3560)" fill="rgba(230,194,128,.38)">
-            <rect x="12" y="17" width="14" height="7" rx="2" /><rect x="34" y="17" width="14" height="7" rx="2" /><rect x="56" y="17" width="14" height="7" rx="2" /><rect x="78" y="17" width="14" height="7" rx="2" />
-          </g>
-
-          <!-- la basilique de Fourvière annonce l'arrivée à Lyon -->
-          <g transform="translate(132 5520)" fill="rgba(38,78,62,.55)">
-            <path d="M0 64 V34 h16 v-9 l4 -11 4 11 v9 h24 v-9 l4 -11 4 11 v9 h24 v-9 l4 -11 4 11 v9 h24 v-9 l4 -11 4 11 v9 h16 V64 Z" />
-            <path d="M52 64 V46 q14 -12 28 0 V64 Z" />
-          </g>
-
-          <!-- la maison qui attend, au bout du sentier -->
-          <g transform="translate(128 6360)" fill="rgba(38,78,62,.6)">
-            <path d="M0 42 V20 L32 0 L64 20 V42 Z" />
-            <path d="M-5 21 L32 0 L69 21 L64 26 L32 8 L0 26 Z" fill="rgba(225,240,235,.32)" />
-            <rect x="26" y="26" width="12" height="16" fill="rgba(230,194,128,.5)" />
-          </g>
-        </svg>
-      </div>
-
       <svg class="map-svg" :viewBox="`0 0 100 ${MAP_H}`" preserveAspectRatio="none" aria-hidden="true">
         <path class="trail-future" :d="futurePath" vector-effect="non-scaling-stroke" />
         <path class="trail-past" :d="pastPath" vector-effect="non-scaling-stroke" />
@@ -280,24 +225,27 @@ onBeforeUnmount(() => {
   background:linear-gradient(90deg,rgba(7,20,14,.54),transparent 28%,transparent 72%,rgba(7,20,14,.54))
 }
 
-/* couche paysage : sous le sentier, fondue dans la nuit */
-.map-landscape {
-  position:absolute;
+/* la vallée de nuit en fond fixe : le parchemin défile par-dessus */
+.planning-bg {
+  position:fixed;
+  inset:0;
   z-index:0;
-  top:-720px;
-  right:0;
-  bottom:-720px;
-  left:0;
-  opacity:.24;
-  pointer-events:none;
-  mask-image:linear-gradient(180deg,transparent,#000 4%,#000 96%,transparent);
-  -webkit-mask-image:linear-gradient(180deg,transparent,#000 4%,#000 96%,transparent)
+  overflow:hidden;
+  pointer-events:none
 }
 
-.landscape-svg {
-  display:block;
+.planning-bg img {
   width:100%;
-  height:100%
+  height:118%;
+  object-fit:cover;
+  object-position:center top;
+  opacity:.55;
+  will-change:transform
+}
+
+.planning-screen > *:not(.planning-bg) {
+  position:relative;
+  z-index:1
 }
 
 .map-svg {
