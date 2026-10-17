@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { currentAdventure, narrativeMilestones } from '../../data/adventure'
+
+const chapter = currentAdventure.chapter
+const scrollerEl = ref<HTMLElement>()
 
 const STEP = 58
 const PAD_X = 60
@@ -30,19 +33,31 @@ const wavePath = computed(() => {
   for (let x = 20; x <= waveLen.value + 20; x += 20) d += ` Q${x - 10} 1 ${x} 7`
   return d
 })
+
+// La caméra glisse jusqu'au jour courant pendant que la piste se dessine
+onMounted(() => {
+  const el = scrollerEl.value
+  if (!el) return
+  const target = Math.max(0, activeX.value - el.clientWidth / 2)
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    el.scrollLeft = target
+  } else {
+    window.setTimeout(() => el.scrollTo({ left: target, behavior: 'smooth' }), 500)
+  }
+})
 </script>
 
 <template>
   <section class="story-phase">
     <div class="phase-top">
       <div>
-        <p class="home-overline">PHASE ACTUELLE</p>
-        <h2>Le voyage<i class="phase-dot" /></h2>
+        <p class="home-overline">CHAPITRE {{ chapter.roman }}</p>
+        <h2>{{ chapter.label }}<i class="phase-dot" /></h2>
       </div>
       <span>JOUR {{ currentAdventure.currentDay }}</span>
     </div>
 
-    <div class="phase-scroller">
+    <div ref="scrollerEl" class="phase-scroller">
       <div class="phase-track" :style="{ width: TRACK_W + 'px' }">
         <i class="phase-line" />
         <i class="phase-fill" :style="{ width: activeX + 'px' }" />
@@ -145,6 +160,7 @@ const wavePath = computed(() => {
   top:63px;
   height:14px;
   overflow:visible;
+  animation:wave-in .7s ease 1.15s both;
   mask:linear-gradient(90deg,transparent 0%,#000 4%,#000 96%,transparent 100%);
   -webkit-mask:linear-gradient(90deg,transparent 0%,#000 4%,#000 96%,transparent 100%)
 }
@@ -157,7 +173,13 @@ const wavePath = computed(() => {
   stroke-dasharray:.1 9
 }
 
-/* accompli : épais, chaud, très lumineux */
+@keyframes wave-in {
+  from {
+    opacity:0
+  }
+}
+
+/* accompli : épais, chaud, très lumineux — se dessine à l'arrivée */
 .phase-fill {
   position:absolute;
   left:0;
@@ -166,7 +188,14 @@ const wavePath = computed(() => {
   overflow:hidden;
   border-radius:10px;
   background:linear-gradient(90deg,rgba(255,215,0,.45) 0%,var(--color-gold) 55%,#ffe9a8 100%);
-  box-shadow:0 0 10px rgba(241,204,122,.7),0 0 26px rgba(255,200,80,.4),inset 0 1px 0 rgba(255,242,161,.7)
+  box-shadow:0 0 10px rgba(241,204,122,.7),0 0 26px rgba(255,200,80,.4),inset 0 1px 0 rgba(255,242,161,.7);
+  animation:fill-grow 1.1s cubic-bezier(.65,0,.2,1) .3s both
+}
+
+@keyframes fill-grow {
+  from {
+    width:0
+  }
 }
 
 .phase-fill::after {
@@ -452,6 +481,18 @@ const wavePath = computed(() => {
   transform:translateX(-50%);
   width:44px;
   height:auto;
-  filter:brightness(1.12) contrast(1.12) saturate(1.3) drop-shadow(0 4px 5px rgba(0,0,0,.55))
+  transform-origin:50% 100%;
+  filter:brightness(1.12) contrast(1.12) saturate(1.3) drop-shadow(0 4px 5px rgba(0,0,0,.55));
+  animation:elf-breathe 3.6s ease-in-out infinite
+}
+
+/* le lutin vit : respiration imperceptible + mini-bond à l'arrivée */
+@keyframes elf-breathe {
+  0%,100% {
+    transform:translateX(-50%) translateY(0)
+  }
+  50% {
+    transform:translateX(-50%) translateY(-3px)
+  }
 }
 </style>

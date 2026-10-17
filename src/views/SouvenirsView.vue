@@ -1,4 +1,12 @@
 <script setup lang="ts">
+import { motion } from 'motion-v'
+
+const reveal = {
+  initial: { opacity: 0, y: 30 },
+  whileInView: { opacity: 1, y: 0 },
+  inViewOptions: { once: true, margin: '-40px' as const },
+  transition: { type: 'spring' as const, stiffness: 170, damping: 25 },
+}
 
 const doneActivities = [
   { date: '12 nov', title: 'Lecture de la première lettre', detail: 'Découverte du voyage à venir.' },
@@ -26,7 +34,7 @@ const notes = [
       <h1>La mémoire du voyage</h1>
       <p>Ce que votre famille a déjà vécu — et ce qu’il reste à écrire.</p>
     </header>
-    <section class="app-card">
+    <motion.section class="app-card" v-bind="reveal">
       <p class="home-overline">ACTIVITÉS RÉALISÉES</p>
       <h2>Déjà accompli</h2>
       <ul class="done-list">
@@ -35,9 +43,9 @@ const notes = [
           <div class="done-body"><strong>{{ a.title }}</strong><small>{{ a.date }} · {{ a.detail }}</small></div>
         </li>
       </ul>
-    </section>
+    </motion.section>
 
-    <section class="app-card">
+    <motion.section class="app-card" v-bind="reveal">
       <p class="home-overline">PHOTOS</p>
       <h2>L’album du voyage</h2>
       <div class="photo-grid">
@@ -50,9 +58,9 @@ const notes = [
           <span>Ajouter</span>
         </button>
       </div>
-    </section>
+    </motion.section>
 
-    <section class="app-card">
+    <motion.section class="app-card" v-bind="reveal">
       <p class="home-overline">NOTES FAMILIALES</p>
       <h2>Le mot de chacun</h2>
       <article v-for="n in notes" :key="n.date" class="note">
@@ -60,7 +68,7 @@ const notes = [
         <p>{{ n.text }}</p>
       </article>
       <button class="note-add" type="button"><i class="mdi mdi-plus" aria-hidden="true" /> Ajouter une note</button>
-    </section>
+    </motion.section>
   </main>
 </template>
 

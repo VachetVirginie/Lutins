@@ -48,9 +48,25 @@ export const journeyMilestones = milestoneSource.map((m) => {
 /** Rétrocompatibilité : positions canoniques du récit (70 jours) */
 export const narrativeMilestones = journeyMilestones
 
+/**
+ * Chapitre courant : le récit se lit en cinq actes délimités par les jalons.
+ * heroA/heroEm alimentent la une du home dans la continuité de l'écran d'ouverture.
+ */
+const CHAPTERS = [
+  { roman: 'I', label: 'Le voyage', heroA: 'Le voyage', heroEm: 'commence.', tagline: 'Le premier chapitre s’ouvre aujourd’hui.' },
+  { roman: 'II', label: 'Un lutin parmi vous', heroA: 'Le lutin', heroEm: 'est arrivé.', tagline: 'Un nouvel habitant veille sur la maison.' },
+  { roman: 'III', label: 'Les deux lutins', heroA: 'Deux lutins', heroEm: 'en farce.', tagline: 'Deux complices en embuscade.' },
+  { roman: 'IV', label: 'Le dernier voyage', heroA: 'Le dernier', heroEm: 'voyage.', tagline: 'Les adieux se préparent en douceur.' },
+  { roman: 'V', label: 'La lettre du Père Noël', heroA: 'Noël', heroEm: 'est là.', tagline: 'Le dernier chapitre s’écrit à Noël.' },
+] as const
+
+const chapterIndex = journeyMilestones.reduce((idx, m, i) => (currentDay >= m.day ? i : idx), 0)
+export const currentChapter = CHAPTERS[Math.min(chapterIndex, CHAPTERS.length - 1)]
+
 export const currentAdventure = {
   currentDay,
   totalDays,
+  chapter: currentChapter,
   currentPhase: 'voyage' as const,
   currentTitle: dailySheets[currentDay]?.title ?? 'Alerte du Pôle Nord',
   currentCategory: 'courrier' as const,

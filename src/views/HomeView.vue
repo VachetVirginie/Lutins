@@ -1,5 +1,26 @@
 <script setup lang="ts">
-import { NextStep, PrepSection, ProgressHero, StoryPhase } from '../components/home'
+import { motion } from 'motion-v'
+import { NextStep, ProgressHero, StoryPhase } from '../components/home'
+import { currentAdventure } from '../data/adventure'
+import { dailySheets } from '../data/dailySheets'
+
+const rise = (delay = 0) => ({
+  initial: { opacity: 0, y: 26 },
+  animate: { opacity: 1, y: 0 },
+  transition: { type: 'spring' as const, stiffness: 190, damping: 26, delay },
+})
+const reveal = {
+  initial: { opacity: 0, y: 30 },
+  whileInView: { opacity: 1, y: 0 },
+  inViewOptions: { once: true, margin: '-50px' as const },
+  transition: { type: 'spring' as const, stiffness: 170, damping: 25 },
+}
+
+// Teaser du lendemain : la page se referme sur une promesse, pas sur une liste
+const tomorrowTitle =
+  currentAdventure.currentDay < currentAdventure.totalDays
+    ? dailySheets[currentAdventure.currentDay + 1]?.title
+    : undefined
 </script>
 
 <template>
@@ -19,9 +40,11 @@ import { NextStep, PrepSection, ProgressHero, StoryPhase } from '../components/h
       <path class="orn-glitter" d="M40 50 L41.6 54 L45.6 55.6 L41.6 57.2 L40 61.2 L38.4 57.2 L34.4 55.6 L38.4 54 Z" />
     </svg>
     <ProgressHero />
-    <StoryPhase />
-    <NextStep />
-    <PrepSection />
+    <motion.div v-bind="rise(0.1)"><StoryPhase /></motion.div>
+    <motion.div v-bind="reveal"><NextStep /></motion.div>
+    <motion.footer v-if="tomorrowTitle" class="home-signoff" v-bind="reveal">
+      <i aria-hidden="true" /><p>Et demain — <em>{{ tomorrowTitle }}</em></p><i aria-hidden="true" />
+    </motion.footer>
   </main>
 </template>
 
@@ -74,5 +97,36 @@ import { NextStep, PrepSection, ProgressHero, StoryPhase } from '../components/h
     opacity:1;
     transform:scale(1.05)
   }
+}
+
+/* signature de fin : filets d'encre + promesse du lendemain */
+.home-signoff {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  margin-top:34px
+}
+
+.home-signoff i {
+  width:34px;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(241,204,122,.5))
+}
+
+.home-signoff i:last-child {
+  transform:scaleX(-1)
+}
+
+.home-signoff p {
+  margin:0;
+  color:#8fa79a;
+  font:italic 500 14px/1.4 var(--font-literary);
+  text-align:center
+}
+
+.home-signoff em {
+  color:var(--color-gold);
+  font-style:italic
 }
 </style>

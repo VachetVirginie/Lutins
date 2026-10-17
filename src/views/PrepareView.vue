@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { motion } from 'motion-v'
+import { currentAdventure } from '../data/adventure'
 import { preparationCatalog, type PreparationCategory } from '../data/preparationCatalog'
 import { haptic } from '../utils/haptics'
 
@@ -13,21 +15,72 @@ function goBack(): void {
 
 type Filter = 'all' | PreparationCategory
 const filter = ref<Filter>('all')
-const done = ref<Set<string>>(new Set())
 
-const groups: { id: PreparationCategory; label: string; icon: string }[] = [
-  { id: 'print', label: 'À imprimer', icon: 'mdi-printer-outline' },
-  { id: 'food', label: 'Aliments', icon: 'mdi-food-apple-outline' },
-  { id: 'gift', label: 'Cadeaux', icon: 'mdi-gift-outline' },
-  { id: 'material', label: 'Matériel & scène', icon: 'mdi-home-edit-outline' },
+// La réserve se souvient de ce qui est embarqué
+const STORAGE_KEY = 'lutin:kit-done'
+const done = ref<Set<string>>(new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]')))
+watch(done, (value) => localStorage.setItem(STORAGE_KEY, JSON.stringify([...value])), { deep: true })
+
+const groups: { id: PreparationCategory; label: string }[] = [
+  { id: 'print', label: 'À imprimer' },
+  { id: 'food', label: 'Aliments' },
+  { id: 'gift', label: 'Cadeaux' },
+  { id: 'material', label: 'Matériel & scène' },
 ]
 
 const visibleGroups = computed(() => groups
   .filter((group) => filter.value === 'all' || group.id === filter.value)
   .map((group) => ({ ...group, items: preparationCatalog.filter((item) => item.category === group.id) }))
   .filter((group) => group.items.length))
+
+// La réserve se lit d'abord à l'horizon d'une semaine — le reste reste plié
+const currentDay = currentAdventure.currentDay
+const totalDays = currentAdventure.totalDays
+const showLater = ref(false)
+const showPast = ref(false)
+
+type CatalogGroup = { id: PreparationCategory; label: string; items: typeof preparationCatalog }
+
+function splitGroups(minExclusive: number, maxInclusive: number): Ref<CatalogGroup[]> {
+  return computed(() => visibleGroups.value
+    .map((group) => ({ ...group, items: group.items.filter((item) => item.day > minExclusive && item.day <= maxInclusive) }))
+    .filter((group) => group.items.length))
+}
+
+const weekEnd = Math.min(currentDay + 7, totalDays)
+const weekGroups = splitGroups(currentDay, weekEnd)
+const laterGroups = splitGroups(weekEnd, totalDays)
+const pastGroups = splitGroups(0, currentDay)
+
+const lineCount = (gs: CatalogGroup[]) => gs.reduce((n, g) => n + g.items.length, 0)
+
+interface ManifestSection {
+  key: string
+  label: string
+  groups: CatalogGroup[]
+  open: boolean
+  toggle: Ref<boolean> | null
+}
+
+const sections = computed<ManifestSection[]>(() => [
+  { key: 'week', label: `Cette semaine — J${currentDay + 1} à J${weekEnd}`, groups: weekGroups.value, open: true, toggle: null },
+  { key: 'later', label: 'Plus loin dans le voyage', groups: laterGroups.value, open: showLater.value, toggle: showLater },
+  { key: 'past', label: 'Déjà passé', groups: pastGroups.value, open: showPast.value, toggle: showPast },
+].filter((section) => section.groups.length))
+
+function toggleSection(toggle: Ref<boolean> | null): void {
+  if (toggle) {
+    toggle.value = !toggle.value
+    haptic(6)
+  }
+}
+
 const readyCount = computed(() => done.value.size)
 const totalCount = preparationCatalog.length
+const fillPct = computed(() => (totalCount ? readyCount.value / totalCount : 0))
+
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches
+const sackEl = ref<HTMLElement>()
 
 function toggle(id: string): void {
   const next = new Set(done.value)
@@ -36,6 +89,35 @@ function toggle(id: string): void {
   done.value = next
   haptic(12)
 }
+
+// Le colis s'envole dans la réserve — le geste signature de la page
+function embark(id: string, ev: MouseEvent): void {
+  const wasDone = done.value.has(id)
+  toggle(id)
+  if (wasDone || reduceMotion) return
+  const fromEl = ev.currentTarget as HTMLElement
+  const toEl = sackEl.value?.querySelector('.sack-figure') as HTMLElement | null
+  if (!toEl) return
+  const a = fromEl.getBoundingClientRect()
+  const b = toEl.getBoundingClientRect()
+  const dx = b.left + b.width / 2 - (a.left + a.width / 2)
+  const dy = b.top + b.height / 2 - (a.top + a.height / 2)
+  const fly = document.createElement('i')
+  fly.style.cssText = `position:fixed;z-index:60;left:${a.left + a.width / 2 - 7}px;top:${a.top + a.height / 2 - 5}px;width:15px;height:11px;border-radius:2px;background:linear-gradient(160deg,#f0e4c3,#d8c08e);box-shadow:0 2px 8px rgba(0,0,0,.45),inset 0 0 0 1px rgba(150,110,50,.4);pointer-events:none`
+  document.body.appendChild(fly)
+  fly.animate([
+    { transform: 'translate3d(0,0,0) scale(1) rotate(0deg)', opacity: 1 },
+    { transform: `translate3d(${dx * 0.5}px,${dy * 0.5 - 50}px,0) scale(.75) rotate(8deg)`, opacity: 1, offset: 0.55 },
+    { transform: `translate3d(${dx}px,${dy}px,0) scale(.15) rotate(16deg)`, opacity: 0.4 },
+  ], { duration: 650, easing: 'cubic-bezier(.5,.05,.3,1)' }).onfinish = () => {
+    fly.remove()
+    toEl.animate([
+      { transform: 'scale(1)' },
+      { transform: 'scale(1.09)' },
+      { transform: 'scale(1)' },
+    ], { duration: 380, easing: 'cubic-bezier(.34,1.56,.64,1)' })
+  }
+}
 </script>
 
 <template>
@@ -43,32 +125,71 @@ function toggle(id: string): void {
     <i class="warm-glow" aria-hidden="true" />
     <header class="prepare-header">
       <button class="back-link" type="button" @click="goBack"><i class="mdi mdi-chevron-left" aria-hidden="true" /> Retour</button>
-      <p class="prepare-overline">TOUT LE KIT, AU BON ENDROIT</p>
-      <h1>À prévoir</h1>
-      <p>Impressions, aliments, cadeaux et matériel, classés par type puis par jour.</p>
+      <p class="prepare-overline">LA RÉSERVE DE L'EXPÉDITION</p>
+      <h1>À <em>prévoir.</em></h1>
+      <p>Cochez un colis pour l'embarquer — la réserve se remplit au fur et à mesure.</p>
     </header>
 
-    <section class="prepare-summary" aria-label="Progression de la préparation">
-      <div class="summary-top"><strong>{{ readyCount }}<em>/{{ totalCount }}</em></strong><span>éléments prêts</span></div>
-      <div class="summary-bar"><i :style="{ width: (readyCount / totalCount) * 100 + '%' }" /></div>
+    <!-- la réserve : le sac se remplit colis après colis -->
+    <section ref="sackEl" class="sack" aria-label="Progression de la réserve">
+      <svg class="sack-figure" viewBox="0 0 64 72" aria-hidden="true">
+        <defs>
+          <clipPath id="sack-clip"><path d="M32 7c-5.5 0-9.5 2.5-11.5 6.5-4-1-7 1-6 5-5 6-8 13-8 21 0 14 10 24 25.5 24S57.5 53.5 57.5 39.5c0-8-3-15-8-21 1-4-2-6-6-5-2-4-6-6.5-11.5-6.5z" /></clipPath>
+          <linearGradient id="sack-glow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9a8" /><stop offset="1" stop-color="#a67d34" /></linearGradient>
+          <linearGradient id="sack-leather" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a5228" /><stop offset=".55" stop-color="#553517" /><stop offset="1" stop-color="#3a210e" /></linearGradient>
+        </defs>
+        <path d="M32 7c-5.5 0-9.5 2.5-11.5 6.5-4-1-7 1-6 5-5 6-8 13-8 21 0 14 10 24 25.5 24S57.5 53.5 57.5 39.5c0-8-3-15-8-21 1-4-2-6-6-5-2-4-6-6.5-11.5-6.5z" fill="url(#sack-leather)" />
+        <g clip-path="url(#sack-clip)">
+          <rect x="0" :y="68 - 60 * fillPct" width="64" :height="60 * fillPct" fill="url(#sack-glow)" opacity=".38" />
+          <rect x="0" :y="68 - 60 * fillPct" width="64" height="2.5" fill="#ffe9a8" :style="{ opacity: fillPct > 0 ? .85 : 0 }" />
+        </g>
+        <path d="M32 7c-5.5 0-9.5 2.5-11.5 6.5-4-1-7 1-6 5-5 6-8 13-8 21 0 14 10 24 25.5 24S57.5 53.5 57.5 39.5c0-8-3-15-8-21 1-4-2-6-6-5-2-4-6-6.5-11.5-6.5z" fill="none" stroke="#d8a94e" stroke-width="1.4" opacity=".85" />
+        <path d="M12.5 24.5c-4.5 6-7 12.5-7 19 0 12.5 9 22.5 26 22.5" fill="none" stroke="rgba(230,194,128,.45)" stroke-width="1" stroke-dasharray="3 3.5" />
+        <path d="M14 19.5c6 4 30 4 36 0" fill="none" stroke="#e6c280" stroke-width="1.3" />
+        <path d="M32 39l2.1 4.4 4.8.7-3.5 3.3.8 4.8-4.2-2.3-4.2 2.3.8-4.8-3.5-3.3 4.8-.7z" fill="#e6c280" opacity=".9" />
+      </svg>
+      <div class="sack-copy">
+        <p class="sack-overline">LA RÉSERVE</p>
+        <strong>{{ readyCount }}<em>/{{ totalCount }}</em></strong>
+        <span>{{ readyCount === totalCount ? 'Tout est embarqué — la route peut commencer.' : 'colis à bord' }}</span>
+      </div>
     </section>
 
-    <div class="prepare-filters" aria-label="Filtrer par type">
-      <button type="button" :class="{ active: filter === 'all' }" @click="filter = 'all'">Tout</button>
-      <button v-for="group in groups" :key="group.id" type="button" :class="{ active: filter === group.id }" @click="filter = group.id"><i :class="['mdi', group.icon]" aria-hidden="true" /> {{ group.label }}</button>
-    </div>
+    <nav class="scope-tabs" aria-label="Filtrer par type">
+      <button type="button" :class="{ active: filter === 'all' }" @click="filter = 'all'; haptic(6)">
+        <motion.span v-if="filter === 'all'" layoutId="filter-pill" class="tab-pill" :transition="{ type: 'spring', stiffness: 380, damping: 32 }" aria-hidden="true" />
+        <span class="tab-label">Tout</span>
+      </button>
+      <button v-for="group in groups" :key="group.id" type="button" :class="{ active: filter === group.id }" @click="filter = group.id; haptic(6)">
+        <motion.span v-if="filter === group.id" layoutId="filter-pill" class="tab-pill" :transition="{ type: 'spring', stiffness: 380, damping: 32 }" aria-hidden="true" />
+        <span class="tab-label">{{ group.label }}</span>
+      </button>
+    </nav>
 
-    <section v-for="group in visibleGroups" :key="group.id" class="app-card prepare-group" :aria-labelledby="`group-${group.id}`">
-      <header class="group-heading"><div><span class="group-icon"><i :class="['mdi', group.icon]" aria-hidden="true" /></span><h2 :id="`group-${group.id}`">{{ group.label }}</h2></div><span class="group-count">{{ group.items.length }}</span></header>
-      <ul class="prepare-list">
-        <li v-for="item in group.items" :key="item.id" class="prepare-item" :class="{ done: done.has(item.id) }">
-          <button class="prepare-check" type="button" :aria-label="done.has(item.id) ? `Marquer ${item.title} comme non prêt` : `Marquer ${item.title} comme prêt`" @click="toggle(item.id)"><i class="mdi" :class="done.has(item.id) ? 'mdi-check' : ''" aria-hidden="true" /></button>
-          <RouterLink class="prepare-item-copy" :to="`/activites/${item.activityId}`"><span class="prepare-day">J{{ item.day }}</span><strong>{{ item.title }}</strong><small>{{ item.detail }}</small></RouterLink>
-        </li>
-      </ul>
+    <section class="manifest" :key="filter" aria-label="Colis de la réserve">
+      <template v-for="section in sections" :key="section.key">
+        <h3 class="manifest-divider"><span>{{ section.label }}</span></h3>
+        <button v-if="section.toggle" class="manifest-more" type="button" @click="toggleSection(section.toggle)">
+          <i class="mdi" :class="section.open ? 'mdi-chevron-up' : 'mdi-chevron-down'" aria-hidden="true" />
+          {{ section.open ? 'Replier' : `${lineCount(section.groups)} colis plus loin` }}
+        </button>
+        <template v-if="section.open">
+          <template v-for="group in section.groups" :key="group.id">
+            <h4 class="manifest-group">{{ group.label }}</h4>
+            <ul class="parcels">
+              <li v-for="(item, i) in group.items" :key="item.id" class="parcel" :class="{ done: done.has(item.id) }" :style="{ '--i': Math.min(i, 12) }">
+                <button class="parcel-check" type="button" :aria-label="done.has(item.id) ? `Remettre ${item.title} au sol` : `Embarquer ${item.title}`" @click="embark(item.id, $event)"><i class="mdi" :class="done.has(item.id) ? 'mdi-check' : ''" aria-hidden="true" /></button>
+                <RouterLink class="parcel-tag" :to="`/activites/${item.activityId}`">
+                  <span class="parcel-day">J{{ item.day }}</span>
+                  <span class="parcel-copy"><strong>{{ item.title }}</strong><small>{{ item.detail }}</small></span>
+                  <i class="mdi mdi-chevron-right parcel-go" aria-hidden="true" />
+                </RouterLink>
+              </li>
+            </ul>
+          </template>
+        </template>
+      </template>
     </section>
-
-    <p class="prepare-note">Chaque élément reste relié à sa fiche du jour. Les textes et annexes proviennent du kit Louis.</p>
   </main>
 </template>
 
@@ -122,6 +243,10 @@ function toggle(id: string): void {
   font:500 38px/.95 var(--font-serif)
 }
 
+.prepare-header h1 em {
+  color:var(--color-gold)
+}
+
 .prepare-header>p:last-child {
   max-width:330px;
   margin:0;
@@ -130,246 +255,331 @@ function toggle(id: string): void {
   line-height:1.5
 }
 
-/* ---- résumé progression ---- */
-.prepare-summary {
-  margin-top:24px;
-  padding:18px 18px 16px;
-  border:1px solid rgba(241,204,122,.22);
-  border-radius:20px;
-  background:rgba(255,255,255,.05);
-  backdrop-filter:blur(16px);
-  box-shadow:0 14px 36px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.07)
-}
-
-.summary-top {
+/* ---- la réserve : sac qui se remplit ---- */
+.sack {
   display:flex;
-  align-items:baseline;
-  gap:8px
+  align-items:center;
+  gap:18px;
+  margin-top:24px;
+  padding:16px 20px;
+  border:1px solid transparent;
+  border-radius:22px;
+  background:
+    linear-gradient(165deg,#172e25 0%,#0e1f17 60%,#0c1a13 100%) padding-box,
+    linear-gradient(155deg,rgba(241,204,122,.45),rgba(241,204,122,.1) 40%,rgba(241,204,122,.25) 100%) border-box;
+  box-shadow:0 18px 42px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,244,214,.07)
 }
 
-.summary-top strong {
-  font:500 26px var(--font-serif);
+.sack-figure {
+  width:60px;
+  height:68px;
+  flex:0 0 auto;
+  filter:drop-shadow(0 6px 14px rgba(0,0,0,.4))
+}
+
+.sack-figure rect {
+  transition:y .5s cubic-bezier(.5,0,.2,1),height .5s cubic-bezier(.5,0,.2,1),opacity .3s
+}
+
+.sack-copy {
+  min-width:0
+}
+
+.sack-overline {
+  margin:0 0 6px;
+  color:var(--color-gold);
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.18em
+}
+
+.sack-copy strong {
+  font:500 30px/1 var(--font-serif);
   color:#ffe9a8
 }
 
-.summary-top strong em {
+.sack-copy strong em {
   font-style:normal;
-  font-size:14px;
+  font-size:15px;
   color:#a9bcae
 }
 
-.summary-top span {
-  color:#a9bcae;
-  font-size:11px
-}
-
-.summary-bar {
-  height:5px;
-  margin-top:12px;
-  border-radius:4px;
-  background:rgba(255,255,255,.09);
-  overflow:hidden
-}
-
-.summary-bar i {
+.sack-copy span {
   display:block;
-  height:100%;
-  border-radius:4px;
-  background:linear-gradient(90deg,#ffd700,#ffe9a8);
-  box-shadow:0 0 8px rgba(255,215,0,.55);
-  transition:width .4s ease
+  margin-top:5px;
+  color:#a9bcae;
+  font-size:11.5px
 }
 
 /* ---- filtres ---- */
-.prepare-filters {
+.scope-tabs {
   display:flex;
   gap:7px;
-  margin:20px 0 4px;
+  margin:22px 0 2px;
   overflow-x:auto;
   padding-bottom:2px;
   scrollbar-width:none
 }
 
-.prepare-filters::-webkit-scrollbar {
+.scope-tabs::-webkit-scrollbar {
   display:none
 }
 
-.prepare-filters button {
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
+.scope-tabs button {
+  position:relative;
   flex:0 0 auto;
-  padding:8px 14px;
-  border:1px solid rgba(255,255,255,.15);
+  padding:8px 15px;
+  border:1px solid rgba(230,194,128,.25);
   border-radius:999px;
-  background:rgba(255,255,255,.05);
+  background:rgba(255,255,255,.04);
   color:#a9bcae;
+  font-family:inherit;
   font-size:11px;
-  font-weight:500;
+  font-weight:600;
   cursor:pointer;
-  transition:background .25s,color .25s,border-color .25s,transform .35s var(--spring)
+  transition:color .25s,border-color .25s,transform .35s var(--spring)
 }
 
-.prepare-filters button:active {
+/* la pilule d'or glisse de filtre en filtre (layoutId) */
+.tab-pill {
+  position:absolute;
+  inset:0;
+  border-radius:999px;
+  background:#e6c280;
+  box-shadow:0 0 14px rgba(230,194,128,.4);
+  pointer-events:none
+}
+
+.tab-label {
+  position:relative;
+  z-index:1
+}
+
+.scope-tabs button:active {
   transform:scale(.94)
 }
 
-.prepare-filters button i {
-  font-size:14px
-}
-
-.prepare-filters button.active {
+.scope-tabs button.active {
   border-color:#e6c280;
-  background:#e6c280;
-  color:#173b32;
-  font-weight:700
+  color:#12251e;
+  font-weight:800
 }
 
-/* ---- groupes ---- */
-.prepare-group {
-  margin-top:20px;
-  padding:16px 16px 8px
-}
-
-.group-heading {
+/* ---- manifeste : colis-étiquettes ---- */
+.manifest-divider {
   display:flex;
   align-items:center;
-  justify-content:space-between
-}
-
-.group-heading>div {
-  display:flex;
-  align-items:center;
-  gap:10px
-}
-
-.group-icon {
-  display:grid;
-  place-items:center;
-  width:32px;
-  height:32px;
-  border-radius:10px;
-  background:rgba(230,194,128,.14);
+  gap:10px;
+  margin:24px 0 12px;
   color:#e6c280;
-  font-size:17px
+  font:700 10px/1 var(--font-sans);
+  letter-spacing:.16em;
+  text-transform:uppercase
 }
 
-.group-heading h2 {
-  margin:0;
-  color:#f5edd9;
-  font:500 20px var(--font-serif)
+.manifest-divider::after {
+  content:'';
+  flex:1;
+  height:1px;
+  background:linear-gradient(90deg,rgba(241,204,122,.35),transparent)
 }
 
-.group-count {
-  padding:4px 10px;
-  border:1px solid rgba(241,204,122,.3);
+.manifest-group {
+  margin:14px 0 8px;
+  color:#8fa79a;
+  font:italic 600 11px/1 var(--font-literary);
+  letter-spacing:.14em;
+  text-transform:uppercase
+}
+
+.manifest-more {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  width:100%;
+  padding:11px;
+  border:1px dashed rgba(230,194,128,.35);
   border-radius:999px;
+  background:transparent;
   color:#e6c280;
-  font-size:11px;
-  font-weight:600
+  font-family:inherit;
+  font-size:11.5px;
+  font-weight:600;
+  cursor:pointer;
+  transition:background .25s
 }
 
-/* ---- items ---- */
-.prepare-list {
+.manifest-more:hover {
+  background:rgba(230,194,128,.08)
+}
+
+.manifest-more i {
+  font-size:15px
+}
+
+.parcels {
+  display:grid;
+  gap:8px;
   list-style:none;
-  margin:12px 0 0;
-  padding:0;
-  border-top:1px solid rgba(255,255,255,.06)
+  margin:0;
+  padding:0
 }
 
-.prepare-item {
+/* colis : carte sombre translucide, le fond nuit respire dessous */
+.parcel {
   display:flex;
   align-items:center;
-  gap:11px;
-  padding:11px 0;
-  border-bottom:1px solid rgba(255,255,255,.05)
+  gap:12px;
+  padding:11px 12px;
+  border:1px solid rgba(230,194,128,.16);
+  border-radius:15px;
+  background:rgba(255,255,255,.045);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  box-shadow:0 10px 22px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.06);
+  animation:parcel-in .5s var(--spring) calc(var(--i,0)*45ms) both;
+  transition:opacity .3s
 }
 
-.prepare-item:last-child {
-  border-bottom:0
+@keyframes parcel-in {
+  from {
+    opacity:0;
+    transform:translateY(14px) scale(.98)
+  }
 }
 
-.prepare-check {
+.parcel.done {
+  opacity:.45
+}
+
+/* le cercle de coche, irrégulier comme la cire — or plein à l'embarquement */
+.parcel-check {
   display:grid;
   place-items:center;
   flex:0 0 auto;
   width:24px;
   height:24px;
   padding:0;
-  border:1.5px solid rgba(255,255,255,.3);
-  border-radius:50%;
+  border:1.5px solid rgba(230,194,128,.75);
+  border-radius:46% 54% 50% 50% / 52% 47% 55% 45%;
   background:transparent;
-  color:#1c3a30;
+  color:#0c1b14;
   font-size:13px;
   cursor:pointer;
-  transition:background .25s,border-color .25s,box-shadow .25s,transform .35s var(--spring)
+  transform:rotate(-4deg);
+  transition:background .25s,box-shadow .25s,transform .3s var(--spring)
 }
 
-.prepare-check:active {
-  transform:scale(.85)
+.parcel-check:active {
+  transform:rotate(-4deg) scale(.85)
 }
 
-.prepare-item-copy:active {
+.parcel.done .parcel-check {
+  background:#e6c280;
+  box-shadow:0 0 12px rgba(230,194,128,.55)
+}
+
+.parcel-tag {
+  display:flex;
+  align-items:center;
+  gap:11px;
+  flex:1;
+  min-width:0;
+  color:#f2ead6;
+  text-decoration:none
+}
+
+.parcel-tag:active {
   transform:scale(.98);
   transition:transform .35s var(--spring)
 }
 
-.prepare-item.done .prepare-check {
-  border-color:#e6c280;
-  background:#e6c280;
-  box-shadow:0 0 10px rgba(230,194,128,.45)
+/* pastille jour */
+.parcel-day {
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+  width:28px;
+  height:28px;
+  border:1px solid #e6c280;
+  border-radius:50%;
+  color:#e6c280;
+  font-size:11px;
+  font-weight:700
 }
 
-.prepare-item-copy {
+.parcel-copy {
   display:grid;
   flex:1;
-  gap:2px;
+  gap:1px;
   min-width:0;
-  color:#fff;
-  text-decoration:none
+  overflow:hidden
 }
 
-.prepare-day {
-  color:#e6c280;
-  font-size:9px;
-  font-weight:700;
-  letter-spacing:.1em
-}
-
-.prepare-item-copy strong {
+.parcel-copy strong {
+  justify-self:start;
+  position:relative;
+  max-width:100%;
   overflow:hidden;
-  font-size:14px;
+  color:#f2ead6;
+  font-size:13.5px;
   font-weight:600;
   text-overflow:ellipsis;
-  white-space:nowrap
+  white-space:nowrap;
+  transition:color .3s
 }
 
-.prepare-item-copy small {
+.parcel-copy strong::after {
+  content:'';
+  position:absolute;
+  left:-2px;
+  right:-2px;
+  top:54%;
+  height:1.6px;
+  border-radius:2px;
+  background:rgba(230,194,128,.7);
+  transform:scaleX(0);
+  transform-origin:left center;
+  transition:transform .4s cubic-bezier(.5,0,.2,1)
+}
+
+.parcel.done .parcel-copy strong {
+  color:#7d948a
+}
+
+.parcel.done .parcel-copy strong::after {
+  transform:scaleX(1)
+}
+
+.parcel-copy small {
   overflow:hidden;
-  color:#a9bcae;
-  font-size:11px;
-  line-height:1.4;
+  color:#cdbd92;
+  font:italic 500 12px/1.4 var(--font-literary);
   text-overflow:ellipsis;
-  white-space:nowrap
+  white-space:nowrap;
+  opacity:.95
 }
 
-.prepare-item.done strong {
-  color:#8ba195;
-  text-decoration:line-through
+.parcel-go {
+  flex:0 0 auto;
+  color:rgba(230,194,128,.5);
+  font-size:18px
 }
 
-.prepare-note {
-  margin:26px 0 0;
-  color:#718a7b;
-  font-size:11px;
-  font-style:italic;
-  font-family:var(--font-serif);
-  line-height:1.5
+@media (prefers-reduced-motion:reduce) {
+  .parcel {
+    animation:none
+  }
+
+  .parcel-copy strong::after {
+    transition:none
+  }
 }
 
-.back-link:focus-visible,.prepare-filters button:focus-visible,.prepare-check:focus-visible,.prepare-item-copy:focus-visible {
+.back-link:focus-visible,.scope-tabs button:focus-visible,.manifest-more:focus-visible,.parcel-check:focus-visible,.parcel-tag:focus-visible {
   outline:2px solid #ffe9a8;
   outline-offset:3px;
-  border-radius:6px
+  border-radius:8px
 }
 </style>

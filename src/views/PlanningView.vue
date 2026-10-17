@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { currentAdventure, narrativeMilestones } from '../data/adventure'
+import { haptic } from '../utils/haptics'
 
 const router = useRouter()
 
@@ -13,9 +14,18 @@ function goBack() {
 const CURRENT = currentAdventure.currentDay
 const TOTAL = currentAdventure.totalDays
 const ROW_H = 86
-const MAP_H = TOTAL * ROW_H + 60
+const MAP_H = TOTAL * ROW_H + 110
 
 const milestoneByDay = new Map<number, (typeof narrativeMilestones)[number]>(narrativeMilestones.map((m) => [m.day as number, m]))
+
+/* chaque jalon porte l'emblème de son chapitre */
+const PHASE_ICON: Record<string, string> = {
+  voyage: 'mdi-mailbox-open-outline',
+  arrivee: 'mdi-door-open',
+  farce: 'mdi-emoticon-wink-outline',
+  depart: 'mdi-exit-to-app',
+  conclusion: 'mdi-ornament',
+}
 
 const stops = Array.from({ length: TOTAL }, (_, i) => {
   const day = i + 1
@@ -23,10 +33,11 @@ const stops = Array.from({ length: TOTAL }, (_, i) => {
   return {
     day,
     x: i % 2 === 0 ? 26 : 74,
-    y: i * ROW_H + 60,
+    y: i * ROW_H + 96,
     title: milestone?.title,
     detail: milestone?.detail,
     milestone: Boolean(milestone),
+    icon: milestone ? PHASE_ICON[milestone.phase] : null,
     state: day < CURRENT ? 'past' : day === CURRENT ? 'current' : 'future',
   }
 })
@@ -44,6 +55,39 @@ function trailSegment(fromIdx: number, toIdx: number): string {
 
 const pastPath = computed(() => trailSegment(0, Math.max(CURRENT - 1, 0)))
 const futurePath = computed(() => trailSegment(Math.max(CURRENT - 1, 0), TOTAL - 1))
+
+/* ---- paysage de fond : les 4 actes du voyage en silhouettes ---- */
+const LANDSCAPE_H = MAP_H + 1440 // battement haut/bas absorbant la parallaxe
+
+const trees = [
+  { x: 24, y: 1080, s: 1.1 }, { x: 352, y: 1230, s: 0.9 }, { x: 30, y: 1620, s: 0.8 }, { x: 356, y: 1810, s: 1.2 },
+  { x: 26, y: 2210, s: 1 }, { x: 358, y: 2420, s: 0.85 }, { x: 28, y: 2740, s: 1.15 }, { x: 354, y: 2960, s: 0.75 },
+  { x: 30, y: 3620, s: 0.9 }, { x: 356, y: 3840, s: 1.05 }, { x: 26, y: 4180, s: 0.8 }, { x: 354, y: 4420, s: 1.1 },
+  { x: 28, y: 4740, s: 0.9 }, { x: 352, y: 4980, s: 1 }, { x: 30, y: 5760, s: 0.85 }, { x: 356, y: 5880, s: 1 },
+  { x: 30, y: 6380, s: 0.9 }, { x: 348, y: 6300, s: 1.05 },
+]
+
+// Parallaxe douce : le paysage dérive plus lentement que le sentier (transform → compositeur)
+const landscapeEl = ref<HTMLElement>()
+let raf = 0
+
+function onScroll() {
+  if (raf) return
+  raf = requestAnimationFrame(() => {
+    raf = 0
+    if (landscapeEl.value) landscapeEl.value.style.transform = `translate3d(0, ${Math.min(700, window.scrollY * 0.12)}px, 0)`
+  })
+}
+
+onMounted(() => {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  window.addEventListener('scroll', onScroll, { passive: true })
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', onScroll)
+  cancelAnimationFrame(raf)
+})
 </script>
 
 <template>
@@ -52,6 +96,53 @@ const futurePath = computed(() => trailSegment(Math.max(CURRENT - 1, 0), TOTAL -
     <section class="planning-progress"><div><strong>Jour {{ CURRENT }}</strong><span>sur {{ TOTAL }}</span></div><div class="planning-progress-bar"><i :style="{ width: (CURRENT / TOTAL) * 100 + '%' }" /></div><small>Le voyage commence</small></section>
 
     <section class="map" :style="{ height: MAP_H + 'px' }" aria-label="Carte des 70 jours">
+      <!-- couche 1 : le paysage du voyage, en silhouettes sous le sentier -->
+      <div ref="landscapeEl" class="map-landscape" aria-hidden="true">
+        <svg class="landscape-svg" :viewBox="`0 0 390 ${LANDSCAPE_H}`" preserveAspectRatio="none">
+          <defs>
+            <path id="pine" d="M0 -16 L7 -2 H3 L9 12 H-9 L-3 -2 H-7 Z" />
+          </defs>
+
+          <!-- aurore boréale au-dessus du départ -->
+          <path d="M0 620 C80 560 160 590 240 540 C300 502 350 520 390 500 V420 H0 Z" fill="rgba(90,190,150,.12)" />
+          <path d="M0 700 C90 650 170 675 260 630 C320 600 360 610 390 590 V480 C340 510 260 530 190 560 C110 595 50 580 0 610 Z" fill="rgba(120,220,180,.08)" />
+
+          <!-- étoiles du grand Nord -->
+          <g fill="rgba(235,240,220,.55)">
+            <circle cx="42" cy="500" r="1.4" /><circle cx="140" cy="468" r="1" /><circle cx="252" cy="528" r="1.2" /><circle cx="330" cy="486" r="1.6" /><circle cx="92" cy="606" r="1" />
+          </g>
+
+          <!-- montagnes enneigées du Pôle Nord -->
+          <path d="M-10 1140 L50 980 L95 1060 L150 920 L215 1070 L280 965 L345 1080 L400 1010 V1200 H-10 Z" fill="rgba(38,78,62,.5)" />
+          <path d="M40 995 L50 980 L62 998 M142 932 L150 920 L162 936 M272 976 L280 965 L292 980" stroke="rgba(225,240,235,.3)" stroke-width="2" fill="none" />
+
+          <!-- la forêt borde le sentier tout du long -->
+          <use v-for="(t, i) in trees" :key="i" href="#pine" :transform="`translate(${t.x} ${t.y}) scale(${t.s})`" fill="rgba(32,68,54,.55)" />
+
+          <!-- le train qui traverse la nuit -->
+          <g transform="translate(52 3560)" fill="rgba(38,78,62,.5)">
+            <path d="M0 12 h200 q14 0 22 8 l9 13 q-3 8 -15 8 h-216 q-10 0 -10 -10 v-9 q0 -10 10 -10 z" />
+            <circle cx="30" cy="44" r="4" /><circle cx="60" cy="44" r="4" /><circle cx="180" cy="44" r="4" /><circle cx="208" cy="44" r="4" />
+          </g>
+          <g transform="translate(52 3560)" fill="rgba(230,194,128,.38)">
+            <rect x="12" y="17" width="14" height="7" rx="2" /><rect x="34" y="17" width="14" height="7" rx="2" /><rect x="56" y="17" width="14" height="7" rx="2" /><rect x="78" y="17" width="14" height="7" rx="2" />
+          </g>
+
+          <!-- la basilique de Fourvière annonce l'arrivée à Lyon -->
+          <g transform="translate(132 5520)" fill="rgba(38,78,62,.55)">
+            <path d="M0 64 V34 h16 v-9 l4 -11 4 11 v9 h24 v-9 l4 -11 4 11 v9 h24 v-9 l4 -11 4 11 v9 h24 v-9 l4 -11 4 11 v9 h16 V64 Z" />
+            <path d="M52 64 V46 q14 -12 28 0 V64 Z" />
+          </g>
+
+          <!-- la maison qui attend, au bout du sentier -->
+          <g transform="translate(128 6360)" fill="rgba(38,78,62,.6)">
+            <path d="M0 42 V20 L32 0 L64 20 V42 Z" />
+            <path d="M-5 21 L32 0 L69 21 L64 26 L32 8 L0 26 Z" fill="rgba(225,240,235,.32)" />
+            <rect x="26" y="26" width="12" height="16" fill="rgba(230,194,128,.5)" />
+          </g>
+        </svg>
+      </div>
+
       <svg class="map-svg" :viewBox="`0 0 100 ${MAP_H}`" preserveAspectRatio="none" aria-hidden="true">
         <path class="trail-future" :d="futurePath" vector-effect="non-scaling-stroke" />
         <path class="trail-past" :d="pastPath" vector-effect="non-scaling-stroke" />
@@ -66,17 +157,18 @@ const futurePath = computed(() => trailSegment(Math.max(CURRENT - 1, 0), TOTAL -
         :class="[s.state, { milestone: s.milestone, 'on-left': s.x < 50 }]"
         :style="{ left: s.x + '%', top: s.y + 'px' }"
         :to="`/activites/jour-${s.day}`"
+        @click="haptic(8)"
       >
-        <span class="stop-dot"><i v-if="s.milestone" class="mdi mdi-pine-tree" aria-hidden="true" /></span>
+        <span class="stop-dot"><i v-if="s.icon" class="mdi" :class="s.icon" aria-hidden="true" /></span>
         <span class="stop-card">
-          <strong>J{{ s.day }}<template v-if="s.title"> · {{ s.title }}</template></strong>
+          <span class="stop-day">J{{ s.day }}</span>
+          <strong v-if="s.title">{{ s.title }}</strong>
           <small v-if="s.detail">{{ s.detail }}</small>
+          <span v-if="s.state === 'current'" class="stop-cta">Ouvrir la journée<i class="mdi mdi-chevron-right" aria-hidden="true" /></span>
         </span>
         <img v-if="s.state === 'current'" class="stop-elf" src="/assets/imgs/lutin.png" alt="" aria-hidden="true" />
       </RouterLink>
     </section>
-
-    <p class="planning-note">Chaque relais s’illumine au fil des jours. Touchez une étape pour ouvrir sa fiche.</p>
   </main>
 </template>
 
@@ -157,17 +249,60 @@ const futurePath = computed(() => trailSegment(Math.max(CURRENT - 1, 0), TOTAL -
   height:100%;
   background:linear-gradient(90deg,#ffd700,#ffe9a8);
   border-radius:4px;
-  box-shadow:0 0 8px rgba(255,215,0,.5)
+  box-shadow:0 0 8px rgba(255,215,0,.5);
+  animation:bar-grow 1.1s cubic-bezier(.65,0,.2,1) .25s both
+}
+
+@keyframes bar-grow {
+  from {
+    width:0
+  }
 }
 
 /* ---- carte au trésor ---- */
 .map {
   position:relative;
-  margin-top:10px
+  margin-top:10px;
+  isolation:isolate;
+  overflow:hidden;
+  border-radius:26px;
+  background:linear-gradient(180deg,rgba(10,28,21,.18),rgba(7,20,14,.68));
+  box-shadow:inset 0 1px 0 rgba(255,244,214,.08),0 18px 38px rgba(0,0,0,.2)
+}
+
+/* vignette latérale : assombrit les bords par-dessus le paysage */
+.map::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:linear-gradient(90deg,rgba(7,20,14,.54),transparent 28%,transparent 72%,rgba(7,20,14,.54))
+}
+
+/* couche paysage : sous le sentier, fondue dans la nuit */
+.map-landscape {
+  position:absolute;
+  z-index:0;
+  top:-720px;
+  right:0;
+  bottom:-720px;
+  left:0;
+  opacity:.24;
+  pointer-events:none;
+  mask-image:linear-gradient(180deg,transparent,#000 4%,#000 96%,transparent);
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 4%,#000 96%,transparent)
+}
+
+.landscape-svg {
+  display:block;
+  width:100%;
+  height:100%
 }
 
 .map-svg {
   position:absolute;
+  z-index:1;
   inset:0;
   width:100%;
   height:100%
@@ -175,29 +310,53 @@ const futurePath = computed(() => trailSegment(Math.max(CURRENT - 1, 0), TOTAL -
 
 .trail-future {
   fill:none;
-  stroke:rgba(190,180,140,.28);
-  stroke-width:3.5;
+  stroke:rgba(255,255,255,.2);
+  stroke-width:2;
   stroke-linecap:round;
-  stroke-dasharray:.5 7
+  stroke-dasharray:6 6
 }
 
+/* le sentier déjà parcouru : fil d'or plein et lumineux */
 .trail-past {
   fill:none;
   stroke:#e6c280;
-  stroke-width:4;
+  stroke-width:3;
   stroke-linecap:round;
-  stroke-dasharray:.5 7;
-  filter:drop-shadow(0 0 6px rgba(255,215,0,.55))
+  filter:drop-shadow(0 0 6px rgba(230,194,128,.8))
 }
 
-/* brouillard de guerre sur les jours à venir */
+/* brouillard de guerre sur les jours à venir : flou progressif + voile */
 .map-fog {
   position:absolute;
+  z-index:3;
   right:-30px;
   bottom:0;
   left:-30px;
   background:linear-gradient(180deg,rgba(180,210,215,0) 0,rgba(170,205,215,.09) 18%,rgba(175,210,220,.17) 60%,rgba(185,215,225,.24) 100%);
+  backdrop-filter:blur(5px);
+  -webkit-backdrop-filter:blur(5px);
+  mask-image:linear-gradient(180deg,transparent 0,#000 140px);
+  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 140px);
   pointer-events:none
+}
+
+/* la brume scintille doucement, comme de la neige en suspension */
+.map-fog::after {
+  content:'';
+  position:absolute;
+  inset:0;
+  background-image:radial-gradient(circle,rgba(255,255,255,.6) 1px,transparent 1.6px);
+  background-size:52px 52px;
+  animation:fog-twinkle 5s ease-in-out infinite
+}
+
+@keyframes fog-twinkle {
+  0%,100% {
+    opacity:.07
+  }
+  50% {
+    opacity:.2
+  }
 }
 
 /* ---- étapes ---- */
@@ -206,10 +365,15 @@ const futurePath = computed(() => trailSegment(Math.max(CURRENT - 1, 0), TOTAL -
   z-index:2;
   display:flex;
   align-items:center;
-  gap:9px;
+  gap:13px;
   max-width:46%;
   text-decoration:none;
-  transform:translate(-50%,-50%)
+  /* le dot est ancré sur le sentier, la carte s'étend vers l'intérieur */
+  transform:translate(-14px,-50%)
+}
+
+.map-stop:not(.on-left) {
+  transform:translate(calc(-100% + 14px),-50%)
 }
 
 .map-stop:not(.on-left) {
@@ -223,22 +387,42 @@ const futurePath = computed(() => trailSegment(Math.max(CURRENT - 1, 0), TOTAL -
   flex:0 0 auto;
   width:22px;
   height:22px;
-  border:2px solid rgba(190,180,140,.4);
+  border:2px solid rgba(230,194,128,.45);
   border-radius:50%;
-  background:#0e241d;
-  color:rgba(190,180,140,.6);
-  font-size:11px
+  background:rgba(10,28,20,.85);
+  color:rgba(230,194,128,.6);
+  font-size:11px;
+  box-shadow:0 0 8px rgba(230,194,128,.18)
 }
 
 .stop-card {
   display:grid;
   gap:2px;
-  padding:8px 12px;
-  border:1px solid rgba(255,255,255,.1);
-  border-radius:14px;
-  background:rgba(255,255,255,.05);
+  max-width:184px;
+  padding:9px 12px;
+  border:1px solid rgba(230,194,128,.3);
+  border-radius:16px;
+  background:rgba(15,35,26,.88);
   backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  box-shadow:0 8px 24px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,244,214,.05);
   transition:filter .3s,opacity .3s,transform .35s var(--spring)
+}
+
+/* le numéro du jour en petit badge d'or */
+.stop-day {
+  justify-self:start;
+  padding:2px 8px;
+  border:1px solid rgba(230,194,128,.5);
+  border-radius:999px;
+  color:#e6c280;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.1em
+}
+
+.map-stop:not(.on-left) .stop-day {
+  justify-self:end
 }
 
 .map-stop:active .stop-card {
@@ -280,8 +464,20 @@ const futurePath = computed(() => trailSegment(Math.max(CURRENT - 1, 0), TOTAL -
   width:30px;
   height:30px;
   border-color:#ffe9a8;
-  background:radial-gradient(circle,#ffe9a8,#e6c280);
-  box-shadow:0 0 18px rgba(255,215,0,.8),0 0 44px rgba(255,215,0,.35)
+  background:radial-gradient(circle,#fff3d1,#e6c280);
+  box-shadow:0 0 18px rgba(255,215,0,.8),0 0 44px rgba(255,215,0,.35);
+  animation:node-pulse 2.2s ease-in-out infinite
+}
+
+@keyframes node-pulse {
+  0%,100% {
+    box-shadow:0 0 18px rgba(255,215,0,.8),0 0 44px rgba(255,215,0,.35);
+    transform:scale(1)
+  }
+  50% {
+    box-shadow:0 0 24px rgba(255,230,160,1),0 0 56px rgba(255,215,0,.5);
+    transform:scale(1.07)
+  }
 }
 
 .map-stop.current .stop-card {
@@ -293,24 +489,112 @@ const futurePath = computed(() => trailSegment(Math.max(CURRENT - 1, 0), TOTAL -
   color:#ffe9a8
 }
 
-.stop-elf {
+/* pilule dorée d'action dans la bulle active */
+.stop-cta {
+  display:inline-flex;
+  align-items:center;
+  justify-self:start;
+  margin-top:7px;
+  padding:7px 12px;
+  border-radius:999px;
+  background:linear-gradient(135deg,#e6c280,#d4af37);
+  color:#0a1c14;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.03em;
+  box-shadow:0 4px 12px rgba(230,194,128,.35);
+  transition:transform .15s cubic-bezier(.34,1.56,.64,1)
+}
+
+.map-stop:active .stop-cta {
+  transform:scale(.95)
+}
+
+.map-stop:not(.on-left) .stop-cta {
+  justify-self:end
+}
+
+.map-stop:not(.on-left) .stop-cta {
+  justify-self:end
+}
+
+.stop-cta i {
+  margin-left:2px;
+  font-size:14px
+}
+
+/* étincelles de lanterne autour du lutin */
+.map-stop.current::after {
+  content:'';
   position:absolute;
-  bottom:calc(100% + 12px);
-  left:50%;
-  width:44px;
-  transform:translateX(-50%);
-  filter:drop-shadow(0 4px 10px rgba(0,0,0,.5)) drop-shadow(0 0 14px rgba(255,215,0,.4));
+  bottom:calc(50% + 4px);
+  left:14px;
+  width:74px;
+  height:64px;
+  margin-left:-37px;
+  background-image:
+    radial-gradient(circle,#ffe9a8 1.6px,transparent 2.2px),
+    radial-gradient(circle,#ffe9a8 1.2px,transparent 1.8px),
+    radial-gradient(circle,#ffd97a 1px,transparent 1.6px);
+  background-position:18% 34%,80% 16%,54% 6%;
+  background-repeat:no-repeat;
+  animation:elf-glint 2.6s ease-in-out infinite;
   pointer-events:none
 }
 
-/* jours futurs : sous la brume */
+@keyframes elf-glint {
+  0%,100% {
+    opacity:.25
+  }
+  50% {
+    opacity:.9
+  }
+}
+
+.map-stop:not(.on-left)::after {
+  left:auto;
+  right:14px;
+  margin-left:0;
+  margin-right:-37px
+}
+
+/* le lutin se tient sur le jalon actif, pas au-dessus de la carte */
+.stop-elf {
+  --ex:-50%;
+  position:absolute;
+  bottom:calc(50% + 12px);
+  left:14px;
+  width:44px;
+  transform:translateX(var(--ex));
+  transform-origin:50% 100%;
+  z-index:1;
+  filter:drop-shadow(0 4px 10px rgba(0,0,0,.5)) drop-shadow(0 0 14px rgba(255,215,0,.4));
+  pointer-events:none;
+  animation:elf-sway 4.2s ease-in-out infinite
+}
+
+.map-stop:not(.on-left) .stop-elf {
+  --ex:50%;
+  left:auto;
+  right:14px
+}
+
+@keyframes elf-sway {
+  0%,100% {
+    transform:translateX(var(--ex)) rotate(-1.6deg) translateY(0)
+  }
+  50% {
+    transform:translateX(var(--ex)) rotate(1.6deg) translateY(-2px)
+  }
+}
+
+/* jours futurs : la brume seule les voile — pas de double flou */
 .map-stop.future .stop-card {
-  opacity:.45;
-  filter:blur(1.6px) saturate(.7)
+  opacity:.8
 }
 
 .map-stop.future .stop-dot {
-  opacity:.6
+  opacity:.75
 }
 
 /* jalons : repères plus grands */
@@ -320,13 +604,11 @@ const futurePath = computed(() => trailSegment(Math.max(CURRENT - 1, 0), TOTAL -
   border-width:1.5px
 }
 
-.planning-note {
-  margin:26px 0 0;
-  color:#718a7b;
-  font-size:11px;
-  font-style:italic;
-  font-family:var(--font-literary);
-  line-height:1.5
+
+@media (prefers-reduced-motion:reduce) {
+  .stop-elf,.map-stop.current .stop-dot,.map-stop.current::after,.map-fog::after,.planning-progress-bar i {
+    animation:none
+  }
 }
 
 .back-link:focus-visible,.map-stop:focus-visible {

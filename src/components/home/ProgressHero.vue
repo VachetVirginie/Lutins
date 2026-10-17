@@ -1,145 +1,135 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { currentAdventure } from '../../data/adventure'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { currentAdventure, remainingDays } from '../../data/adventure'
 
-const fillPct = computed(() => (currentAdventure.currentDay / currentAdventure.totalDays) * 100)
+const chapter = currentAdventure.chapter
+
+// Parallaxe douce : la scène dérive plus lentement que le scroll (transform → compositeur)
+const sceneEl = ref<HTMLElement>()
+let raf = 0
+
+function onScroll() {
+  if (raf) return
+  raf = requestAnimationFrame(() => {
+    raf = 0
+    if (sceneEl.value) sceneEl.value.style.transform = `translate3d(0, ${Math.min(70, window.scrollY * 0.14)}px, 0) scale(1.1)`
+  })
+}
+
+onMounted(() => {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  window.addEventListener('scroll', onScroll, { passive: true })
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', onScroll)
+  cancelAnimationFrame(raf)
+})
 </script>
 
 <template>
   <section class="progress-hero">
-    <i class="hero-spark hero-spark--tl" aria-hidden="true" /><i class="hero-spark hero-spark--br" aria-hidden="true" />
-    <div class="progress-copy">
-      <p class="home-overline">JOUR {{ currentAdventure.currentDay }} · DÉBUT DE L’AVENTURE</p>
-      <h2>Le voyage<br /><em>commence.</em></h2>
-      <p>Une première étape vers Noël.</p>
+    <div class="hero-scene" aria-hidden="true">
+      <img ref="sceneEl" src="/assets/created/arrival-mobile-hero.png" alt="" />
+      <i class="hero-veil" />
     </div>
-    <div class="progress-orb" :style="{ '--fill': fillPct + '%' }"><i class="orb-spark" aria-hidden="true" /><strong>{{ currentAdventure.currentDay }}</strong><span>/ {{ currentAdventure.totalDays }}</span><small>JOURS</small></div>
+
+    <i class="hero-spark hero-spark--tl" aria-hidden="true" /><i class="hero-spark hero-spark--br" aria-hidden="true" />
+
+    <div class="progress-copy">
+      <p class="home-overline">JOUR {{ currentAdventure.currentDay }} · {{ remainingDays }} JOURS AVANT NOËL</p>
+      <h2>{{ chapter.heroA }}<br /><em>{{ chapter.heroEm }}</em></h2>
+      <p>{{ chapter.tagline }}</p>
+    </div>
   </section>
 </template>
 
 <style scoped>
+/* ---- la scène : l'illustration de l'ouverture continue sous le héros ---- */
 .progress-hero  {
   position:relative;
   display:flex;
-  align-items:center;
+  align-items:flex-end;
   justify-content:space-between;
-  gap:14px;
-  margin-top:14px;
-  padding:24px 22px;
-  border:1px solid rgba(241,204,122,.3);
-  border-radius:26px;
-  background:radial-gradient(ellipse 60% 90% at 88% 8%,rgba(255,205,110,.14),transparent 60%),linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.02) 60%);
-  backdrop-filter:blur(18px);
-  box-shadow:0 18px 45px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -14px 30px rgba(10,25,18,.35)
+  gap:16px;
+  min-height:338px;
+  margin:0 -20px;
+  padding:0 22px 30px
+}
+
+.hero-scene  {
+  position:absolute;
+  inset:-55px 0 0;
+  overflow:hidden;
+  mask-image:linear-gradient(180deg,#000 42%,rgba(0,0,0,.55) 68%,transparent 97%);
+  -webkit-mask-image:linear-gradient(180deg,#000 42%,rgba(0,0,0,.55) 68%,transparent 97%)
+}
+
+.hero-scene img  {
+  display:block;
+  width:100%;
+  height:112%;
+  object-fit:cover;
+  object-position:58% 62%;
+  transform:scale(1.1);
+  filter:brightness(.96) contrast(1.05) saturate(1.08)
+}
+
+.hero-veil  {
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,rgba(10,25,19,.3) 0%,rgba(10,25,19,.18) 34%,rgba(10,26,19,.68) 78%,rgba(10,28,21,.9) 100%)
+}
+
+/* ---- copie monumentale : même voix que l'écran d'ouverture ---- */
+.progress-copy  {
+  position:relative;
+  z-index:2;
+  min-width:0
+}
+
+.progress-copy .home-overline  {
+  font-size:9px;
+  color:#ffe9a8;
+  text-shadow:0 1px 8px rgba(0,0,0,.6);
+  animation:hero-in .7s var(--spring) .05s both
 }
 
 .progress-copy h2  {
-  margin:8px 0 10px;
-  font:500 30px/.95 var(--font-serif);
-  letter-spacing:-.04em;
-  color:#f7efdb
+  margin:10px 0 10px;
+  font:500 clamp(38px,10vw,50px)/.96 var(--font-serif);
+  letter-spacing:-.045em;
+  color:#f9f1de;
+  text-shadow:0 2px 22px rgba(0,0,0,.55);
+  animation:hero-in .75s var(--spring) .14s both
 }
 
 .progress-copy h2 em  {
   color:var(--color-gold);
-  font-style:italic
+  font-style:italic;
+  text-shadow:0 0 24px rgba(255,215,0,.35),0 2px 18px rgba(0,0,0,.5)
 }
 
 .progress-copy>p:last-child  {
+  max-width:240px;
   margin:0;
-  color:#a9bcae;
+  color:#c3d2c7;
   font-size:13px;
-  line-height:1.45
+  line-height:1.5;
+  text-shadow:0 1px 10px rgba(0,0,0,.7);
+  animation:hero-in .7s var(--spring) .24s both
 }
 
-.progress-orb  {
-  position:relative;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  width:96px;
-  height:96px;
-  flex:0 0 auto
-}
-
-.progress-orb::after  {
-  content:'';
-  position:absolute;
-  inset:-16px;
-  border-radius:50%;
-  background:radial-gradient(circle,rgba(255,205,110,.32),rgba(255,190,80,.1) 55%,transparent 72%);
-  animation:orb-breathe 4s ease-in-out infinite
-}
-
-.orb-spark  {
-  position:absolute;
-  inset:-4px;
-  animation:orb-orbit 7s linear infinite
-}
-
-.orb-spark::before  {
-  content:'';
-  position:absolute;
-  left:50%;
-  top:0;
-  width:5px;
-  height:5px;
-  margin-left:-2.5px;
-  border-radius:50%;
-  background:#fff3c2;
-  box-shadow:0 0 8px #ffd97a,0 0 18px rgba(255,200,90,.8)
-}
-
-@keyframes orb-orbit  {
-  to  {
-    transform:rotate(360deg)
+@keyframes hero-in  {
+  from  {
+    opacity:0;
+    transform:translateY(16px)
   }
-}
-
-@keyframes orb-breathe  {
-  0%,100%  {
-    opacity:.65;
-    transform:scale(.94)
-  }
-  50%  {
-    opacity:1;
-    transform:scale(1.05)
-  }
-}
-
-.progress-orb::before  {
-  content:'';
-  position:absolute;
-  inset:0;
-  border-radius:50%;
-  background:conic-gradient(var(--color-gold) var(--fill,0%),rgba(241,204,122,.13) 0);
-  mask:radial-gradient(farthest-side,transparent calc(100% - 6px),#000 calc(100% - 5px));
-  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 6px),#000 calc(100% - 5px));
-  filter:drop-shadow(0 0 5px rgba(241,204,122,.55))
-}
-
-.progress-orb strong  {
-  font:500 31px/.85 var(--font-serif);
-  color:var(--color-gold)
-}
-
-.progress-orb span  {
-  margin-top:2px;
-  font-size:10px;
-  color:#9db0a4
-}
-
-.progress-orb small  {
-  margin-top:5px;
-  font-size:8px;
-  letter-spacing:.16em;
-  color:var(--color-gold);
-  opacity:.85
 }
 
 .hero-spark  {
   position:absolute;
+  z-index:2;
   width:5px;
   height:5px;
   border-radius:50%;
@@ -149,13 +139,13 @@ const fillPct = computed(() => (currentAdventure.currentDay / currentAdventure.t
 }
 
 .hero-spark--tl  {
-  left:-3px;
-  top:16px
+  left:26px;
+  top:22%
 }
 
 .hero-spark--br  {
-  right:-2px;
-  bottom:34%;
+  right:30%;
+  bottom:18%;
   animation-delay:1.2s
 }
 
@@ -170,4 +160,9 @@ const fillPct = computed(() => (currentAdventure.currentDay / currentAdventure.t
   }
 }
 
+@media (prefers-reduced-motion:reduce)  {
+  .progress-copy>*  {
+    animation:none
+  }
+}
 </style>
