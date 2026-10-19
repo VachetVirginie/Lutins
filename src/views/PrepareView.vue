@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, ref, watch, type Ref } from 'vue'
+import { computed, ref, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { motion } from 'motion-v'
 import { currentAdventure } from '../data/adventure'
+import { adventure } from '../data/adventureStore'
 import { preparationCatalog, type PreparationCategory } from '../data/preparationCatalog'
 import { haptic } from '../utils/haptics'
 
@@ -16,10 +17,11 @@ function goBack(): void {
 type Filter = 'all' | PreparationCategory
 const filter = ref<Filter>('all')
 
-// La réserve se souvient de ce qui est embarqué
-const STORAGE_KEY = 'lutin:kit-done'
-const done = ref<Set<string>>(new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]')))
-watch(done, (value) => localStorage.setItem(STORAGE_KEY, JSON.stringify([...value])), { deep: true })
+// La réserve fait partie de l'état partagé — les coches voyagent entre appareils
+const done = computed<Set<string>>({
+  get: () => adventure.prepDone,
+  set: (value) => (adventure.prepDone = value),
+})
 
 const groups: { id: PreparationCategory; label: string }[] = [
   { id: 'print', label: 'À imprimer' },

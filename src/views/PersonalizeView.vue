@@ -1,31 +1,14 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { haptic } from '../utils/haptics'
+import { adventure, createFamily, familyCode, fileToDataUrl, joinFamily, leaveFamily, syncStatus, uploadPhoto } from '../data/adventureStore'
+import { syncAvailable } from '../lib/supabase'
 
 const router = useRouter()
 
-/**
- * Le formulaire de l'expédition : tout reste en mémoire vive,
- * aucune donnée n'est persistée ni envoyée.
- */
-const form = reactive({
-  prenoms_enfants: [] as string[],
-  nom_proche: '',
-  nom_lutin: '',
-  deuxieme_lutin: false,
-  nom_second_lutin: '',
-  ville: '',
-  destination: '',
-  quartier: '',
-  date_debut: '',
-  date_fin: '',
-  jours_sans_activite: '',
-  lieux_sejour: '',
-  activites_modifiees: '',
-  photo_entree: '',
-  photo_lutins: '',
-})
+// Le formulaire écrit directement dans l'état partagé de l'aventure
+const form = adventure
 
 /* ---- étapes ---- */
 const STEPS = [
@@ -52,18 +35,16 @@ function prev() {
   else step.value--
 }
 
-/* ---- prénoms : une liste de destinataires ---- */
-const draftName = ref('')
+/* ---- prénoms : une ligne par enfant, éditée directement ---- */
+if (!form.prenoms_enfants.length) form.prenoms_enfants = ['']
 
-function addChild() {
-  const names = draftName.value.split(',').map((n) => n.trim()).filter(Boolean)
-  for (const n of names) if (!form.prenoms_enfants.includes(n)) form.prenoms_enfants.push(n)
-  draftName.value = ''
-  if (names.length) haptic(10)
+function addChildRow() {
+  form.prenoms_enfants.push('')
+  haptic(8)
 }
 
-function removeChild(name: string) {
-  form.prenoms_enfants = form.prenoms_enfants.filter((n) => n !== name)
+function removeChildRow(index: number) {
+  form.prenoms_enfants.splice(index, 1)
   haptic(6)
 }
 
@@ -74,18 +55,73 @@ const joursDisponibles = computed(() => {
   return d > 0 ? d : null
 })
 
-/* ---- photos : aperçu local, rien n'est téléversé ---- */
-function pickPhoto(field: 'photo_entree' | 'photo_lutins', event: Event) {
+/* ---- photos : aperçu instantané, upload si l'expédition est partagée ---- */
+async function pickPhoto(field: 'photo_entree' | 'photo_lutins', event: Event) {
   const file = (event.target as HTMLInputElement).files?.[0]
   if (!file) return
-  if (form[field]) URL.revokeObjectURL(form[field])
-  form[field] = URL.createObjectURL(file)
+  form[field] = await fileToDataUrl(file) // aperçu immédiat + persistance locale
   haptic(10)
+  const remote = await uploadPhoto(field, file)
+  if (remote) form[field] = remote // remplacé par l'URL distante, visible de l'autre parent
 }
+
+/* ---- partage famille : un code relie les deux appareils ---- */
+const joinInput = ref('')
+const joinError = ref(false)
+const busy = ref(false)
+const copied = ref(false)
+
+async function shareCode() {
+  const text = `Rejoins l'aventure des lutins avec le code ${familyCode.value}`
+  try {
+    await navigator.share({ title: 'Lutin farceur', text })
+  } catch {
+    await navigator.clipboard?.writeText(text).catch(() => {})
+    copied.value = true
+    window.setTimeout(() => (copied.value = false), 2200)
+  }
+}
+
+async function onCreateFamily() {
+  busy.value = true
+  const code = await createFamily()
+  busy.value = false
+  if (code) {
+    haptic([12, 40, 8])
+    shareCode()
+  }
+}
+
+async function onJoin() {
+  if (!joinInput.value.trim()) return
+  busy.value = true
+  joinError.value = !(await joinFamily(joinInput.value))
+  busy.value = false
+  if (!joinError.value) {
+    joinInput.value = ''
+    haptic([12, 40, 8])
+  }
+}
+
+function onLeave() {
+  leaveFamily()
+  haptic(6)
+}
+
+const syncLabel = computed(
+  () =>
+    ({
+      local: 'enregistré sur cet appareil',
+      connecting: 'connexion…',
+      synced: 'synchronisé en direct',
+      error: 'erreur de synchronisation',
+    })[syncStatus.value],
+)
 
 const recap = computed(() => {
   const rows: { label: string; value: string }[] = []
-  if (form.prenoms_enfants.length) rows.push({ label: 'Destinataires', value: form.prenoms_enfants.join(', ') })
+  const kids = form.prenoms_enfants.filter(Boolean)
+  if (kids.length) rows.push({ label: 'Destinataires', value: kids.join(', ') })
   if (form.nom_proche) rows.push({ label: 'Proches', value: form.nom_proche })
   if (form.nom_lutin) rows.push({ label: 'Premier lutin', value: form.nom_lutin })
   if (form.deuxieme_lutin && form.nom_second_lutin) rows.push({ label: 'Second lutin', value: form.nom_second_lutin })
@@ -123,27 +159,24 @@ const recap = computed(() => {
 
       <!-- 1 · la famille -->
       <template v-if="current.id === 'famille'">
-        <label class="pz-field">
+        <div class="pz-field">
           <span>Prénom(s) des enfants</span>
-          <span class="pz-add">
-            <input
-              v-model="draftName"
-              type="text"
-              placeholder="ex : Louis, Emma"
-              enterkeyhint="done"
-              @keydown.enter.prevent="addChild"
-            />
-            <button type="button" class="pz-add-btn" :disabled="!draftName.trim()" @click="addChild">
-              <i class="mdi mdi-plus" aria-hidden="true" /> Ajouter
+          <div v-for="(name, i) in form.prenoms_enfants" :key="i" class="pz-row">
+            <input v-model="form.prenoms_enfants[i]" type="text" placeholder="Prénom de l'enfant" autocomplete="off" />
+            <button
+              v-if="form.prenoms_enfants.length > 1"
+              type="button"
+              class="pz-row-del"
+              aria-label="Retirer cet enfant"
+              @click="removeChildRow(i)"
+            >
+              <i class="mdi mdi-close" aria-hidden="true" />
             </button>
-          </span>
-        </label>
-        <ul v-if="form.prenoms_enfants.length" class="pz-chips">
-          <li v-for="name in form.prenoms_enfants" :key="name">
-            {{ name }}
-            <button type="button" aria-label="Retirer" @click="removeChild(name)"><i class="mdi mdi-close" /></button>
-          </li>
-        </ul>
+          </div>
+          <button type="button" class="pz-add-row" @click="addChildRow">
+            <i class="mdi mdi-plus" aria-hidden="true" /> Ajouter un enfant
+          </button>
+        </div>
         <label class="pz-field">
           <span>Un proche qui apparaît dans l'histoire</span>
           <input v-model="form.nom_proche" type="text" placeholder="ex : Papi et Mamie" />
@@ -245,6 +278,34 @@ const recap = computed(() => {
 
       <!-- 6 · le récapitulatif -->
       <template v-else>
+        <article class="pz-piece pz-family">
+          <header><b><i class="mdi mdi-account-group-outline" aria-hidden="true" /></b><span>L'expédition à deux</span></header>
+          <template v-if="!familyCode">
+            <p>Deux appareils, une seule aventure — chaque réglage et chaque coche se synchronise en direct.</p>
+            <div class="pz-family-actions">
+              <button type="button" class="pz-family-btn" :disabled="busy || !syncAvailable" @click="onCreateFamily">
+                Créer un code famille
+              </button>
+              <span class="pz-join">
+                <input v-model="joinInput" type="text" placeholder="LUTIN-XXXX" maxlength="9" autocapitalize="characters" />
+                <button type="button" class="pz-family-btn" :disabled="busy || !joinInput.trim()" @click="onJoin">Rejoindre</button>
+              </span>
+            </div>
+            <p v-if="joinError" class="pz-error">Ce code n'existe pas — vérifiez les 4 lettres.</p>
+            <p v-if="!syncAvailable" class="pz-note">La synchronisation n'est pas encore configurée — tout reste sur cet appareil.</p>
+          </template>
+          <template v-else>
+            <p class="pz-code">{{ familyCode }}</p>
+            <div class="pz-family-actions">
+              <button type="button" class="pz-family-btn" @click="shareCode">
+                <i class="mdi mdi-share-variant-outline" aria-hidden="true" /> {{ copied ? 'Copié !' : 'Partager' }}
+              </button>
+              <button type="button" class="pz-family-btn pz-family-btn--ghost" @click="onLeave">Quitter</button>
+            </div>
+            <p class="pz-sync"><i :class="syncStatus" aria-hidden="true" />{{ syncLabel }}</p>
+          </template>
+        </article>
+
         <ul v-if="recap.length" class="pz-recap">
           <li v-for="row in recap" :key="row.label">
             <span>{{ row.label }}</span>
@@ -443,66 +504,18 @@ const recap = computed(() => {
   gap:16px
 }
 
-/* l'ajout de destinataire */
-.pz-add {
+/* lignes de destinataires : un champ par enfant */
+.pz-row {
   display:flex;
-  gap:8px;
-  align-items:flex-end
-}
-
-.pz-add input {
-  flex:1
-}
-
-.pz-add-btn {
-  display:inline-flex;
   align-items:center;
-  gap:4px;
-  padding:8px 13px;
-  border:1px solid rgba(230,194,128,.4);
-  border-radius:999px;
-  background:transparent;
-  color:#e6c280;
-  font:700 11.5px var(--font-ui);
-  cursor:pointer;
-  transition:transform .2s var(--spring),opacity .2s;
-  -webkit-tap-highlight-color:transparent
-}
-
-.pz-add-btn:active {
-  transform:scale(.94)
-}
-
-.pz-add-btn:disabled {
-  opacity:.35
-}
-
-.pz-chips {
-  display:flex;
-  flex-wrap:wrap;
   gap:8px;
-  margin:-6px 0 16px;
-  padding:0;
-  list-style:none
+  animation:row-in .35s var(--spring) both
 }
 
-.pz-chips li {
-  display:inline-flex;
-  align-items:center;
-  gap:7px;
-  padding:6px 8px 6px 13px;
-  border:1px solid rgba(230,194,128,.45);
-  border-radius:999px;
-  background:rgba(230,194,128,.08);
-  color:#ffe9a8;
-  font:italic 500 14px var(--font-literary);
-  animation:chip-in .35s var(--spring) both
-}
-
-@keyframes chip-in {
+@keyframes row-in {
   from {
     opacity:0;
-    transform:scale(.8)
+    transform:translateY(-6px)
   }
   to {
     opacity:1;
@@ -510,18 +523,50 @@ const recap = computed(() => {
   }
 }
 
-.pz-chips button {
+.pz-row input {
+  flex:1
+}
+
+.pz-row-del {
   display:grid;
   place-items:center;
-  width:18px;
-  height:18px;
+  flex:none;
+  width:26px;
+  height:26px;
   padding:0;
   border:0;
   border-radius:50%;
-  background:rgba(230,194,128,.2);
+  background:rgba(232,138,110,.14);
+  color:#e8a08a;
+  font-size:13px;
+  cursor:pointer;
+  transition:transform .2s var(--spring);
+  -webkit-tap-highlight-color:transparent
+}
+
+.pz-row-del:active {
+  transform:scale(.85)
+}
+
+.pz-add-row {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  justify-self:start;
+  margin-top:2px;
+  padding:8px 14px;
+  border:1px dashed rgba(230,194,128,.4);
+  border-radius:999px;
+  background:transparent;
   color:#e6c280;
-  font-size:11px;
-  cursor:pointer
+  font:700 11.5px var(--font-ui);
+  cursor:pointer;
+  transition:transform .2s var(--spring);
+  -webkit-tap-highlight-color:transparent
+}
+
+.pz-add-row:active {
+  transform:scale(.95)
 }
 
 /* l'interrupteur du second lutin */
@@ -669,6 +714,127 @@ const recap = computed(() => {
 
 .pz-photo.filled {
   border-style:solid
+}
+
+/* la carte famille */
+.pz-family {
+  margin-bottom:18px;
+  border-color:rgba(230,194,128,.4);
+  background:rgba(230,194,128,.05)
+}
+
+.pz-family-actions {
+  display:grid;
+  gap:10px
+}
+
+.pz-family-btn {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  padding:10px 16px;
+  border:1px solid rgba(230,194,128,.5);
+  border-radius:999px;
+  background:rgba(230,194,128,.12);
+  color:#ffe9a8;
+  font:700 12px var(--font-ui);
+  cursor:pointer;
+  transition:transform .2s var(--spring),opacity .2s;
+  -webkit-tap-highlight-color:transparent
+}
+
+.pz-family-btn:active {
+  transform:scale(.96)
+}
+
+.pz-family-btn:disabled {
+  opacity:.35
+}
+
+.pz-family-btn--ghost {
+  background:transparent;
+  color:#9db4a8;
+  border-color:rgba(255,255,255,.18)
+}
+
+.pz-join {
+  display:flex;
+  gap:8px;
+  align-items:center
+}
+
+.pz-join input {
+  flex:1;
+  min-width:0;
+  padding:10px 12px;
+  border:1px dashed rgba(241,204,122,.35);
+  border-radius:12px;
+  background:transparent;
+  color:#f4ead4;
+  font:700 14px var(--font-ui);
+  letter-spacing:.14em;
+  text-transform:uppercase
+}
+
+.pz-join input::placeholder {
+  color:rgba(159,180,168,.4);
+  letter-spacing:.14em
+}
+
+.pz-code {
+  margin:0 0 12px;
+  color:#ffe9a8;
+  font:800 22px/1 var(--font-ui);
+  letter-spacing:.18em;
+  text-align:center;
+  text-shadow:0 0 14px rgba(230,194,128,.5)
+}
+
+.pz-sync {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin:12px 0 0;
+  color:#8fa79a;
+  font:600 11px var(--font-ui);
+  letter-spacing:.04em
+}
+
+.pz-sync i {
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#8fa79a
+}
+
+.pz-sync i.synced {
+  background:#7fd99a;
+  box-shadow:0 0 8px rgba(127,217,154,.8);
+  animation:sync-breathe 2.4s ease-in-out infinite
+}
+
+.pz-sync i.connecting {
+  background:#e6c280
+}
+
+.pz-sync i.error {
+  background:#e88
+}
+
+@keyframes sync-breathe {
+  0%,100% {
+    opacity:1
+  }
+  50% {
+    opacity:.45
+  }
+}
+
+.pz-error {
+  margin:8px 0 0;
+  color:#e8a08a;
+  font:600 11.5px var(--font-ui)
 }
 
 /* le récapitulatif */

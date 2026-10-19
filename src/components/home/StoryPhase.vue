@@ -10,14 +10,14 @@ const PAD_X = 60
 const TOTAL_DAYS = currentAdventure.totalDays
 const TRACK_W = PAD_X * 2 + STEP * (TOTAL_DAYS - 1)
 
-const milestoneByDay = new Map<number, string>(narrativeMilestones.map((m) => [m.day, m.title]))
+const milestoneByDay = computed(() => new Map<number, string>(narrativeMilestones.value.map((m) => [m.day, m.title])))
 
 const nodes = computed(() =>
   Array.from({ length: TOTAL_DAYS }, (_, i) => {
     const day = i + 1
     return {
       day,
-      title: milestoneByDay.get(day),
+      title: milestoneByDay.value.get(day),
       x: PAD_X + i * STEP,
       state: day === currentAdventure.currentDay ? 'active' : day < currentAdventure.currentDay ? 'done' : 'upcoming',
     }

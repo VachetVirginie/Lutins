@@ -16,7 +16,7 @@ const TOTAL = currentAdventure.totalDays
 const ROW_H = 86
 const MAP_H = TOTAL * ROW_H + 110
 
-const milestoneByDay = new Map<number, (typeof narrativeMilestones)[number]>(narrativeMilestones.map((m) => [m.day as number, m]))
+const milestoneByDay = new Map<number, (typeof narrativeMilestones.value)[number]>(narrativeMilestones.value.map((m) => [m.day as number, m]))
 
 /* chaque jalon porte l'emblème de son chapitre */
 const PHASE_ICON: Record<string, string> = {

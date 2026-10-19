@@ -5,6 +5,7 @@ import { currentAdventure } from '../data/adventure'
 import { contentGapByDay } from '../data/contentGaps'
 import { dailySheetsByActivityId } from '../data/dailySheets'
 import { haptic } from '../utils/haptics'
+import { personalizeSheet } from '../utils/personalize'
 
 const route = useRoute()
 const router = useRouter()
@@ -15,7 +16,10 @@ function goBack() {
 }
 const activityId = computed(() => String(route.params.activityId))
 const dayNumber = computed(() => Number(activityId.value.match(/jour-(\d+)/)?.[1] ?? 0))
-const sheet = computed(() => dailySheetsByActivityId[activityId.value] ?? dailySheetsByActivityId[`jour-${dayNumber.value}`])
+const sheet = computed(() => {
+  const raw = dailySheetsByActivityId[activityId.value] ?? dailySheetsByActivityId[`jour-${dayNumber.value}`]
+  return raw ? personalizeSheet(raw) : raw
+})
 const gap = computed(() => contentGapByDay[dayNumber.value])
 const preparationDone = ref(false)
 const copied = ref(false)
