@@ -4,11 +4,12 @@ import { useRoute, useRouter } from 'vue-router'
 import { MotionConfig } from 'motion-v'
 import AmbientDust from './components/AmbientDust.vue'
 import LanternNav from './components/LanternNav.vue'
+import CursorLantern from './components/magic/CursorLantern.vue'
 import SealStamp from './components/SealStamp.vue'
 
-// La neige 3D reste hors du bundle initial : chargée en tâche de fond sur
-// l'écran d'ouverture, prête avant que le sceau ne soit déverrouillé
-const SnowTransition = defineAsyncComponent(() => import('./components/SnowTransition.vue'))
+// La traversée du sceau reste hors du bundle initial : chargée en tâche de
+// fond sur l'écran d'ouverture, prête avant que le sceau ne soit déverrouillé
+const PortalTransition = defineAsyncComponent(() => import('./components/PortalTransition.vue'))
 
 // Ciel horaire : aube dorée, jour froid, crépuscule ambré, nuit bleutée
 onMounted(() => {
@@ -25,7 +26,7 @@ onMounted(() => {
   document.documentElement.style.setProperty('--sky-alpha', alpha)
 
   if (route.name === 'opening') {
-    const warm = () => import('./components/SnowTransition.vue')
+    const warm = () => import('./components/PortalTransition.vue')
     if ('requestIdleCallback' in window) requestIdleCallback(warm)
     else setTimeout(warm, 700)
   }
@@ -43,7 +44,7 @@ router.beforeEach((_to, from) => {
 const transitionName = computed(() => (fromName.value === 'opening' ? 'page' : ''))
 const showNav = computed(() => route.name !== 'opening')
 
-// Ouverture → aventure : la bourrasque couvre l'échange de pages
+// Ouverture → aventure : la traversée du sceau couvre l'échange de pages
 const gusting = ref(false)
 let gustTimer: number | undefined
 
@@ -53,8 +54,12 @@ watch(
     if (prev !== 'opening' || name !== 'home') return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     gusting.value = true
+    document.documentElement.classList.add('is-gusting')
     window.clearTimeout(gustTimer)
-    gustTimer = window.setTimeout(() => (gusting.value = false), 1900)
+    gustTimer = window.setTimeout(() => {
+      gusting.value = false
+      document.documentElement.classList.remove('is-gusting')
+    }, 1900)
   },
 )
 </script>
@@ -69,8 +74,9 @@ watch(
         </transition>
       </router-view>
       <LanternNav v-if="showNav" />
+      <CursorLantern />
       <SealStamp />
-      <SnowTransition v-if="gusting" />
+      <PortalTransition v-if="gusting" />
     </div>
   </MotionConfig>
 </template>

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { currentAdventure, journeyMilestones, remainingDays } from '../../data/adventure'
 import { adventure } from '../../data/adventureStore'
 import { sheetForDay } from '../../data/farces'
 import { preparationCatalog } from '../../data/preparationCatalog'
-import NightCanvas from '../../components/magic/NightCanvas.vue'
+import SceneNight from '../../components/magic/SceneNight.vue'
 import ConstellationMap from '../../components/home/ConstellationMap.vue'
+import { waxCrack } from '../../utils/sound'
 
 /**
  * « La veillée » — l'accueil desktop n'est pas une page, c'est une scène :
@@ -17,11 +19,23 @@ const current = computed(() => currentAdventure.currentDay)
 const total = computed(() => currentAdventure.totalDays)
 const milestones = journeyMilestones
 
+/* le tagline vit : il cite la dépêche du soir, pas l'ouverture passée */
+const tagline = computed(() => {
+  const sheet = sheetForDay(current.value)
+  return sheet ? `Ce soir — « ${sheet.title} »` : chapter.value.tagline
+})
+
 /* ---- la semaine de préparation, résumée en une carte ---- */
 const weekPrep = computed(() => {
   const items = preparationCatalog.value.filter((i) => i.day > current.value && i.day <= current.value + 7)
   const done = items.filter((i) => adventure.prepDone.has(i.id)).length
-  return { count: items.length, done }
+  return { count: items.length, done, preview: items.slice(0, 3) }
+})
+
+/* la lettre est adressée aux enfants — comme un vrai courrier */
+const addressee = computed(() => {
+  const noms = adventure.prenoms_enfants.filter(Boolean)
+  return noms.length ? noms.join(' et ') : 'la famille'
 })
 
 const tomorrow = computed(() =>
@@ -36,6 +50,16 @@ function onMouse(e: MouseEvent) {
   scene.value.style.setProperty('--px', String((e.clientX / w - 0.5) * 2))
   scene.value.style.setProperty('--py', String((e.clientY / h - 0.5) * 2))
 }
+
+/* ---- briser le sceau : la cire se fend, puis on entre ---- */
+const router = useRouter()
+const cracking = ref(false)
+function breakSeal() {
+  if (cracking.value) return
+  cracking.value = true
+  waxCrack()
+  window.setTimeout(() => router.push('/aujourdhui'), 520)
+}
 </script>
 
 <template>
@@ -43,9 +67,10 @@ function onMouse(e: MouseEvent) {
     <!-- le ciel : aurore, lune, neige -->
     <div class="sky" aria-hidden="true">
       <i class="aurora aurora--a" /><i class="aurora aurora--b" />
+      <i class="ambient-glow" />
       <i class="moon" />
-      <NightCanvas />
-      <svg class="forest" viewBox="0 0 1200 90" preserveAspectRatio="none">
+      <SceneNight />
+      <svg class="forest" viewBox="0 0 1200 90" preserveAspectRatio="none" aria-hidden="true" focusable="false">
         <path d="M0 90 L0 62 L38 62 L52 30 L66 62 L110 62 L128 38 L146 62 L210 62 L210 90 Z
                  M230 90 L230 58 L268 58 L286 24 L304 58 L352 58 L366 42 L380 58 L430 58 L430 90 Z
                  M450 90 L450 64 L500 64 L518 34 L536 64 L590 64 L606 44 L622 64 L680 64 L680 90 Z
@@ -58,7 +83,7 @@ function onMouse(e: MouseEvent) {
     <header class="veille-hero">
       <p class="veille-overline">JOUR {{ current }} · {{ remainingDays }} NUITS AVANT NOËL</p>
       <h1>{{ chapter.heroA }}<br /><em>{{ chapter.heroEm }}</em></h1>
-      <p class="veille-tag">{{ chapter.tagline }}</p>
+      <p class="veille-tag">{{ tagline }}</p>
     </header>
 
     <!-- le voyage en constellation -->
@@ -78,39 +103,42 @@ function onMouse(e: MouseEvent) {
       <i class="lamp-glow" aria-hidden="true" />
 
       <section class="desk-row">
-        <!-- la dépêche du jour, posée au centre de la lumière -->
-        <RouterLink to="/aujourdhui" class="paper letter-card">
-          <span class="paper-seal"><b>J{{ current }}</b></span>
-          <p class="paper-over">LA DÉPÊCHE DU JOUR</p>
+        <!-- la dépêche du jour, en verre dans le ciel -->
+        <a href="/aujourdhui" class="glass-card letter-card" :class="{ 'is-cracking': cracking }" @click.prevent="breakSeal">
+          <span class="day-orb" aria-hidden="true"><b>J{{ current }}</b></span>
+          <p class="glass-over">✦ LA DÉPÊCHE DU JOUR</p>
           <h2>{{ currentAdventure.currentTitle }}</h2>
-          <p class="paper-desc">{{ currentAdventure.currentDescription }}</p>
-          <span class="paper-cta">Briser le sceau <i class="mdi mdi-arrow-right" aria-hidden="true" /></span>
-        </RouterLink>
+          <p class="letter-to">À l'attention de {{ addressee }}</p>
+          <p class="glass-desc">{{ currentAdventure.currentDescription }}</p>
+          <span class="glass-cta">Lire la dépêche <i class="mdi mdi-arrow-right" aria-hidden="true" /></span>
+        </a>
 
-        <!-- le carnet de préparation, épinglé -->
-        <RouterLink to="/prepare" class="paper carnet-card">
-          <i class="carnet-pin" aria-hidden="true" />
-          <p class="paper-over">LA RÉSERVE · CETTE SEMAINE</p>
+        <!-- la préparation, même verre -->
+        <RouterLink to="/prepare" class="glass-card carnet-card">
+          <p class="glass-over">VOTRE PRÉPARATION</p>
           <h2>{{ weekPrep.count ? `${weekPrep.done}/${weekPrep.count} colis embarqués` : 'Rien à préparer' }}</h2>
-          <p class="paper-desc">{{ weekPrep.count ? 'La réserve vous attend — tout cocher avant le soir.' : 'La semaine est légère, profitez-en.' }}</p>
-          <span class="paper-cta">Ouvrir la réserve <i class="mdi mdi-arrow-right" aria-hidden="true" /></span>
-        </RouterLink>
-
-        <!-- la carte du voyage, roulée -->
-        <RouterLink to="/planning" class="paper map-card">
-          <p class="paper-over">LA CARTE DU VOYAGE</p>
-          <h2>La route complète</h2>
-          <p class="paper-desc">{{ total }} jours de dépêches, jalons et détours.</p>
-          <span class="paper-cta">Dérouler la carte <i class="mdi mdi-arrow-right" aria-hidden="true" /></span>
+          <ul v-if="weekPrep.preview.length" class="carnet-list">
+            <li v-for="item in weekPrep.preview" :key="item.id" :class="{ done: adventure.prepDone.has(item.id) }">
+              <i aria-hidden="true" />{{ item.title }}
+            </li>
+          </ul>
+          <p v-else class="glass-desc">La semaine est légère, profitez-en.</p>
+          <span class="glass-cta">Ouvrir la réserve <i class="mdi mdi-arrow-right" aria-hidden="true" /></span>
         </RouterLink>
       </section>
 
-      <RouterLink v-if="tomorrow" class="tomorrow-slip" :to="`/activites/jour-${tomorrow.day}`">
-        <i class="mdi mdi-weather-night" aria-hidden="true" />
-        <span>Et demain — <em>{{ tomorrow.title }}</em></span>
-        <i class="mdi mdi-chevron-right" aria-hidden="true" />
-      </RouterLink>
+      <!-- demain : un mot discret sous la dépêche, pas une quatrième carte -->
+      <div v-if="tomorrow" class="tomorrow-wrap">
+        <RouterLink class="tomorrow-link" :to="`/activites/jour-${tomorrow.day}`">
+          Et demain — <em>{{ tomorrow.title }}</em> <i class="mdi mdi-arrow-right" aria-hidden="true" />
+        </RouterLink>
+      </div>
     </div>
+
+    <RouterLink to="/personnalisation" class="veille-gear">
+      <i class="mdi mdi-cog-outline" aria-hidden="true" />
+      <span class="sr-only">Personnaliser l'aventure</span>
+    </RouterLink>
   </main>
 </template>
 
@@ -123,13 +151,14 @@ function onMouse(e: MouseEvent) {
   min-height: 100svh;
   overflow: hidden;
   color: #f2ead8;
-  background: linear-gradient(180deg, #0a1e22 0%, #0c2526 34%, #0d221b 60%, #0a1b13 78%, #081410 100%);
+  /* le vert forêt : sapin lumineux au centre, vert nuit aux bords — jamais noir */
+  background: radial-gradient(circle at 50% 18%, #1c4433 0%, #143528 45%, #0f2c21 72%, #0c241b 100%);
 }
 
-/* ---------- le ciel ---------- */
+/* ---------- le ciel : il couvre tout l'écran, plus de coupure ---------- */
 .sky {
   position: absolute;
-  inset: 0 0 38%;
+  inset: 0;
   overflow: hidden;
   pointer-events: none;
 }
@@ -161,16 +190,32 @@ function onMouse(e: MouseEvent) {
 @keyframes aurora-b {
   to { transform: translate3d(-8vw, 4vh, 0) scale(1.08); }
 }
+/* la chaleur des bougies : un halo ambré qui veille en haut à droite */
+.ambient-glow {
+  position: absolute;
+  top: -10%;
+  right: -5%;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(224,160,60,.22) 0%, transparent 70%);
+  filter: blur(80px);
+}
+/* la lune : un croissant fin dessiné par l'ombre interne décalée */
 .moon {
   position: absolute;
   top: 7%;
   right: 9%;
-  width: 86px;
-  height: 86px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  background: radial-gradient(circle at 38% 34%, #fff9e0, #f0d894 52%, #d9b465 82%);
-  box-shadow: 0 0 40px rgba(255,230,160,.5), 0 0 120px rgba(255,200,100,.22);
-  transform: translate3d(calc(var(--px) * -14px), calc(var(--py) * -8px), 0);
+  box-shadow:
+    inset -22px 9px 0 0 #f0d894,
+    inset -22px 9px 6px 2px rgba(255,242,190,.7);
+  filter: drop-shadow(0 0 12px rgba(255,230,160,.45)) drop-shadow(0 0 40px rgba(255,200,100,.18));
+  opacity: .85;
+  transform: translate3d(calc(var(--px) * -22px), calc(var(--py) * -12px), 0);
+  transition: transform .6s ease-out;
 }
 .forest {
   position: absolute;
@@ -257,162 +302,295 @@ function onMouse(e: MouseEvent) {
 }
 .mile i { color: var(--color-gold); font-size: 12px; }
 
-/* ---------- le bureau ---------- */
+/* ---------- la zone basse : l'HUD magique, dans le même ciel ---------- */
 .desk {
   position: relative;
   z-index: 2;
   margin-top: 30px;
-  padding: 64px 48px 72px;
-  background:
-    radial-gradient(ellipse 70% 80% at 28% 0%, rgba(255,196,96,.1), transparent 60%),
-    linear-gradient(180deg, rgba(13,26,20,.35) 0%, #0d1f17 30%, #0a1710 100%);
-  box-shadow: inset 0 1px 0 rgba(241,204,122,.1);
+  padding: 46px 48px 88px;
 }
-/* la lampe : lumière chaude qui respire doucement, suit un peu le curseur */
+/* une lueur chaude discrète derrière les panneaux — la lampe devient un halo */
 .lamp-glow {
   position: absolute;
-  top: -180px;
-  left: 12%;
-  width: 520px;
-  height: 520px;
+  top: -60px;
+  left: 8%;
+  width: 560px;
+  height: 560px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,205,110,.22), rgba(255,180,80,.07) 50%, transparent 70%);
-  filter: blur(30px);
+  background: radial-gradient(circle, rgba(255,205,110,.14), rgba(255,180,80,.05) 50%, transparent 70%);
+  filter: blur(40px);
   transform: translate3d(calc(var(--px) * 16px), calc(var(--py) * 9px), 0);
   animation: lamp-breathe 6s ease-in-out infinite;
   pointer-events: none;
 }
 @keyframes lamp-breathe {
-  50% { opacity: .75; }
+  50% { opacity: .7; }
 }
 .desk-row {
-  display: grid;
-  grid-template-columns: 1.3fr 1fr 1fr;
-  gap: 28px;
-  max-width: 1180px;
-  margin: 0 auto;
+  display: flex;
   align-items: stretch;
+  gap: 24px;
+  max-width: 980px;
+  margin: 0 auto;
 }
 
-/* objets de papier posés sur le bureau */
-.paper {
+/* les panneaux de verre dépoli — le contenu flotte dans la nuit */
+.glass-card {
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 30px 28px 22px;
-  border-radius: 6px 18px 10px 24px / 18px 8px 24px 10px;
-  background:
-    radial-gradient(ellipse 60% 40% at 18% 10%, rgba(255,252,238,.7), transparent 60%),
-    repeating-linear-gradient(0deg, transparent 0 3px, rgba(110,72,26,.03) 3px 4px),
-    linear-gradient(158deg, #f4ead2 0%, #ead9b4 58%, #dcc593 100%);
-  box-shadow: 0 22px 46px rgba(0,0,0,.5), inset 0 0 0 1px rgba(150,110,50,.3), inset 0 0 26px rgba(120,78,28,.12);
-  color: #43331c;
+  padding: 30px 30px 24px;
+  border: 1px solid rgba(224,194,131,.2);
+  border-radius: 16px;
+  background: rgba(10,28,22,.55);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 30px 60px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1);
+  color: #f4eae1;
   text-decoration: none;
-  transition: transform .45s var(--spring), box-shadow .45s;
+  transition: transform .4s cubic-bezier(.16,1,.3,1), border-color .4s, box-shadow .4s;
 }
-.paper:hover {
-  transform: translateY(-6px) rotate(-.4deg);
-  box-shadow: 0 34px 60px rgba(0,0,0,.55), inset 0 0 0 1px rgba(150,110,50,.35), inset 0 0 26px rgba(120,78,28,.12);
+.glass-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(224,194,131,.6);
+  box-shadow: 0 30px 60px rgba(0,0,0,.6), 0 0 24px rgba(224,194,131,.15);
 }
-.paper-over {
+/* poussière d'étoiles qui s'agglomère au survol */
+.glass-card::after {
+  content: '';
+  position: absolute;
+  inset: -14px;
+  border-radius: 26px;
+  background:
+    radial-gradient(circle 1.5px at 8% 30%, rgba(255,236,170,.9), transparent 100%),
+    radial-gradient(circle 1px at 22% -4%, rgba(255,236,170,.7), transparent 100%),
+    radial-gradient(circle 1.3px at 96% 22%, rgba(255,236,170,.85), transparent 100%),
+    radial-gradient(circle 1px at 88% 96%, rgba(255,236,170,.6), transparent 100%),
+    radial-gradient(circle 1.2px at 45% 104%, rgba(255,236,170,.75), transparent 100%),
+    radial-gradient(circle 1px at -3% 78%, rgba(255,236,170,.65), transparent 100%);
+  opacity: 0;
+  transition: opacity .45s;
+  pointer-events: none;
+}
+.glass-card:hover::after { opacity: 1; }
+
+.glass-over {
   margin: 0;
-  color: #8a6a2f;
-  font-size: 9.5px;
+  color: var(--color-gold);
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: .18em;
+  letter-spacing: .22em;
 }
-.paper h2 {
-  margin: 8px 0 0;
-  font: 500 23px/1.15 var(--font-serif);
-  color: #33260f;
-}
-.paper-desc {
+.glass-card h2 {
   margin: 10px 0 0;
-  font: 500 13.5px/1.55 var(--font-literary);
-  color: #5c4620;
+  font: 500 26px/1.12 var(--font-serif);
+  color: #e0c283; /* l'or chaud des bougies, rappel du « la vôtre. » */
+  letter-spacing: -.01em;
+}
+.glass-card:hover h2 {
+  color: #ffe9a8;
+  text-shadow: 0 0 18px rgba(255,215,120,.35);
+}
+.glass-desc {
+  margin: 12px 0 0;
+  font: 500 15.5px/1.6 var(--font-literary);
+  color: #c9d4c9;
   flex: 1;
 }
-.paper-cta {
+/* les actions : capsules de verre qui se remplissent de lumière */
+.glass-cta {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  margin-top: 18px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(140,105,45,.3);
-  color: #6d5220;
-  font-size: 12.5px;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 10px 18px;
+  border: 1px solid rgba(224,194,131,.35);
+  border-radius: 999px;
+  background: rgba(224,194,131,.05);
+  color: #e8ddc0;
+  font-size: 12px;
   font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  transition: background .35s, box-shadow .35s, color .35s, border-color .35s;
+  width: fit-content;
 }
-.paper:hover .paper-cta {
-  color: #9a6f1e;
+.glass-card:hover .glass-cta {
+  background: rgba(224,194,131,.18);
+  border-color: rgba(224,194,131,.7);
+  color: #ffe9a8;
+  box-shadow: 0 0 22px rgba(224,194,131,.3), inset 0 0 12px rgba(255,225,140,.12);
 }
-.paper-seal {
+
+/* ---- la dépêche : l'orbe du jour remplace la cire ---- */
+.letter-card {
+  flex: 1.35;
+  min-height: 280px;
+}
+/* rétro-éclairée : un halo d'or feutré veille derrière la dépêche */
+.letter-card::before {
+  content: '';
   position: absolute;
-  top: -18px;
+  inset: -22px -18px;
+  z-index: -1;
+  border-radius: 30px;
+  background: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(224,160,60,.16), transparent 70%);
+  filter: blur(18px);
+  pointer-events: none;
+}
+.day-orb {
+  position: absolute;
+  top: -20px;
   right: 26px;
   display: grid;
   place-items: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 47% 53% 51% 49% / 52% 48% 52% 48%;
-  background: radial-gradient(circle at 34% 30%, #e2684a 0%, #b83b2a 46%, #8c2718 100%);
-  box-shadow: 0 6px 16px rgba(0,0,0,.45), inset 0 2px 4px rgba(255,190,160,.4);
-  color: #ffd9b8;
-  font: 600 14px/1 var(--font-serif);
-  transform: rotate(8deg);
-}
-.carnet-pin {
-  position: absolute;
-  top: -8px;
-  left: 50%;
-  width: 14px;
-  height: 14px;
+  width: 58px;
+  height: 58px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #f7e6b8, #b98a3e);
-  box-shadow: 0 3px 6px rgba(0,0,0,.4);
-  transform: translateX(-50%);
+  border: 1px solid rgba(255,222,140,.5);
+  background:
+    radial-gradient(circle at 36% 30%, #f4d98f 0%, #c8954a 48%, #7a4f1a 100%);
+  box-shadow: 0 8px 22px rgba(0,0,0,.5), 0 0 26px rgba(255,205,100,.4), inset 0 2px 5px rgba(255,244,200,.55);
+  color: #3a2708;
+  font: 600 15px/1 var(--font-serif);
+  transition: transform .3s var(--spring);
 }
-.map-card {
-  transform: rotate(.7deg);
+.letter-card:hover .day-orb {
+  transform: scale(1.08);
+  box-shadow: 0 8px 22px rgba(0,0,0,.5), 0 0 40px rgba(255,205,100,.65), inset 0 2px 5px rgba(255,244,200,.55);
 }
-.carnet-card {
-  transform: rotate(-.8deg);
+/* l'orbe appelle : une onde dorée invite à le briser */
+.day-orb::after {
+  content: '';
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,215,120,.5);
+  animation: orb-beckon 2.6s ease-out infinite;
 }
-.carnet-card:hover, .map-card:hover {
-  transform: translateY(-6px) rotate(0deg);
+@keyframes orb-beckon {
+  0% { transform: scale(.82); opacity: .9; }
+  100% { transform: scale(1.5); opacity: 0; }
 }
-
-/* la promesse du lendemain : bande de papier glissée sous la lampe */
-.tomorrow-slip {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  max-width: 680px;
-  margin: 30px auto 0;
-  padding: 14px 24px;
-  border: 1px dashed rgba(140,105,45,.5);
-  border-radius: 4px 14px 6px 16px / 12px 5px 14px 6px;
-  background: linear-gradient(160deg, rgba(244,234,210,.92), rgba(224,205,159,.92));
-  box-shadow: 0 12px 26px rgba(0,0,0,.4);
-  color: #5c4620;
-  font-size: 14px;
-  text-decoration: none;
-  transform: rotate(-.5deg);
-  transition: transform .4s var(--spring);
+.is-cracking .day-orb {
+  animation: orb-burst .5s cubic-bezier(.3,.7,.4,1) forwards;
 }
-.tomorrow-slip:hover {
-  transform: rotate(0deg) translateY(-3px);
+@keyframes orb-burst {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.25); filter: brightness(1.8); }
+  100% { transform: scale(.3) translateY(26px); opacity: 0; filter: brightness(2.5); }
 }
-.tomorrow-slip em {
-  color: #33260f;
+.is-cracking {
+  animation: panel-dissolve .55s cubic-bezier(.5,0,.7,.3) .1s forwards;
+}
+@keyframes panel-dissolve {
+  to { transform: translateY(10px) scale(.97); opacity: 0; }
+}
+.letter-to {
+  margin: 7px 0 0;
+  color: rgba(233,220,187,.6);
   font: italic 500 14.5px var(--font-literary);
 }
-.tomorrow-slip i:first-child { color: #a67d34; }
+
+/* ---- la préparation : checklist en verre ---- */
+.carnet-card {
+  flex: 1;
+}
+.carnet-list {
+  display: grid;
+  gap: 9px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  flex: 1;
+}
+.carnet-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #d4dccf;
+  font: 500 13.5px/1.35 var(--font-literary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.carnet-list li i {
+  flex: none;
+  width: 13px;
+  height: 13px;
+  border: 1.5px solid rgba(224,194,131,.55);
+  border-radius: 4px;
+}
+.carnet-list li.done {
+  color: rgba(201,212,201,.5);
+  text-decoration: line-through;
+  text-decoration-color: rgba(224,194,131,.4);
+}
+.carnet-list li.done i {
+  border-color: rgba(224,194,131,.9);
+  background: radial-gradient(circle at 50% 50%, #e0c283 45%, #a67d34);
+  box-shadow: 0 0 8px rgba(224,194,131,.5);
+}
+
+/* demain : un mot discret sous la dépêche, pas une quatrième carte */
+/* demain : un murmure doré au bas du bureau, directement sur la nuit */
+.tomorrow-wrap {
+  margin: 26px 0 0;
+  text-align: center;
+}
+.tomorrow-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  color: #d8b96e;
+  font: 400 14px/1 var(--font-literary);
+  letter-spacing: .1em;
+  text-decoration: none;
+  transition: color .3s;
+}
+.tomorrow-link:hover { color: #ffe9a8; }
+.tomorrow-link em {
+  font: italic 500 15px var(--font-literary);
+  color: #e8e3d5;
+}
+.tomorrow-link:hover em { color: #fff4d6; }
+.tomorrow-link i { font-size: 12px; }
+
+/* l'engrenage des réglages : un bouton de laiton, en haut à droite */
+.veille-gear {
+  position: fixed;
+  top: 22px;
+  right: clamp(18px, 3vw, 40px);
+  z-index: 9;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(224,194,131,.3);
+  border-radius: 50%;
+  background: rgba(9,22,17,.58);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: #a0b2a6;
+  font-size: 20px;
+  text-decoration: none;
+  box-shadow: 0 10px 26px rgba(0,0,0,.4);
+  transition: color .3s, border-color .3s;
+}
+.veille-gear i {
+  transition: transform .6s cubic-bezier(.3,.85,.35,1.05);
+}
+.veille-gear:hover {
+  color: #e0c283;
+  border-color: rgba(224,194,131,.6);
+}
+.veille-gear:hover i {
+  transform: rotate(120deg);
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .aurora--a, .aurora--b, .lamp-glow { animation: none; }
+  .aurora--a, .aurora--b, .lamp-glow, .day-orb::after { animation: none; }
   .moon, .forest { transform: none !important; }
-  .paper:hover, .tomorrow-slip:hover { transform: none; }
+  .glass-card:hover { transform: none; }
 }
 </style>

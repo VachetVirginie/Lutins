@@ -44,8 +44,9 @@ function spinGear(event: MouseEvent) {
 <template>
   <DesktopHome v-if="isDesktop" />
   <main v-else class="app-screen">
-    <RouterLink to="/personnalisation" class="home-gear" aria-label="Personnaliser l'aventure" @click.prevent="spinGear">
+    <RouterLink to="/personnalisation" class="home-gear" @click.prevent="spinGear">
       <i class="mdi mdi-cog-outline" aria-hidden="true" />
+      <span class="sr-only">Personnaliser l'aventure</span>
     </RouterLink>
     <svg class="home-ornament" viewBox="0 0 60 96" aria-hidden="true">
       <defs>

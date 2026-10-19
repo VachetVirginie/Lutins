@@ -2,7 +2,11 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { currentAdventure, narrativeMilestones } from '../data/adventure'
+import { useIsDesktop } from '../composables/useBreakpoints'
+import DesktopPlanning from './planning/DesktopPlanning.vue'
 import { haptic } from '../utils/haptics'
+
+const isDesktop = useIsDesktop()
 
 const router = useRouter()
 
@@ -82,7 +86,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <main class="app-screen planning-screen">
+  <DesktopPlanning v-if="isDesktop" />
+  <main v-else class="app-screen planning-screen">
     <div class="planning-bg" aria-hidden="true"><img ref="landscapeEl" src="/assets/landscapes/journey-map.jpg" alt="" /></div>
     <header class="planning-header"><button class="back-link" type="button" @click="goBack"><i class="mdi mdi-chevron-left" aria-hidden="true" /> Retour</button><p class="planning-overline">LA CARTE DU VOYAGE</p><h1>Le planning</h1><p>La route des lutins, du premier courrier jusqu’au retour au Pôle Nord.</p></header>
     <section class="planning-progress"><div><strong>Jour {{ CURRENT }}</strong><span>sur {{ TOTAL }}</span></div><div class="planning-progress-bar"><i :style="{ width: (CURRENT / TOTAL) * 100 + '%' }" /></div><small>Le voyage commence</small></section>

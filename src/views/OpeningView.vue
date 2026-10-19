@@ -1,11 +1,21 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import MagicSeal from '../components/MagicSeal.vue'
 import { useIsDesktop } from '../composables/useBreakpoints'
+import { adventure } from '../data/adventureStore'
+import { totalDays } from '../data/adventure'
 import DesktopOpening from './opening/DesktopOpening.vue'
 
 const isDesktop = useIsDesktop()
 const router = useRouter()
+
+const kicker = computed(() => {
+  const noms = adventure.prenoms_enfants.filter(Boolean)
+  if (noms.length === 0) return 'L’aventure de votre famille'
+  if (noms.length === 1) return `L’aventure de ${noms[0]}`
+  return `L’aventure de ${noms.slice(0, -1).join(', ')} et ${noms[noms.length - 1]}`
+})
 
 function enter() {
   sessionStorage.setItem('lutins-unlocked', '1')
@@ -19,13 +29,14 @@ function enter() {
     <img class="opening-image" src="/assets/created/arrival-mobile-hero.png" alt="Un lutin se prépare à commencer son aventure de Noël" />
     <div class="opening-overlay" />
     <section class="opening-copy">
-      <p class="opening-chapter"><i /> UNE HISTOIRE À VIVRE <i /></p>
-      <p class="opening-kicker">L’aventure de Louis</p>
-      <h1>La magie<br /><em>commence ici.</em></h1>
-      <p class="opening-subtitle">Un voyage de lutins, pensé pour votre famille.</p>
+      <p class="opening-chapter"><i /> {{ totalDays }} NUITS DE MERVEILLES <i /></p>
+      <p class="opening-kicker">{{ kicker }}</p>
+      <h1>La magie a une adresse :<br /><em>la vôtre.</em></h1>
+      <p class="opening-subtitle">Chaque nuit, une dépêche du Pôle Nord. Une aventure de lutins qui s’écrit chez vous, en famille.</p>
     </section>
     <section class="opening-entry" aria-label="Entrer dans l’aventure">
       <MagicSeal @unlocked="enter" />
+      <p class="entry-hint"><b>Briser le sceau</b><span>Maintenez un instant — la porte s’ouvre</span></p>
     </section>
   </main>
 </template>
@@ -126,6 +137,27 @@ function enter() {
   justify-content:center;
   gap:9px;
   margin:0 28px
+}
+
+.entry-hint  {
+  display:grid;
+  gap:3px;
+  margin:2px 0 0;
+  justify-items:center;
+  text-align:center
+}
+
+.entry-hint b  {
+  color:var(--color-gold);
+  font-size:9.5px;
+  font-weight:700;
+  letter-spacing:.22em;
+  text-transform:uppercase
+}
+
+.entry-hint span  {
+  color:rgba(255,255,255,.7);
+  font:italic 400 13.5px var(--font-literary)
 }
 
 @media(min-width:700px)  {

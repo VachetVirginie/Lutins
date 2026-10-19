@@ -127,7 +127,7 @@ onBeforeUnmount(() => window.removeEventListener('deviceorientation', onTilt))
           class="env-seal"
           type="button"
           :disabled="cracking"
-          :aria-label="`Briser le sceau pour lire la fiche du jour ${sheet.day}`"
+          :aria-label="`J${sheet.day} · Briser le sceau pour lire la dépêche`"
           @click="unseal"
         ><b>J{{ sheet.day }}</b></button>
         <span class="env-burst" aria-hidden="true">

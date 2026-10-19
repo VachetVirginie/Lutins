@@ -73,7 +73,7 @@ onMounted(() => {
           :class="[`is-${n.state}`, { 'is-milestone': n.title }]"
           :style="{ left: n.x + 'px' }"
           :to="`/activites/jour-${n.day}`"
-          :aria-label="`Jour ${n.day}${n.title ? ' · ' + n.title : ''}`"
+          :aria-label="`J${n.day}${n.title ? ' · ' + n.title : ''}`"
         >
           <template v-if="n.state === 'active'">
             <i class="elf-halo" aria-hidden="true" />
@@ -81,7 +81,7 @@ onMounted(() => {
             <img class="phase-elf" src="/assets/imgs/lutin.png" alt="" />
           </template>
           <b class="node-dot" aria-hidden="true" />
-          <span class="node-label"><strong>J{{ n.day }}</strong><em v-if="n.title">{{ n.title }}</em></span>
+          <span class="node-label"><strong>J{{ n.day }}</strong><em v-if="n.title"> {{ n.title }}</em></span>
         </RouterLink>
       </div>
     </div>

@@ -37,6 +37,22 @@ body  {
   background:var(--color-night)
 }
 
+/* Expérience immersive : pas de chrome de navigateur — les barres de défilement
+   sont masquées, la molette/le tactile continuent de faire défiler */
+html  {
+  scrollbar-width:none;
+  -ms-overflow-style:none
+}
+
+html::-webkit-scrollbar  {
+  display:none
+}
+
+/* Pendant la bourrasque de transition, la page est figée */
+html.is-gusting  {
+  overflow:hidden
+}
+
 /* Grain de film : unifie les surfaces planes, rendu « cinéma » */
 body::after  {
   content:'';
@@ -172,3 +188,17 @@ button  {
   }
 }
 
+
+/* texte pour les technologies d'assistance, invisible à l'écran */
+.sr-only  {
+  position:absolute;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0 0 0 0);
+  clip-path:inset(50%);
+  white-space:nowrap;
+  border:0
+}

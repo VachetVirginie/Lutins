@@ -166,51 +166,79 @@ function isActive(to: string): boolean {
   border-radius:14px
 }
 
-/* ---- bureau : la piste de lanternes devient un header ---- */
+/* ---- bureau : pill flottante en verre dépoli, typographie seule ---- */
 @media (min-width:1024px) {
   .lantern-nav {
-    top:0;
+    top:22px;
     bottom:auto;
-    left:0;
-    width:100%;
-    transform:none;
+    left:50%;
+    width:auto;
+    transform:translateX(-50%);
     justify-content:center;
-    gap:40px;
-    padding:16px 48px;
-    border-left:0;
-    border-right:0;
-    border-top:0;
-    border-radius:0;
-    background:linear-gradient(180deg,rgba(12,26,20,.92),rgba(10,22,16,.78));
-    backdrop-filter:blur(10px);
+    gap:2px;
+    padding:6px 8px;
+    border:1px solid rgba(224,194,131,.22);
+    border-radius:999px;
+    background:rgba(9,22,17,.58);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    box-shadow:0 18px 42px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,244,214,.07);
     animation:none
   }
-  .nav-scrim {
+  /* ni scrim, ni piste pointillée — la pill flotte, elle ne barre pas */
+  .nav-scrim,.nav-trail {
     display:none
   }
-  .nav-trail {
-    left:15%;
-    right:15%
-  }
   .nav-lantern {
+    position:relative;
     flex-direction:row;
-    gap:9px;
     min-width:0;
-    padding:6px 14px;
-    font-size:14px
+    padding:9px 18px;
+    border-radius:999px;
+    transition:background .3s
   }
+  .nav-lantern:hover {
+    background:rgba(224,194,131,.07)
+  }
+  /* les icônes SaaS sortent du paysage : la typo suffit */
   .lantern-body {
-    width:auto;
-    height:auto
+    display:none
   }
-  .lantern-body i {
-    font-size:20px
+  /* ni le gros halo jaune — l'actif se signale par une étincelle */
+  .lantern-glow {
+    display:none
   }
   .lantern-label {
-    font-size:13.5px
+    font:500 12.5px var(--font-serif);
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:#a0b2a6;
+    transition:color .3s
+  }
+  .nav-lantern:hover .lantern-label {
+    color:#e0c283
   }
   .nav-lantern.is-active .lantern-label {
-    color:#ffe9a8
+    color:#fff6dc
+  }
+  /* ✦ : le signe magique, pas une ampoule */
+  .nav-lantern.is-active::before {
+    content:'✦';
+    position:absolute;
+    top:-11px;
+    left:50%;
+    color:#e0c283;
+    font-size:10px;
+    text-shadow:0 0 9px rgba(224,194,131,.95);
+    transform:translateX(-50%);
+    animation:sparkle-breathe 2.6s ease-in-out infinite;
+    pointer-events:none
+  }
+  @keyframes sparkle-breathe {
+    50% {
+      opacity:.55;
+      transform:translateX(-50%) translateY(-1.5px)
+    }
   }
 }
 

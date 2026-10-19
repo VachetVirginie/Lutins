@@ -1,13 +1,23 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import MagicSeal from '../../components/MagicSeal.vue'
 import NightCanvas from '../../components/magic/NightCanvas.vue'
+import { adventure } from '../../data/adventureStore'
+import { totalDays } from '../../data/adventure'
 
 /**
  * L'entrée en desktop : l'affiche devient un cinéma — la nuit couvre tout
  * l'écran, la neige tombe sur l'illustration, le sceau se brise au centre.
  */
 const router = useRouter()
+
+const kicker = computed(() => {
+  const noms = adventure.prenoms_enfants.filter(Boolean)
+  if (noms.length === 0) return 'L’aventure de votre famille'
+  if (noms.length === 1) return `L’aventure de ${noms[0]}`
+  return `L’aventure de ${noms.slice(0, -1).join(', ')} et ${noms[noms.length - 1]}`
+})
 
 function enter() {
   sessionStorage.setItem('lutins-unlocked', '1')
@@ -23,12 +33,16 @@ function enter() {
     <NightCanvas class="opening-snow" />
 
     <section class="opening-copy">
-      <p class="opening-chapter"><i /> UNE HISTOIRE À VIVRE <i /></p>
-      <p class="opening-kicker">L’aventure de Louis</p>
-      <h1>La magie<br /><em>commence ici.</em></h1>
-      <p class="opening-subtitle">Un voyage de lutins, pensé pour votre famille.</p>
+      <p class="opening-chapter"><i /> {{ totalDays }} NUITS DE MERVEILLES <i /></p>
+      <p class="opening-kicker">{{ kicker }}</p>
+      <h1>La magie a une adresse :<br /><em>la vôtre.</em></h1>
+      <p class="opening-subtitle">Chaque nuit, une dépêche du Pôle Nord. Une aventure de lutins qui s’écrit chez vous, en famille.</p>
       <div class="opening-entry" aria-label="Entrer dans l’aventure">
         <MagicSeal @unlocked="enter" />
+        <p class="entry-hint">
+          <b>Briser le sceau</b>
+          <span>Maintenez un instant — la porte s’ouvre</span>
+        </p>
       </div>
     </section>
   </main>
@@ -49,7 +63,7 @@ function enter() {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 62% 32%;
+  object-position: 62% 42%;
   filter: brightness(1.05) contrast(1.05) saturate(1.05);
 }
 /* les aurores passent par-dessus l'image — le ciel est vivant */
@@ -144,9 +158,30 @@ function enter() {
   opacity: .85;
 }
 .opening-entry {
+  display: flex;
+  align-items: center;
+  gap: 26px;
   margin-top: 46px;
   transform-origin: left center;
 }
+.entry-hint {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  text-align: left;
+}
+.entry-hint b {
+  color: var(--color-gold);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+}
+.entry-hint span {
+  color: rgba(255,255,255,.72);
+  font: italic 400 15px var(--font-literary);
+}
+.opening-entry:hover .entry-hint b { color: #fff2a1; }
 
 @media (prefers-reduced-motion: reduce) {
   .aurora--a, .aurora--b { animation: none; }

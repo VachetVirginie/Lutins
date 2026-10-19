@@ -2,6 +2,7 @@
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useDaySheet } from '../../composables/useDaySheet'
 import PrintSheet from '../../components/activity/PrintSheet.vue'
+import { waxCrack } from '../../utils/sound'
 
 const {
   sheet, gap, dayVisual, annexes, preparationDone, chapter, totalDays, dayNumber,
@@ -12,14 +13,40 @@ const {
 const opened = ref(false)
 const cracking = ref(false)
 
+/* ---- la lettre se déroule puis s'écrit : effet machine à écrire douce ---- */
+const typedMessage = ref('')
+let typer: number | undefined
+
 watch(sheet, () => {
   opened.value = false
   cracking.value = false
+  typedMessage.value = ''
+  if (typer) window.clearInterval(typer)
 }, { immediate: true })
+
+watch(opened, (isOpen) => {
+  if (!isOpen) return
+  const full = sheet.value?.message ?? ''
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    typedMessage.value = full
+    return
+  }
+  let i = 0
+  typer = window.setInterval(() => {
+    i += 3
+    typedMessage.value = full.slice(0, i)
+    if (i >= full.length && typer) window.clearInterval(typer)
+  }, 20)
+})
+
+onBeforeUnmount(() => {
+  if (typer) window.clearInterval(typer)
+})
 
 function unseal() {
   if (cracking.value || opened.value) return
   cracking.value = true
+  waxCrack()
   window.setTimeout(() => (opened.value = true), 720)
 }
 
@@ -74,13 +101,12 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
       <div class="env-scene" :class="{ 'is-cracking': cracking }">
         <div class="env-body">
           <i class="env-flap" aria-hidden="true" />
-          <button class="env-seal" type="button" :disabled="cracking" :aria-label="`Briser le sceau pour lire la fiche du jour ${sheet.day}`" @click="unseal">
+          <button class="env-seal" type="button" :disabled="cracking" :aria-label="`J${sheet.day} · Briser le sceau pour lire la dépêche`" @click="unseal">
             <b>J{{ sheet.day }}</b>
           </button>
           <span class="env-burst" aria-hidden="true"><i v-for="n in 8" :key="n" :style="{ '--a': `${n * 45}deg`, '--dd': `${46 + n * 8}px` }" /></span>
         </div>
         <i class="env-shadow" aria-hidden="true" />
-        <p class="env-hint"><i class="mdi mdi-cursor-default-click-outline" aria-hidden="true" /> Cliquez sur la cire pour décacheter la dépêche</p>
       </div>
     </section>
 
@@ -91,12 +117,12 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
         <span class="postmark" aria-hidden="true"><b>POSTE DU<br />PÔLE NORD</b><small>{{ sheet.date }}</small></span>
         <p class="paper-label">LE MOT DU LUTIN</p>
         <h1 class="letter-title">{{ sheet.title }}</h1>
-        <blockquote>{{ sheet.message }}</blockquote>
+        <blockquote :class="{ 'is-typing': typedMessage.length < (sheet.message?.length ?? 0) }">{{ typedMessage }}</blockquote>
         <footer class="letter-actions">
-          <button type="button" :class="{ copied }" @click="copyMessage">
+          <button type="button" class="ink-stamp" :class="{ copied }" @click="copyMessage">
             <i class="mdi" :class="copied ? 'mdi-check' : 'mdi-content-copy'" aria-hidden="true" /> {{ copied ? 'Copié !' : 'Copier' }}
           </button>
-          <button type="button" @click="printSheet"><i class="mdi mdi-printer-outline" aria-hidden="true" /> Imprimer la fiche</button>
+          <button type="button" class="ink-stamp" @click="printSheet"><i class="mdi mdi-printer-outline" aria-hidden="true" /> Imprimer la fiche</button>
         </footer>
       </article>
 
@@ -106,8 +132,8 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
           <i v-if="preparationDone" class="carnet-stamp" aria-hidden="true"><b>PRÊT</b></i>
           <p class="paper-label dark">LE CARNET SECRET DES LUTINS</p>
           <p class="carnet-copy">{{ sheet.adultPreparation }}</p>
-          <button class="done-row" type="button" :class="{ done: preparationDone }" @click="togglePreparation">
-            <span class="done-check"><i v-if="preparationDone" class="mdi mdi-check" aria-hidden="true" /></span>
+          <button class="done-row" type="button" :class="{ done: preparationDone }" @click="waxCrack(); togglePreparation()">
+            <span class="done-seal" :class="{ 'is-pressed': preparationDone }"><i v-if="preparationDone" class="mdi mdi-check" aria-hidden="true" /></span>
             <span>{{ preparationDone ? 'Tout est prêt' : 'Marquer comme préparé' }}</span>
           </button>
         </article>
@@ -115,9 +141,12 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
         <section v-if="annexes.length" class="paper annexes" data-depth="14" aria-label="Annexes à découper">
           <p class="paper-label dark">LES ANNEXES — À DÉCOUPER</p>
           <div class="desk-stamps">
-            <figure v-for="(asset, i) in annexes" :key="asset.file" class="stamp" :style="{ '--r': `${(i % 2 ? 1 : -1) * (1.5 + i * 0.8)}deg` }">
-              <a class="stamp-frame" :href="asset.file" target="_blank" rel="noreferrer"><img :src="asset.file" :alt="asset.label" loading="lazy"></a>
-              <figcaption>{{ asset.label }}<small>{{ asset.page ? `Annexe · p. ${asset.page}` : 'Visuel du jour' }} — {{ assetKind(asset.label) }}</small></figcaption>
+            <figure v-for="(asset, i) in annexes" :key="asset.file" class="stamp" :style="{ '--r': `${(i % 2 ? 2.4 : -3.1) + i * 0.6}deg` }">
+              <a class="stamp-frame" :href="asset.file" target="_blank" rel="noreferrer">
+                <img :src="asset.file" :alt="asset.label" loading="lazy">
+                <span class="pol-label">{{ asset.label }}</span>
+              </a>
+              <figcaption><small>{{ asset.page ? `Annexe · p. ${asset.page}` : 'Visuel du jour' }} — {{ assetKind(asset.label) }}</small></figcaption>
               <div class="stamp-actions">
                 <button type="button" @click="printAsset(asset.file)"><i class="mdi mdi-printer" aria-hidden="true" /> Imprimer</button>
                 <a :href="asset.file" download><i class="mdi mdi-download" aria-hidden="true" /></a>
@@ -197,30 +226,30 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding-top: 26px;
+  padding-top: 84px;
 }
 .desk-back {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 8px 14px;
-  border: 1px solid rgba(241,204,122,.28);
+  padding: 9px 16px;
+  border: 1px solid rgba(224,194,131,.42);
   border-radius: 999px;
-  background: transparent;
-  color: #cbb98d;
-  font-size: 13px;
+  background: rgba(18,34,27,.45);
+  color: #e8e3d5;
+  font-size: 13.5px;
   cursor: pointer;
   transition: color .3s, border-color .3s, transform .3s;
 }
 .desk-back:hover {
-  color: var(--color-gold);
-  border-color: rgba(241,204,122,.6);
+  color: #e0c283;
+  border-color: rgba(224,194,131,.75);
   transform: translateX(-2px);
 }
 .desk-overline {
   margin: 0;
-  color: var(--color-gold);
-  font-size: 10px;
+  color: #e0c283;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: .22em;
 }
@@ -233,19 +262,19 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 8px 14px;
-  border: 1px solid rgba(241,204,122,.22);
+  padding: 9px 16px;
+  border: 1px solid rgba(224,194,131,.35);
   border-radius: 999px;
-  background: rgba(20,40,32,.5);
-  color: #cbb98d;
-  font-size: 12.5px;
+  background: rgba(18,34,27,.55);
+  color: #e8e3d5;
+  font-size: 13px;
   cursor: pointer;
   transition: all .3s;
 }
 .desk-nav button:hover:not(:disabled) {
-  color: var(--color-gold);
-  border-color: rgba(241,204,122,.55);
-  background: rgba(30,54,44,.7);
+  color: #ffe9a8;
+  border-color: rgba(224,194,131,.7);
+  background: rgba(30,54,44,.75);
 }
 .desk-nav button:disabled {
   opacity: .3;
@@ -270,7 +299,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
 .desk-date {
   position: relative;
   z-index: 2;
-  margin: 10px 0 0;
+  margin: 26px 0 0;
   text-align: center;
   color: #a9bcae;
   font-size: 11.5px;
@@ -401,17 +430,6 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   background: radial-gradient(ellipse, rgba(0,0,0,.55), transparent 70%);
   filter: blur(6px);
 }
-.env-hint {
-  margin-top: 26px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: #cbb98d;
-  font-size: 12.5px;
-  letter-spacing: .06em;
-  opacity: .8;
-}
-.env-hint i { color: var(--color-gold); }
 
 /* ---------- le bureau ouvert ---------- */
 .desk-open {
@@ -476,21 +494,34 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   font: 600 15px/1 var(--font-serif);
   transform: rotate(8deg);
 }
+/* le cachet postal : un filigrane encré, en arrière-plan du parchemin */
 .postmark {
   position: absolute;
-  top: 20px;
-  left: 40px;
+  top: 22px;
+  right: 130px;
   display: grid;
   justify-items: center;
-  gap: 2px;
-  color: rgba(90,60,25,.55);
-  font-size: 8px;
+  gap: 3px;
+  color: rgba(120,80,40,.22);
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: .14em;
+  letter-spacing: .16em;
   text-align: center;
-  transform: rotate(-9deg);
+  transform: rotate(-12deg);
+  pointer-events: none;
+  z-index: 0;
 }
-.postmark b { font-size: 9px; }
+.postmark b {
+  font-size: 13px;
+  padding: 3px 7px;
+  border: 1.5px solid rgba(120,80,40,.22);
+  border-radius: 4px;
+}
+/* le contenu de la lettre passe au-dessus du filigrane */
+.letter .paper-label, .letter-title, .letter blockquote, .letter-actions {
+  position: relative;
+  z-index: 1;
+}
 .letter-title {
   margin: 8px 0 18px;
   font: 500 34px/1.05 var(--font-serif);
@@ -502,32 +533,55 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   font: italic 500 19px/1.75 var(--font-literary);
   color: #4a3a20;
 }
+/* la plume qui écrit : caret d'encre tant que le mot se dépose */
+blockquote.is-typing::after {
+  content: '';
+  display: inline-block;
+  width: 2px;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: -.15em;
+  background: #6d5220;
+  animation: quill-blink .8s steps(1) infinite;
+}
+@keyframes quill-blink {
+  50% { opacity: 0; }
+}
 .letter-actions {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   margin-top: 26px;
   padding-top: 16px;
   border-top: 1px solid rgba(140,105,45,.3);
 }
-.letter-actions button {
+/* les actions : des tampons d'encre, pas des boutons gris */
+.ink-stamp {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 9px 16px;
-  border: 1px solid rgba(140,105,45,.4);
-  border-radius: 999px;
+  padding: 8px 14px;
+  border: 1.5px solid rgba(110,72,30,.65);
+  border-radius: 6px;
   background: transparent;
-  color: #6d5220;
-  font-size: 12.5px;
-  font-weight: 600;
+  color: #7a5a28;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: all .3s;
+  transform: rotate(-1deg);
+  transition: all .25s;
+  box-shadow: inset 0 0 8px rgba(110,72,30,.08);
 }
-.letter-actions button:hover {
-  background: rgba(140,105,45,.12);
-  border-color: rgba(140,105,45,.7);
+.ink-stamp:nth-child(2) { transform: rotate(.8deg); }
+.ink-stamp:hover {
+  border-color: rgba(110,72,30,.95);
+  color: #5c4010;
+  background: rgba(140,105,45,.1);
+  transform: rotate(0deg) scale(1.04);
 }
-.letter-actions button.copied {
+.ink-stamp:active { transform: scale(.94); }
+.ink-stamp.copied {
   color: #2f6b3a;
   border-color: #2f6b3a;
 }
@@ -589,19 +643,30 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   font-weight: 600;
   cursor: pointer;
 }
-.done-check {
+/* le tampon de validation : une goutte de cire qui se pose */
+.done-seal {
   display: grid;
   place-items: center;
-  width: 19px;
-  height: 19px;
-  border: 1.5px solid rgba(140,105,45,.6);
-  border-radius: 50%;
-  color: #2f6b3a;
+  width: 26px;
+  height: 26px;
+  border-radius: 47% 53% 51% 49% / 52% 48% 52% 48%;
+  border: 1.5px dashed rgba(140,105,45,.55);
+  color: #ffe0c4;
+  font-size: 13px;
+  transition: all .3s var(--spring);
 }
-.done-row.done .done-check {
-  background: rgba(50,110,60,.18);
-  border-color: #2f6b3a;
+.done-seal.is-pressed {
+  border: 0;
+  background: radial-gradient(circle at 34% 30%, #e2684a 0%, #b83b2a 46%, #8c2718 100%);
+  box-shadow: 0 3px 8px rgba(0,0,0,.35), inset 0 1px 3px rgba(255,190,160,.4);
+  animation: seal-press .45s cubic-bezier(.2,1.4,.4,1);
 }
+@keyframes seal-press {
+  0% { transform: scale(1.6); opacity: 0; }
+  60% { transform: scale(.92); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.done-row.done { color: #4a6520; }
 
 /* timbres éparpillés */
 .desk-stamps {
@@ -621,19 +686,28 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   transform: rotate(0deg) scale(1.04);
   z-index: 2;
 }
+/* les annexes : de vrais polaroids posés sur le bureau */
 .stamp-frame {
   display: block;
-  padding: 7px;
-  background: #fdf8ea;
+  padding: 8px 8px 0;
+  background: linear-gradient(170deg, #fffef7, #f4ecd8);
   border-radius: 3px;
-  box-shadow: 0 8px 18px rgba(0,0,0,.35), inset 0 0 0 1px rgba(140,105,45,.3);
+  box-shadow: 0 12px 26px rgba(0,0,0,.4), 0 3px 8px rgba(0,0,0,.28), inset 0 0 0 1px rgba(140,105,45,.12);
 }
 .stamp-frame img {
   display: block;
   width: 100%;
   aspect-ratio: 4/3;
   object-fit: cover;
-  border-radius: 2px;
+  border-radius: 1px;
+  filter: saturate(.92) contrast(1.02);
+}
+.pol-label {
+  display: block;
+  padding: 8px 4px 12px;
+  color: #6b5a38;
+  font: italic 500 12.5px/1.2 var(--font-literary);
+  text-align: center;
 }
 .stamp figcaption {
   font-size: 10.5px;
