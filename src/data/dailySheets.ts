@@ -46,7 +46,13 @@ export const dailySheets: Record<number, DailySheet> = {
       'Déposer la carte des paysages enneigés ainsi que le coloriage du lutin. À joindre : Carte H (Pôle Nord) + Coloriage.',
     message:
       "Je monte à bord du traîneau d'entraînement ! Prochaine étape : la traversée de la banquise. Je t'ai glissé un coloriage de moi pour que tu puisses décorer ta chambre !",
-    assets: [],
+    assets: [
+      {
+        file: '/assets/printables/coloriage-lutin.jpg',
+        label: 'Coloriage du lutin',
+        page: 0,
+      },
+    ],
     gifts: [],
   },
   4: {

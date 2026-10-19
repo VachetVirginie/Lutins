@@ -27,9 +27,12 @@ const gap = computed(() => contentGapByDay[dayNumber.value])
 // Le visuel du jour rejoint les annexes — résolu par la date réelle de la dépêche
 const dayVisual = computed(() => (dayNumber.value ? visualForDay(dayNumber.value) : undefined))
 const annexes = computed<KitAsset[]>(() => {
-  // les visuels générés remplacent tous les printables du kit —
-  // ils comblent les jours « Visuel de scène à créer »
-  return dayVisual.value ? [{ file: dayVisual.value, label: 'Illustration du jour', page: 0 }] : []
+  // le visuel du jour ouvre les annexes ; seuls les printables
+  // explicitement conservés dans la fiche (ex. le coloriage) suivent
+  const list: KitAsset[] = []
+  if (dayVisual.value) list.push({ file: dayVisual.value, label: 'Illustration du jour', page: 0 })
+  list.push(...(sheet.value?.assets ?? []))
+  return list
 })
 // Le tampon « PRÊT » fait partie de l'état partagé : il survit au rechargement et voyage entre appareils
 const preparationDone = computed({
