@@ -57,8 +57,10 @@ function spinGear(event: MouseEvent) {
       <path class="orn-glitter" d="M40 50 L41.6 54 L45.6 55.6 L41.6 57.2 L40 61.2 L38.4 57.2 L34.4 55.6 L38.4 54 Z" />
     </svg>
     <ProgressHero />
-    <motion.div v-bind="rise(0.1)"><StoryPhase /></motion.div>
-    <motion.div v-bind="reveal"><NextStep /></motion.div>
+    <div class="home-duo">
+      <motion.div v-bind="rise(0.1)"><StoryPhase /></motion.div>
+      <motion.div v-bind="reveal"><NextStep /></motion.div>
+    </div>
     <motion.footer v-if="tomorrowTitle" class="home-signoff" v-bind="reveal">
       <i aria-hidden="true" /><p>Et demain — <em>{{ tomorrowTitle }}</em></p><i aria-hidden="true" />
     </motion.footer>
@@ -184,6 +186,15 @@ function spinGear(event: MouseEvent) {
   }
   to {
     transform:rotate(360deg)
+  }
+}
+
+@media (min-width:1100px) {
+  .home-duo {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+    align-items:start
   }
 }
 

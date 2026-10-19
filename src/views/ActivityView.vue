@@ -1310,4 +1310,31 @@ function printAsset(file: string) {
   outline:2px solid #ffe9a8;
   outline-offset:3px
 }
+
+/* ---- grand écran : la lettre à gauche, le carnet et les annexes à droite ---- */
+@media (min-width:1100px) {
+  .activity-screen {
+    display:grid;
+    grid-template-columns:minmax(0,1.6fr) minmax(330px,1fr);
+    column-gap:36px;
+    align-items:start
+  }
+  .activity-screen > :is(header, nav) {
+    grid-column:1/-1
+  }
+  .envelope {
+    grid-column:1/-1;
+    width:min(640px,100%);
+    justify-self:center
+  }
+  .letter {
+    grid-column:1
+  }
+  .carnet,.annexes,.slip,.gap-note {
+    grid-column:2
+  }
+  .asset-grid {
+    grid-template-columns:repeat(auto-fill,minmax(150px,1fr))
+  }
+}
 </style>

@@ -553,6 +553,13 @@ onBeforeUnmount(() => {
 }
 
 
+@media (min-width:1100px) {
+  .planning-header,.planning-progress,.map {
+    max-width:840px;
+    margin-inline:auto
+  }
+}
+
 @media (prefers-reduced-motion:reduce) {
   .stop-elf,.map-stop.current .stop-dot,.map-stop.current::after,.map-fog::after,.planning-progress-bar i {
     animation:none

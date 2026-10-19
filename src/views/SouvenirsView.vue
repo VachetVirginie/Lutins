@@ -236,4 +236,15 @@ const notes = [
   font-size:14px
 }
 
+@media (min-width:1100px)  {
+  .photo-grid  {
+    grid-template-columns:repeat(auto-fill,minmax(180px,1fr))
+  }
+  .done-list  {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    column-gap:32px
+  }
+}
+
 </style>

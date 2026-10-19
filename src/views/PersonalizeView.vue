@@ -1341,4 +1341,15 @@ const recap = computed(() => {
     transition:opacity .15s ease
   }
 }
+
+/* ---- grand écran : la feuille respire au centre ---- */
+@media (min-width:1100px) {
+  .pz-header,
+  .pz-track,
+  .pz-sheet,
+  .pz-footer {
+    max-width:760px;
+    margin-inline:auto
+  }
+}
 </style>

@@ -579,6 +579,12 @@ function embark(id: string, ev: MouseEvent): void {
   }
 }
 
+@media (min-width:1100px) {
+  .parcels {
+    grid-template-columns:1fr 1fr
+  }
+}
+
 .back-link:focus-visible,.scope-tabs button:focus-visible,.manifest-more:focus-visible,.parcel-check:focus-visible,.parcel-tag:focus-visible {
   outline:2px solid #ffe9a8;
   outline-offset:3px;

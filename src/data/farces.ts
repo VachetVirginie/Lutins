@@ -1,5 +1,5 @@
 import { adventure } from './adventureStore'
-import { arrivalDay, totalDays } from './calendar'
+import { adventureStart, arrivalDay, DAY_MS, totalDays } from './calendar'
 import { dailySheets, type DailySheet } from './dailySheets'
 
 /**
@@ -383,11 +383,40 @@ const finaleSheet = (day: number) => mk(day, finale)
 const avantDernierSheet = (day: number) => mk(day, avantDernier)
 
 /**
+ * Fiches calendaires : elles suivent la date réelle, pas le numéro de jour.
+ * Si le départ de l'aventure bouge, le 1er novembre reste le 1er novembre.
+ */
+const SPECIALS: Record<string, FarceDay> = {
+  // Le jour des morts : une veillée douce, pas un moment qui fait peur
+  '11-01': {
+    title: 'La veillée des lanternes',
+    adultPreparation:
+      'Poser une bougie LED ou un petit photophore près du lutin, avec une chrysanthème ou une fleur dessinée. Une photo de famille glissée à côté rend la veillée encore plus tendre.',
+    message:
+      "Louis, cette nuit j'ai traversé un village où brillaient des centaines de petites lumières. Ici, on allume une lanterne pour se souvenir de ceux qu'on a aimés — les grands-parents, les amis, même les lutins très très vieux du Pôle Nord. Alors moi aussi, j'ai gardé ma lanterne allumée jusqu'au matin. Si tu veux, allume une lumière avec moi ce soir et pense à quelqu'un que tu aimes fort : un petit souvenir, ça fait briller tout un cœur.",
+    gifts: ['Bougie LED ou photophore', 'Chrysanthème (vraie ou dessinée)'],
+  },
+}
+
+const SPECIALS_BY_MONTH_DAY = new Map(
+  Object.entries(SPECIALS).map(([key, sheet]) => [key.split('-').map(Number), sheet]),
+)
+
+/** La fiche « date précise » du jour s'il en existe une (11-01, 12-06…) */
+function specialForDay(day: number): DailySheet | null {
+  const d = new Date(adventureStart.value.getTime() + (day - 1) * DAY_MS)
+  const hit = SPECIALS_BY_MONTH_DAY.get([d.getMonth() + 1, d.getDate()])
+  return hit ? mk(day, hit) : null
+}
+
+/**
  * La fiche narrative du jour : la veille puis la séquence des farces,
  * la valise et la lettre finale toujours aux deux derniers jours.
  * Renvoie null si le jour n'est pas couvert par le plan (le kit fait relais).
  */
 export function farceForDay(day: number): DailySheet | null {
+  const special = specialForDay(day)
+  if (special) return special
   const arrival = arrivalDay.value
   const total = totalDays.value
   if (day === total) return finaleSheet(day)
