@@ -131,7 +131,7 @@ function embark(id: string, ev: MouseEvent): void {
       <button class="back-link" type="button" @click="goBack"><i class="mdi mdi-chevron-left" aria-hidden="true" /> Retour</button>
       <p class="prepare-overline">LA RÉSERVE DE L'EXPÉDITION</p>
       <h1>À <em>prévoir.</em></h1>
-      <p>Cochez un colis pour l'embarquer — la réserve se remplit au fur et à mesure.</p>
+      <p>Cochez un colis pour le glisser dans le sac — la réserve se remplit au fil de la veillée.</p>
     </header>
 
     <!-- la réserve : le sac se remplit colis après colis -->

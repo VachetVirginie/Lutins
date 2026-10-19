@@ -18,7 +18,7 @@ const upcomingDays = computed(() => Array.from({ length: 7 }, (_, index) => {
   return {
     day,
     title: sheetForDay(day)?.title ?? `Jour ${day}`,
-    detail: dayItems.length ? `${dayItems.length} élément${dayItems.length > 1 ? 's' : ''} à préparer` : 'Voir la fiche du jour',
+    detail: dayItems.length ? `${dayItems.length} élément${dayItems.length > 1 ? 's' : ''} à préparer` : 'Lire la dépêche du jour',
     done: dayItems.length > 0 && dayItems.every((item) => item.done),
     activityId: `jour-${day}`,
   }
@@ -28,7 +28,7 @@ const upcomingDays = computed(() => Array.from({ length: 7 }, (_, index) => {
 <template>
   <section class="home-prep" :class="{ collapsed: !isOpen }">
     <button class="section-heading" type="button" :aria-expanded="isOpen" aria-controls="upcoming-preparation" @click="isOpen = !isOpen">
-      <div><p class="home-overline">DANS LES 7 PROCHAINS JOURS</p><h2>Matériel nécessaire</h2></div>
+      <div><p class="home-overline">DANS LES 7 PROCHAINS JOURS</p><h2>Ce qu'il faut embarquer</h2></div>
       <span>{{ doneCount }}/{{ TOTAL_PREP }} prêts</span><i class="section-toggle mdi" :class="isOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'" aria-hidden="true" />
     </button>
     <div id="upcoming-preparation" class="prep-body" :class="{ open: isOpen }">
@@ -38,13 +38,13 @@ const upcomingDays = computed(() => Array.from({ length: 7 }, (_, index) => {
           <div class="prep-row" :class="{ 'is-done': day.done }">
             <span class="prep-day" :class="{ done: day.done }">J{{ day.day }}</span>
             <RouterLink class="prep-text" :to="`/activites/${day.activityId}`"><strong>{{ day.title }}</strong><small>{{ day.detail }}</small></RouterLink>
-            <RouterLink class="prep-chevron" :to="`/activites/${day.activityId}`" :aria-label="`Ouvrir la fiche du jour ${day.day}`"><i class="mdi mdi-arrow-up-right" aria-hidden="true" /></RouterLink>
+            <RouterLink class="prep-chevron" :to="`/activites/${day.activityId}`" :aria-label="`Ouvrir la dépêche du jour ${day.day}`"><i class="mdi mdi-arrow-up-right" aria-hidden="true" /></RouterLink>
           </div>
         </li>
       </ul>
       </div>
     </div>
-    <RouterLink class="prep-link" to="/prepare">Voir tout le kit par type <i class="mdi mdi-arrow-right" aria-hidden="true" /></RouterLink>
+    <RouterLink class="prep-link" to="/prepare">Ouvrir toute la réserve <i class="mdi mdi-arrow-right" aria-hidden="true" /></RouterLink>
   </section>
 </template>
 

@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useDaySheet } from '../../composables/useDaySheet'
+import { journeyMilestones } from '../../data/adventure'
+import { PHASES } from '../../data/chapters'
 import PrintSheet from '../../components/activity/PrintSheet.vue'
 import { waxCrack } from '../../utils/sound'
 
@@ -42,6 +44,13 @@ function crackWax() {
   unseal({ crack: waxCrack })
 }
 
+/* le décor feutré du jour : l'illustration du jour, sinon le paysage du chapitre */
+const deskScene = computed(() => {
+  if (dayVisual.value) return dayVisual.value
+  const active = [...journeyMilestones.value].reverse().find((m) => m.day <= dayNumber.value)
+  return active ? PHASES[active.phase]?.scene : undefined
+})
+
 /* ---- parallaxe souris : la scène respire, jamais plus de quelques pixels ---- */
 const desk = ref<HTMLElement | null>(null)
 
@@ -63,7 +72,9 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
 
 <template>
   <main ref="desk" class="desk" @mousemove.passive="onMouse">
-    <!-- la lampe : une flaque de lumière chaude, la scène vit dessous -->
+    <!-- le décor du jour, feutré — puis la lampe : une flaque de lumière chaude -->
+    <img v-if="deskScene" class="desk-photo" :key="deskScene" :src="deskScene" alt="" aria-hidden="true" />
+    <i class="desk-veil" aria-hidden="true" />
     <i class="desk-lamp" aria-hidden="true" />
     <i class="desk-lamp-glow" aria-hidden="true" />
 
@@ -80,7 +91,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
         <button type="button" :disabled="dayNumber >= totalDays" @click="goToDay(dayNumber + 1)">
           J{{ dayNumber + 1 }} <i class="mdi mdi-chevron-right" aria-hidden="true" />
         </button>
-        <button class="desk-print" type="button" title="Imprimer la fiche" @click="printSheet">
+        <button class="desk-print" type="button" title="Imprimer la dépêche" @click="printSheet">
           <i class="mdi mdi-printer-outline" aria-hidden="true" />
         </button>
       </nav>
@@ -103,7 +114,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
     </section>
 
     <!-- Le bureau ouvert : lettre au centre, marges épinglées -->
-    <section v-else-if="sheet" class="desk-open" aria-label="Fiche du jour">
+    <section v-else-if="sheet" class="desk-open" aria-label="La dépêche du jour">
       <article class="paper letter" data-depth="10">
         <span class="wax-seal" aria-hidden="true"><b>J{{ sheet.day }}</b></span>
         <span class="postmark" aria-hidden="true"><b>POSTE DU<br />PÔLE NORD</b><small>{{ sheet.date }}</small></span>
@@ -114,15 +125,16 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
           <button type="button" class="ink-stamp" :class="{ copied }" @click="copyMessage">
             <i class="mdi" :class="copied ? 'mdi-check' : 'mdi-content-copy'" aria-hidden="true" /> {{ copied ? 'Copié !' : 'Copier' }}
           </button>
-          <button type="button" class="ink-stamp" @click="printSheet"><i class="mdi mdi-printer-outline" aria-hidden="true" /> Imprimer la fiche</button>
+          <button type="button" class="ink-stamp" @click="printSheet"><i class="mdi mdi-printer-outline" aria-hidden="true" /> Imprimer la dépêche</button>
         </footer>
       </article>
 
-      <aside class="desk-margins">
-        <article class="paper carnet" data-depth="6" :class="{ done: preparationDone }">
-          <i class="carnet-pin" aria-hidden="true" />
+      <aside class="desk-margins paper" data-depth="8" aria-label="Carnet et annexes">
+        <i class="carnet-pin" aria-hidden="true" />
+
+        <article class="margin-section carnet" :class="{ done: preparationDone }">
           <i v-if="preparationDone" class="carnet-stamp" aria-hidden="true"><b>PRÊT</b></i>
-          <p class="paper-label dark">LE CARNET SECRET DES LUTINS</p>
+          <p class="paper-label">LE CARNET SECRET DES LUTINS</p>
           <p class="carnet-copy">{{ sheet.adultPreparation }}</p>
           <button class="done-row" type="button" :class="{ done: preparationDone }" @click="waxCrack(); togglePreparation()">
             <span class="done-seal" :class="{ 'is-pressed': preparationDone }"><i v-if="preparationDone" class="mdi mdi-check" aria-hidden="true" /></span>
@@ -130,15 +142,15 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
           </button>
         </article>
 
-        <section v-if="annexes.length" class="paper annexes" data-depth="14" aria-label="Annexes à découper">
-          <p class="paper-label dark">LES ANNEXES — À DÉCOUPER</p>
+        <section v-if="annexes.length" class="margin-section annexes" aria-label="Annexes à découper">
+          <p class="paper-label">LES ANNEXES — À DÉCOUPER</p>
           <div class="desk-stamps">
             <figure v-for="(asset, i) in annexes" :key="asset.file" class="stamp" :style="{ '--r': `${(i % 2 ? 2.4 : -3.1) + i * 0.6}deg` }">
               <a class="stamp-frame" :href="asset.file" target="_blank" rel="noreferrer">
                 <img :src="asset.file" :alt="asset.label" :aria-labelledby="`stamp-cap-${i}`" loading="lazy">
                 <span class="pol-label">{{ asset.label }}</span>
               </a>
-              <figcaption :id="`stamp-cap-${i}`"><small>{{ asset.page ? `Annexe · p. ${asset.page}` : 'Visuel du jour' }} — {{ assetKind(asset.label) }}</small></figcaption>
+              <figcaption :id="`stamp-cap-${i}`"><small>{{ asset.page ? `Annexe · p. ${asset.page}` : 'Illustration du jour' }} — {{ assetKind(asset.label) }}</small></figcaption>
               <div class="stamp-actions">
                 <button type="button" @click="printAsset(asset.file)"><i class="mdi mdi-printer" aria-hidden="true" /> Imprimer</button>
                 <a :href="asset.file" download><i class="mdi mdi-download" aria-hidden="true" /></a>
@@ -147,8 +159,8 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
           </div>
         </section>
 
-        <article v-if="sheet.gifts.length" class="paper slip" data-depth="4" aria-label="À glisser dans la scène">
-          <p class="paper-label dark">À GLISSER DANS LA SCÈNE</p>
+        <article v-if="sheet.gifts.length" class="margin-section slip" aria-label="À glisser dans la scène">
+          <p class="paper-label">À GLISSER DANS LA SCÈNE</p>
           <ul>
             <li v-for="gift in sheet.gifts" :key="gift"><b aria-hidden="true">✳</b>{{ gift }}</li>
           </ul>
@@ -156,13 +168,13 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
 
         <aside v-if="gap && !dayVisual" class="gap-note" aria-label="Élément à produire">
           <i class="mdi mdi-pencil-outline" aria-hidden="true" />
-          <div><strong>Visuel de scène à créer</strong><p>{{ gap.detail }}</p></div>
+          <div><strong>Illustration de scène à créer</strong><p>{{ gap.detail }}</p></div>
         </aside>
       </aside>
     </section>
 
     <section v-else class="desk-stage">
-      <p class="desk-missing">Fiche introuvable</p>
+      <p class="desk-missing">Cette dépêche s'est égarée en route</p>
     </section>
 
     <p class="desk-keys" aria-hidden="true"><kbd>←</kbd><kbd>→</kbd> feuilleter les dépêches</p>
@@ -184,6 +196,46 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
     radial-gradient(ellipse 90% 55% at 30% -10%, rgba(255,196,96,.14), transparent 55%),
     radial-gradient(ellipse 120% 80% at 50% 120%, #0d211a 0%, #081712 55%, #050f0b 100%);
   color: #f2ead8;
+}
+
+/* le paysage du jour devient le fond de page — la veillée continue ici */
+.desk-photo {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 40%;
+  filter: brightness(.68) saturate(.95) blur(2px);
+  pointer-events: none;
+  animation: desk-photo-in .9s ease both;
+}
+@keyframes desk-photo-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.desk-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(9,20,16,.78) 0%, rgba(5,17,13,.55) 38%, rgba(5,17,13,.88) 100%);
+}
+
+/* le halo ambré du coin — comme sur la veillée et l'atlas */
+.desk::after {
+  content: '';
+  position: fixed;
+  top: -6%;
+  right: -4%;
+  z-index: 1;
+  width: 560px;
+  height: 560px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(224,160,60,.18), transparent 68%);
+  filter: blur(70px);
+  pointer-events: none;
 }
 
 /* la lampe, hors champ : son halo descend sur le bureau */
@@ -278,7 +330,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   color: #f5edd9;
 }
 .desk-nav-day em {
-  color: #8fa79a;
+  color: #b8c9bd;
   font-size: 12px;
   font-style: normal;
 }
@@ -293,9 +345,10 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   z-index: 2;
   margin: 26px 0 0;
   text-align: center;
-  color: #a9bcae;
+  color: #c8d6cb;
   font-size: 11.5px;
   letter-spacing: .14em;
+  text-shadow: 0 1px 5px rgba(0,0,0,.5);
 }
 
 /* ---------- l'enveloppe sous la lampe ---------- */
@@ -435,16 +488,16 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   align-items: start;
 }
 
-/* papier commun : même texture que le mobile, échelle bureau */
+/* panneau de verre dépoli — le langage de la veillée et de l'atlas */
 .paper {
   position: relative;
-  border-radius: 6px 20px 10px 26px / 20px 8px 26px 10px;
-  background:
-    radial-gradient(ellipse 60% 40% at 18% 10%, rgba(255,252,238,.75), transparent 60%),
-    repeating-linear-gradient(0deg, transparent 0 3px, rgba(110,72,26,.03) 3px 4px),
-    linear-gradient(158deg, #f4ead2 0%, #ead9b4 58%, #dcc593 100%);
-  box-shadow: 0 26px 54px rgba(0,0,0,.5), inset 0 0 0 1px rgba(150,110,50,.3), inset 0 0 30px rgba(120,78,28,.14);
-  color: #43331c;
+  border-radius: 20px;
+  background: rgba(8,22,17,.55);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(224,194,131,.25);
+  box-shadow: 0 26px 54px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,244,214,.08);
+  color: #ede4d0;
   transform: translate3d(calc(var(--px) * var(--dx, 6px)), calc(var(--py) * var(--dy, 4px)), 0);
   transition: transform .5s cubic-bezier(.3,.9,.35,1);
 }
@@ -455,7 +508,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
 
 .paper-label {
   margin: 0;
-  color: #8a6a2f;
+  color: #e0c283;
   font-size: 9.5px;
   font-weight: 700;
   letter-spacing: .18em;
@@ -508,7 +561,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   display: grid;
   justify-items: center;
   gap: 3px;
-  color: rgba(120,80,40,.22);
+  color: rgba(224,194,131,.28);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: .16em;
@@ -520,7 +573,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
 .postmark b {
   font-size: 13px;
   padding: 3px 7px;
-  border: 1.5px solid rgba(120,80,40,.22);
+  border: 1.5px solid rgba(224,194,131,.28);
   border-radius: 4px;
 }
 /* le contenu de la lettre passe au-dessus du filigrane */
@@ -531,13 +584,13 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
 .letter-title {
   margin: 8px 0 18px;
   font: 500 34px/1.05 var(--font-serif);
-  color: #33260f;
+  color: #f4ead8;
 }
 .letter blockquote {
   margin: 0;
   white-space: pre-line;
   font: italic 500 19px/1.75 var(--font-literary);
-  color: #4a3a20;
+  color: #ece1c6;
 }
 /* la plume qui écrit : caret d'encre tant que le mot se dépose */
 blockquote.is-typing::after {
@@ -547,7 +600,7 @@ blockquote.is-typing::after {
   height: 1.05em;
   margin-left: 2px;
   vertical-align: -.15em;
-  background: #6d5220;
+  background: #e0c283;
   animation: quill-blink .8s steps(1) infinite;
 }
 @keyframes quill-blink {
@@ -558,52 +611,51 @@ blockquote.is-typing::after {
   gap: 12px;
   margin-top: 26px;
   padding-top: 16px;
-  border-top: 1px solid rgba(140,105,45,.3);
+  border-top: 1px solid rgba(224,194,131,.25);
 }
-/* les actions : des tampons d'encre, pas des boutons gris */
+/* les actions : capsules translucides bordées d'or */
 .ink-stamp {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 8px 14px;
-  border: 1.5px solid rgba(110,72,30,.65);
-  border-radius: 6px;
-  background: transparent;
-  color: #7a5a28;
+  padding: 9px 16px;
+  border: 1px solid rgba(224,194,131,.4);
+  border-radius: 999px;
+  background: rgba(224,194,131,.07);
+  color: #f0dcae;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: .12em;
   text-transform: uppercase;
   cursor: pointer;
-  transform: rotate(-1deg);
   transition: all .25s;
-  box-shadow: inset 0 0 8px rgba(110,72,30,.08);
 }
-.ink-stamp:nth-child(2) { transform: rotate(.8deg); }
 .ink-stamp:hover {
-  border-color: rgba(110,72,30,.95);
-  color: #5c4010;
-  background: rgba(140,105,45,.1);
-  transform: rotate(0deg) scale(1.04);
+  border-color: rgba(224,194,131,.85);
+  color: #ffe9a8;
+  background: rgba(224,194,131,.15);
+  box-shadow: 0 0 18px rgba(224,194,131,.28);
+  transform: translateY(-1px);
 }
-.ink-stamp:active { transform: scale(.94); }
+.ink-stamp:active { transform: scale(.96); }
 .ink-stamp.copied {
-  color: #2f6b3a;
-  border-color: #2f6b3a;
+  color: #a8ddb0;
+  border-color: rgba(140,210,150,.55);
 }
 
-/* la marge : carnet, timbres, bande */
+/* la marge : un seul panneau de verre, des sections aérées */
 .desk-margins {
-  display: grid;
-  gap: 22px;
-}
-.carnet {
-  padding: 26px 24px 18px;
-  transform: rotate(.8deg) translate3d(calc(var(--px) * var(--dx, 6px)), calc(var(--py) * var(--dy, 4px)), 0);
+  padding: 30px 26px 24px;
   animation: margin-in .7s cubic-bezier(.3,.9,.35,1) .3s both;
 }
-.annexes { animation: margin-in .7s cubic-bezier(.3,.9,.35,1) .42s both; padding: 24px 22px 20px; }
-.slip { animation: margin-in .7s cubic-bezier(.3,.9,.35,1) .54s both; padding: 20px 22px 16px; transform: rotate(-1.2deg) translate3d(calc(var(--px) * var(--dx, 4px)), calc(var(--py) * var(--dy, 3px)), 0); }
+.margin-section {
+  position: relative;
+}
+.margin-section + .margin-section {
+  margin-top: 22px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(224,194,131,.16);
+}
 @keyframes margin-in {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; }
@@ -621,12 +673,12 @@ blockquote.is-typing::after {
 }
 .carnet-stamp {
   position: absolute;
-  top: 12px;
-  right: 16px;
+  top: 0;
+  right: 0;
   padding: 4px 8px;
-  border: 1.5px solid rgba(50,110,60,.55);
+  border: 1.5px solid rgba(122,200,140,.55);
   border-radius: 4px;
-  color: #2f6b3a;
+  color: #8fd49a;
   font: 700 9px var(--font-sans);
   letter-spacing: .14em;
   transform: rotate(9deg);
@@ -634,6 +686,7 @@ blockquote.is-typing::after {
 .carnet-copy {
   margin: 12px 0 14px;
   font: 500 14.5px/1.6 var(--font-literary);
+  color: #e9dfc6;
 }
 .done-row {
   display: flex;
@@ -642,9 +695,9 @@ blockquote.is-typing::after {
   width: 100%;
   padding: 10px 0 4px;
   border: 0;
-  border-top: 1px solid rgba(140,105,45,.3);
+  border-top: 1px solid rgba(224,194,131,.22);
   background: none;
-  color: #6d5220;
+  color: #e0c283;
   font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;
@@ -656,7 +709,7 @@ blockquote.is-typing::after {
   width: 26px;
   height: 26px;
   border-radius: 47% 53% 51% 49% / 52% 48% 52% 48%;
-  border: 1.5px dashed rgba(140,105,45,.55);
+  border: 1.5px dashed rgba(224,194,131,.55);
   color: #ffe0c4;
   font-size: 13px;
   transition: all .3s var(--spring);
@@ -672,7 +725,7 @@ blockquote.is-typing::after {
   60% { transform: scale(.92); opacity: 1; }
   100% { transform: scale(1); }
 }
-.done-row.done { color: #4a6520; }
+.done-row.done { color: #a8ddb0; }
 
 /* timbres éparpillés */
 .desk-stamps {
@@ -718,13 +771,13 @@ blockquote.is-typing::after {
 .stamp figcaption {
   font-size: 10.5px;
   font-weight: 600;
-  color: #5c4620;
+  color: #f4ead8;
   text-align: center;
 }
 .stamp figcaption small {
   display: block;
   font-weight: 400;
-  color: #e0c283;
+  color: #f0dcae;
   text-shadow: 0 1px 4px rgba(0,0,0,.6);
 }
 .stamp-actions {
@@ -736,11 +789,11 @@ blockquote.is-typing::after {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 5px 10px;
-  border: 1px solid rgba(140,105,45,.35);
+  padding: 5px 12px;
+  border: 1px solid rgba(224,194,131,.4);
   border-radius: 999px;
-  background: rgba(255,250,235,.5);
-  color: #6d5220;
+  background: rgba(224,194,131,.07);
+  color: #f0dcae;
   font-size: 10.5px;
   font-weight: 600;
   text-decoration: none;
@@ -748,7 +801,10 @@ blockquote.is-typing::after {
   transition: all .25s;
 }
 .stamp-actions button:hover, .stamp-actions a:hover {
-  background: rgba(140,105,45,.15);
+  border-color: rgba(224,194,131,.8);
+  color: #ffe9a8;
+  background: rgba(224,194,131,.16);
+  box-shadow: 0 0 14px rgba(224,194,131,.25);
 }
 .stamp-actions a {
   padding: 5px 9px;
@@ -768,9 +824,9 @@ blockquote.is-typing::after {
   align-items: center;
   gap: 6px;
   font: italic 500 13px var(--font-literary);
-  color: #4a3a20;
+  color: #eee3c8;
 }
-.slip li b { color: #a67d34; font-style: normal; }
+.slip li b { color: #e0c283; font-style: normal; }
 
 /* la note à produire */
 .gap-note {
@@ -823,7 +879,7 @@ button:focus-visible, a:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .env-scene, .letter, .carnet, .annexes, .slip, .gap-note { animation: none; }
+  .env-scene, .letter, .desk-margins, .gap-note, .desk-photo { animation: none; }
   .env-body, .paper { transform: none !important; transition: none; }
 }
 </style>

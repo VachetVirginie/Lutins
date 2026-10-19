@@ -5,7 +5,7 @@ import { currentAdventure } from '../../data/adventure'
 <template>
   <section class="home-next">
     <div class="next-art">
-      <img src="/assets/created/journey-station.png" alt="Le trajet des lutins" /><span class="next-tag">PROCHAINE ÉTAPE</span>
+      <img src="/assets/created/journey-station.png" alt="La traversée des lutins" /><span class="next-tag">LA PROCHAINE HALTE</span>
       <span class="next-postmark" aria-hidden="true">POSTE DU<br />PÔLE NORD</span>
     </div>
     <span class="next-seal" aria-hidden="true"><b>J{{ currentAdventure.currentDay }}</b></span>
@@ -13,7 +13,7 @@ import { currentAdventure } from '../../data/adventure'
       <p class="home-overline">LA DÉPÊCHE DU JOUR</p>
       <h2>{{ currentAdventure.currentTitle }}</h2>
       <p>{{ currentAdventure.currentDescription }}</p>
-      <RouterLink class="next-cta" to="/aujourdhui">Ouvrir <i class="mdi mdi-arrow-right" aria-hidden="true" /></RouterLink>
+      <RouterLink class="next-cta" to="/aujourdhui">Ouvrir la dépêche <i class="mdi mdi-arrow-right" aria-hidden="true" /></RouterLink>
     </div>
   </section>
 </template>

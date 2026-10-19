@@ -90,8 +90,8 @@ onBeforeUnmount(() => window.removeEventListener('deviceorientation', onTilt))
         </div>
       </template>
       <template v-else>
-        <p class="home-overline">FICHE DU JOUR</p>
-        <h1 class="activity-missing">Fiche introuvable</h1>
+        <p class="home-overline">LA DÉPÊCHE DU JOUR</p>
+        <h1 class="activity-missing">Cette dépêche s'est égarée en route</h1>
       </template>
     </header>
 
@@ -156,14 +156,14 @@ onBeforeUnmount(() => window.removeEventListener('deviceorientation', onTilt))
           <div v-for="asset in annexes" :key="asset.file" class="stamp">
             <a class="stamp-frame" :href="asset.file" target="_blank" rel="noreferrer"><img :src="asset.file" :alt="asset.label" loading="lazy"></a>
             <span>{{ asset.label }}</span>
-            <small>{{ asset.page ? `Annexe · p. ${asset.page}` : 'Visuel du jour' }} — {{ assetKind(asset.label) }}</small>
+            <small>{{ asset.page ? `Annexe · p. ${asset.page}` : 'Illustration du jour' }} — {{ assetKind(asset.label) }}</small>
             <div class="stamp-actions">
               <button type="button" @click="printAsset(asset.file)"><i class="mdi mdi-printer" aria-hidden="true" /> Imprimer</button>
               <a :href="asset.file" download><i class="mdi mdi-download" aria-hidden="true" /> Télécharger</a>
             </div>
           </div>
         </div>
-        <button class="print-all" type="button" @click="printSheet"><i class="mdi mdi-printer-check" aria-hidden="true" /> Imprimer la fiche complète (lettre + annexes)</button>
+        <button class="print-all" type="button" @click="printSheet"><i class="mdi mdi-printer-check" aria-hidden="true" /> Imprimer la dépêche complète (lettre + annexes)</button>
       </section>
 
       <section v-if="sheet.gifts.length" class="slip" aria-labelledby="gift-title">
@@ -173,7 +173,7 @@ onBeforeUnmount(() => window.removeEventListener('deviceorientation', onTilt))
         </ul>
       </section>
 
-      <aside v-if="gap && !dayVisual" class="gap-note" aria-label="Élément à produire"><i class="mdi mdi-pencil-outline" aria-hidden="true" /><div><strong>Visuel de scène à créer</strong><p>{{ gap.detail }}</p></div></aside>
+      <aside v-if="gap && !dayVisual" class="gap-note" aria-label="Élément à produire"><i class="mdi mdi-pencil-outline" aria-hidden="true" /><div><strong>Illustration de scène à créer</strong><p>{{ gap.detail }}</p></div></aside>
     </template>
 
     <PrintSheet v-if="sheet" :sheet="sheet" :annexes="annexes" />

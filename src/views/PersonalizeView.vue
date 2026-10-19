@@ -14,9 +14,9 @@ const form = adventure
 const STEPS = [
   { id: 'famille', overline: 'Étape 1 / 6', title: 'Les destinataires' },
   { id: 'lutins', overline: 'Étape 2 / 6', title: 'Les voyageurs' },
-  { id: 'voyage', overline: 'Étape 3 / 6', title: 'Le trajet' },
+  { id: 'voyage', overline: 'Étape 3 / 6', title: 'La traversée' },
   { id: 'calendrier', overline: 'Étape 4 / 6', title: 'Le calendrier' },
-  { id: 'pieces', overline: 'Étape 5 / 6', title: 'Les pièces jointes' },
+  { id: 'pieces', overline: 'Étape 5 / 6', title: 'Les documents de bord' },
   { id: 'recap', overline: 'Dernière étape', title: 'La dépêche est prête' },
 ] as const
 
@@ -163,7 +163,7 @@ const recap = computed(() => {
         <i class="mdi mdi-chevron-left" aria-hidden="true" /> Retour
       </button>
       <div class="pz-emblem" aria-hidden="true"><i class="mdi mdi-feather" /><b /><b /></div>
-      <p class="pz-overline">LE FORMULAIRE DE L'EXPÉDITION</p>
+      <p class="pz-overline">LE REGISTRE DE L'EXPÉDITION</p>
       <h1 id="pz-title">Votre aventure,<br />à vos couleurs</h1>
     </header>
 
@@ -210,14 +210,14 @@ const recap = computed(() => {
             <input v-model="joinInput" type="text" placeholder="LUTIN-XXXX" maxlength="10" autocapitalize="characters" autofocus title="Code famille" />
             <button type="submit" class="pz-family-btn" :disabled="busy || !joinInput.trim()">Rejoindre</button>
           </form>
-          <p v-if="joinError" class="pz-error">Ce code n'existe pas — vérifiez les 4 lettres.</p>
+          <p v-if="joinError" class="pz-error">Aucune expédition ne porte ce code — vérifiez les 4 lettres.</p>
         </div>
         <button type="button" class="pz-gate-opt" @click="next">
           <i class="mdi mdi-feather" aria-hidden="true" />
           <span><b>Je crée notre aventure</b><small>je remplis le formulaire</small></span>
           <i class="mdi mdi-arrow-right" aria-hidden="true" />
         </button>
-        <p v-if="!syncAvailable" class="pz-note">La synchronisation n'est pas encore configurée — tout restera sur cet appareil.</p>
+        <p v-if="!syncAvailable" class="pz-note">Le courrier synchronisé n'est pas encore ouvert — tout restera sur cet appareil.</p>
       </template>
       </template>
 
@@ -229,7 +229,7 @@ const recap = computed(() => {
       <!-- 1 · la famille -->
       <template v-if="current.id === 'famille'">
         <div class="pz-field">
-          <span id="pz-lbl-enfants">Prénom(s) des enfants</span>
+          <span id="pz-lbl-enfants">Les prénoms des enfants</span>
           <div v-for="(name, i) in form.prenoms_enfants" :key="i" class="pz-row">
             <input v-model="form.prenoms_enfants[i]" type="text" placeholder="Prénom de l'enfant" autocomplete="off" aria-labelledby="pz-lbl-enfants" />
             <button
@@ -269,7 +269,7 @@ const recap = computed(() => {
       <!-- 2 · les lutins -->
       <template v-else-if="current.id === 'lutins'">
         <label class="pz-field" for="pz-nom-lutin">
-          <span>Le nom du lutin</span>
+          <span>Le nom de votre lutin</span>
           <input id="pz-nom-lutin" v-model="form.nom_lutin" type="text" placeholder="ex : Farfadet" />
         </label>
         <label class="pz-switch" for="pz-deuxieme-lutin">
@@ -291,7 +291,7 @@ const recap = computed(() => {
           <input id="pz-ville" v-model="form.ville" type="text" placeholder="ex : Lyon" />
         </label>
         <label class="pz-field" for="pz-destination">
-          <span>La destination du voyage</span>
+          <span>La destination de la traversée</span>
           <input id="pz-destination" v-model="form.destination" type="text" placeholder="ex : la maison familiale" />
         </label>
         <label class="pz-field" for="pz-quartier">
@@ -326,15 +326,15 @@ const recap = computed(() => {
           <i class="mdi mdi-door-open" aria-hidden="true" /> Sans date d'arrivée, le lutin frappe à la porte vers le J29
         </p>
         <label class="pz-field" for="pz-pauses">
-          <span>Jours sans activité</span>
+          <span>Nuits où le lutin se repose</span>
           <input id="pz-pauses" v-model="form.jours_sans_activite" type="text" placeholder="ex : 14 nov., 3 déc." />
         </label>
         <label class="pz-field" for="pz-lieux">
-          <span>Lieux de séjour ou déplacement</span>
+          <span>Lieux de séjour et déplacements</span>
           <textarea id="pz-lieux" v-model="form.lieux_sejour" rows="2" placeholder="ex : 3 jours chez Papi et Mamie à la mi-parcours" />
         </label>
         <label class="pz-field" for="pz-ajustements">
-          <span>Activités remplacées ou déplacées</span>
+          <span>Farces à remplacer ou déplacer</span>
           <textarea id="pz-ajustements" v-model="form.activites_modifiees" rows="2" placeholder="ex : la chasse au trésor du J40 déplacée au lendemain" />
         </label>
       </template>
@@ -374,7 +374,7 @@ const recap = computed(() => {
         <article class="pz-piece pz-family">
           <header><b><i class="mdi mdi-account-group-outline" aria-hidden="true" /></b><span>L'expédition à deux</span></header>
           <template v-if="!familyCode">
-            <p>Deux appareils, une seule aventure — chaque réglage et chaque coche se synchronise en direct.</p>
+            <p>Deux appareils, une seule aventure — chaque réglage et chaque coche voyage d'un écran à l'autre.</p>
             <div class="pz-family-actions">
               <button type="button" class="pz-family-btn" :disabled="busy || !syncAvailable" @click="onCreateFamily">
                 Créer un code famille
@@ -384,8 +384,8 @@ const recap = computed(() => {
                 <button type="submit" class="pz-family-btn" :disabled="busy || !joinInput.trim()">Rejoindre</button>
               </form>
             </div>
-            <p v-if="joinError" class="pz-error">Ce code n'existe pas — vérifiez les 4 lettres.</p>
-            <p v-if="!syncAvailable" class="pz-note">La synchronisation n'est pas encore configurée — tout reste sur cet appareil.</p>
+            <p v-if="joinError" class="pz-error">Aucune expédition ne porte ce code — vérifiez les 4 lettres.</p>
+            <p v-if="!syncAvailable" class="pz-note">Le courrier synchronisé n'est pas encore ouvert — tout reste sur cet appareil.</p>
           </template>
           <template v-else>
             <p class="pz-code">{{ familyCode }}</p>

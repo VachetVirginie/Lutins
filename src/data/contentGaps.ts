@@ -30,9 +30,9 @@ for (const sheet of Object.values(dailySheets)) {
       day: sheet.day,
       type: 'visual-scene',
       priority: 'medium',
-      title: `Visuel de scène pour J${sheet.day}`,
+      title: `Illustration de scène pour J${sheet.day}`,
       detail: `Créer une scène premium pour cette journée. Le texte et la préparation adulte sont prêts, mais aucune image dédiée n'est liée à ce jour.`,
-      expectedOutput: 'Une image mobile verticale optimisée pour la fiche du jour.',
+      expectedOutput: 'Une image mobile verticale optimisée pour la dépêche du jour.',
     })
   }
 

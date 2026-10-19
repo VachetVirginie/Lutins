@@ -117,14 +117,14 @@ function breakSeal() {
 
         <!-- la préparation, même verre -->
         <RouterLink to="/prepare" class="glass-card carnet-card">
-          <p class="glass-over">VOTRE PRÉPARATION</p>
+          <p class="glass-over">LA RÉSERVE</p>
           <h2>{{ weekPrep.count ? `${weekPrep.done}/${weekPrep.count} colis embarqués` : 'Rien à préparer' }}</h2>
           <ul v-if="weekPrep.preview.length" class="carnet-list">
             <li v-for="item in weekPrep.preview" :key="item.id" :class="{ done: adventure.prepDone.has(item.id) }">
               <i aria-hidden="true" />{{ item.title }}
             </li>
           </ul>
-          <p v-else class="glass-desc">La semaine est légère, profitez-en.</p>
+          <p v-else class="glass-desc">La semaine est douce — la réserve peut souffler.</p>
           <span class="glass-cta">Ouvrir la réserve <i class="mdi mdi-arrow-right" aria-hidden="true" /></span>
         </RouterLink>
       </section>
