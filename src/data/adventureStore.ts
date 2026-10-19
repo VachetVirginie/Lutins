@@ -135,17 +135,37 @@ let channel: ReturnType<NonNullable<typeof supabase>['channel']> | null = null
 
 function subscribe(code: string) {
   channel?.unsubscribe()
-  if (!supabase) return
-  channel = supabase
+  const sb = supabase
+  if (!sb) return
+  channel = sb
     .channel(`adventure-${code}`)
     .on(
       'postgres_changes',
-      { event: 'UPDATE', schema: 'public', table: 'adventures', filter: `code=eq.${code}` },
-      (payload) => applyRemote(payload.new.state as AdventureSnapshot),
+      { event: '*', schema: 'public', table: 'adventures', filter: `code=eq.${code}` },
+      (payload) => {
+        const remote = (payload.new as { state?: AdventureSnapshot }).state
+        if (remote) applyRemote(remote)
+      },
     )
     .subscribe((status) => {
       if (status === 'SUBSCRIBED') syncStatus.value = 'synced'
+      else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        syncStatus.value = 'error'
+        console.warn('[lutins] realtime channel:', status)
+      }
     })
+}
+
+/** Rattrapage : tire l'état distant (au démarrage ou après une coupure realtime) */
+async function fetchRemote(code: string) {
+  const sb = supabase
+  if (!sb) return
+  const { data, error } = await sb.from('adventures').select('state').eq('code', code).maybeSingle()
+  if (error) {
+    console.warn('[lutins] fetchRemote failed:', error.message)
+    return
+  }
+  if (data) applyRemote(data.state as AdventureSnapshot)
 }
 
 /** Crée une expédition partagée : génère le code et pousse l'état courant */
@@ -198,8 +218,16 @@ export function leaveFamily() {
   syncStatus.value = 'local'
 }
 
-/** Reconnexion au démarrage si un code est déjà enregistré */
-if (supabase && familyCode.value) subscribe(familyCode.value)
+/** Reconnexion au démarrage si un code est déjà enregistré : rattrapage + abonnement */
+if (supabase && familyCode.value) {
+  const code = familyCode.value
+  void fetchRemote(code)
+  subscribe(code)
+  // le realtime ne couvre pas l'absence : on retélécharge au retour au premier plan
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && familyCode.value) void fetchRemote(familyCode.value)
+  })
+}
 
 /* ---- les photos : Storage pour la sync, data-URL compressée en local ---- */
 
