@@ -1,53 +1,19 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { currentAdventure } from '../data/adventure'
-import { adventure } from '../data/adventureStore'
-import { contentGapByDay } from '../data/contentGaps'
-import { dailySheetsByActivityId } from '../data/dailySheets'
-import { sheetForDay } from '../data/farces'
-import type { KitAsset } from '../data/dailySheets'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { useIsDesktop } from '../composables/useBreakpoints'
+import { useDaySheet } from '../composables/useDaySheet'
 import { haptic } from '../utils/haptics'
-import { personalizeSheet } from '../utils/personalize'
-import { visualForDay } from '../data/dayVisuals'
+import DesktopActivity from './activity/DesktopActivity.vue'
+import PrintSheet from '../components/activity/PrintSheet.vue'
 
-const route = useRoute()
+const isDesktop = useIsDesktop()
 const router = useRouter()
 
-function goBack() {
-  if (window.history.state?.back) router.back()
-  else router.push('/home')
-}
-const activityId = computed(() => String(route.params.activityId))
-const dayNumber = computed(() => Number(activityId.value.match(/jour-(\d+)/)?.[1] ?? 0))
-const sheet = computed(() => {
-  const raw = sheetForDay(dayNumber.value) ?? dailySheetsByActivityId[activityId.value]
-  return raw ? personalizeSheet(raw) : raw
-})
-const gap = computed(() => contentGapByDay[dayNumber.value])
-// Le visuel du jour rejoint les annexes — résolu par la date réelle de la dépêche
-const dayVisual = computed(() => (dayNumber.value ? visualForDay(dayNumber.value) : undefined))
-const annexes = computed<KitAsset[]>(() => {
-  // le visuel du jour ouvre les annexes ; seuls les printables
-  // explicitement conservés dans la fiche (ex. le coloriage) suivent
-  const list: KitAsset[] = []
-  if (dayVisual.value) list.push({ file: dayVisual.value, label: 'Illustration du jour', page: 0 })
-  list.push(...(sheet.value?.assets ?? []))
-  return list
-})
-// Le tampon « PRÊT » fait partie de l'état partagé : il survit au rechargement et voyage entre appareils
-const preparationDone = computed({
-  get: () => adventure.daysDone.has(dayNumber.value),
-  set: (value) => {
-    const next = new Set(adventure.daysDone)
-    value ? next.add(dayNumber.value) : next.delete(dayNumber.value)
-    adventure.daysDone = next
-  },
-})
-const copied = ref(false)
-
-const chapter = currentAdventure.chapter
-const totalDays = currentAdventure.totalDays
+const {
+  sheet, gap, dayVisual, annexes, preparationDone, chapter, totalDays, dayNumber,
+  goBack, copied, copyMessage, assetKind, printSheet, printAsset, togglePreparation,
+} = useDaySheet()
 
 // La dépêche arrive scellée : un geste sur la cire l'ouvre — écho du sceau d'ouverture
 const opened = ref(false)
@@ -82,7 +48,7 @@ function onTouchEnd(e: TouchEvent) {
   const dy = e.changedTouches[0].clientY - touchY
   if (Math.abs(dx) < 70 || Math.abs(dy) > 50) return
   const target = dx < 0 ? dayNumber.value + 1 : dayNumber.value - 1
-  if (target < 1 || target > totalDays) return
+  if (target < 1 || target > totalDays.value) return
   haptic(6)
   router.push(`/activites/jour-${target}`)
 }
@@ -118,44 +84,11 @@ onMounted(() => {
   }
 })
 onBeforeUnmount(() => window.removeEventListener('deviceorientation', onTilt))
-
-function togglePreparation() {
-  preparationDone.value = !preparationDone.value
-  haptic(12)
-}
-
-async function copyMessage() {
-  if (!sheet.value) return
-  await navigator.clipboard?.writeText(sheet.value.message)
-  haptic(8)
-  copied.value = true
-  setTimeout(() => (copied.value = false), 1800)
-}
-
-// Distinction d'usage : découper le mot, imprimer le support, écrire à la main
-function assetKind(label: string): string {
-  if (/coloriage/i.test(label)) return 'À imprimer puis colorier'
-  if (/carte|pancarte|image|illustration/i.test(label)) return 'À imprimer puis découper'
-  return 'À imprimer'
-}
-
-/** Imprime la fiche complète (lettre + annexes) via la vue d'impression */
-function printSheet() {
-  haptic(8)
-  window.print()
-}
-
-/** Imprime une seule annexe dans une fenêtre dédiée */
-function printAsset(file: string) {
-  const w = window.open('', '_blank')
-  if (!w) return
-  w.document.write(`<!doctype html><html><head><title>Annexe</title></head><body style="margin:0;display:grid;place-items:center;min-height:100vh;background:#fff"><img src="${file}" style="max-width:100%;max-height:100vh;object-fit:contain" onload="setTimeout(()=>window.print(),150)" /></body></html>`)
-  w.document.close()
-}
 </script>
 
 <template>
-  <main class="app-screen activity-screen" @touchstart.passive="onTouchStart" @touchend.passive="onTouchEnd">
+  <DesktopActivity v-if="isDesktop" />
+  <main v-else class="app-screen activity-screen" @touchstart.passive="onTouchStart" @touchend.passive="onTouchEnd">
     <i class="warm-glow" aria-hidden="true" />
     <i class="warm-spark warm-spark--a" aria-hidden="true" />
     <i class="warm-spark warm-spark--b" aria-hidden="true" />
@@ -256,17 +189,7 @@ function printAsset(file: string) {
       <aside v-if="gap && !dayVisual" class="gap-note" aria-label="Élément à produire"><i class="mdi mdi-pencil-outline" aria-hidden="true" /><div><strong>Visuel de scène à créer</strong><p>{{ gap.detail }}</p></div></aside>
     </template>
 
-    <!-- vue imprimable : lettre + annexes regroupés -->
-    <div v-if="sheet" class="print-sheet" aria-hidden="true">
-      <h1>J{{ sheet.day }} · {{ sheet.title }}</h1>
-      <p class="print-date">{{ sheet.date }}</p>
-      <h2>Le mot du lutin <small>(à découper)</small></h2>
-      <p class="print-message">{{ sheet.message }}</p>
-      <template v-if="annexes.length">
-        <h2>Annexes <small>(à imprimer)</small></h2>
-        <div class="print-assets"><figure v-for="asset in annexes" :key="asset.file"><img :src="asset.file" :alt="asset.label"><figcaption>{{ asset.label }}{{ asset.page ? ` — p. ${asset.page}` : '' }}</figcaption></figure></div>
-      </template>
-    </div>
+    <PrintSheet v-if="sheet" :sheet="sheet" :annexes="annexes" />
 
   </main>
 </template>
@@ -1171,74 +1094,6 @@ function printAsset(file: string) {
   opacity:.85
 }
 
-/* ---- vue imprimable (écran : masquée, print : seule visible) ---- */
-.print-sheet {
-  display:none
-}
-
-@media print {
-  .print-sheet {
-    display:block;
-    padding:12px 4mm;
-    color:#222;
-    background:#fff;
-    font-family:Georgia,serif
-  }
-
-  .print-sheet h1 {
-    margin:0;
-    font-size:20pt
-  }
-
-  .print-date {
-    margin:2mm 0 6mm;
-    font-size:9pt;
-    letter-spacing:.14em;
-    text-transform:uppercase
-  }
-
-  .print-sheet h2 {
-    margin:7mm 0 3mm;
-    font-size:12pt;
-    border-bottom:1px solid #999
-  }
-
-  .print-sheet h2 small {
-    font-weight:400;
-    font-style:italic;
-    color:#666
-  }
-
-  .print-message {
-    padding:4mm;
-    border:1.5px dashed #8a6a2f;
-    font-size:11pt;
-    line-height:1.6;
-    white-space:pre-line
-  }
-
-  .print-assets {
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:5mm
-  }
-
-  .print-assets figure {
-    margin:0;
-    break-inside:avoid
-  }
-
-  .print-assets img {
-    width:100%;
-    border:1px solid #ccc
-  }
-
-  .print-assets figcaption {
-    font-size:8pt;
-    color:#555
-  }
-}
-
 /* ---- cadeaux : bande de papier déchirée ---- */
 .slip {
   --r:-.5deg;
@@ -1311,30 +1166,4 @@ function printAsset(file: string) {
   outline-offset:3px
 }
 
-/* ---- grand écran : la lettre à gauche, le carnet et les annexes à droite ---- */
-@media (min-width:1100px) {
-  .activity-screen {
-    display:grid;
-    grid-template-columns:minmax(0,1.6fr) minmax(330px,1fr);
-    column-gap:36px;
-    align-items:start
-  }
-  .activity-screen > :is(header, nav) {
-    grid-column:1/-1
-  }
-  .envelope {
-    grid-column:1/-1;
-    width:min(640px,100%);
-    justify-self:center
-  }
-  .letter {
-    grid-column:1
-  }
-  .carnet,.annexes,.slip,.gap-note {
-    grid-column:2
-  }
-  .asset-grid {
-    grid-template-columns:repeat(auto-fill,minmax(150px,1fr))
-  }
-}
 </style>

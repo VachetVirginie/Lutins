@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import MagicSeal from '../components/MagicSeal.vue'
+import { useIsDesktop } from '../composables/useBreakpoints'
+import DesktopOpening from './opening/DesktopOpening.vue'
 
+const isDesktop = useIsDesktop()
 const router = useRouter()
 
 function enter() {
@@ -11,7 +14,8 @@ function enter() {
 </script>
 
 <template>
-  <main class="opening-screen">
+  <DesktopOpening v-if="isDesktop" />
+  <main v-else class="opening-screen">
     <img class="opening-image" src="/assets/created/arrival-mobile-hero.png" alt="Un lutin se prépare à commencer son aventure de Noël" />
     <div class="opening-overlay" />
     <section class="opening-copy">

@@ -166,6 +166,54 @@ function isActive(to: string): boolean {
   border-radius:14px
 }
 
+/* ---- bureau : la piste de lanternes devient un header ---- */
+@media (min-width:1024px) {
+  .lantern-nav {
+    top:0;
+    bottom:auto;
+    left:0;
+    width:100%;
+    transform:none;
+    justify-content:center;
+    gap:40px;
+    padding:16px 48px;
+    border-left:0;
+    border-right:0;
+    border-top:0;
+    border-radius:0;
+    background:linear-gradient(180deg,rgba(12,26,20,.92),rgba(10,22,16,.78));
+    backdrop-filter:blur(10px);
+    animation:none
+  }
+  .nav-scrim {
+    display:none
+  }
+  .nav-trail {
+    left:15%;
+    right:15%
+  }
+  .nav-lantern {
+    flex-direction:row;
+    gap:9px;
+    min-width:0;
+    padding:6px 14px;
+    font-size:14px
+  }
+  .lantern-body {
+    width:auto;
+    height:auto
+  }
+  .lantern-body i {
+    font-size:20px
+  }
+  .lantern-label {
+    font-size:13.5px
+  }
+  .nav-lantern.is-active .lantern-label {
+    color:#ffe9a8
+  }
+}
+
 @media (prefers-reduced-motion:reduce) {
   .lantern-nav {
     animation:none

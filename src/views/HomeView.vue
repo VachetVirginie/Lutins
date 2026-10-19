@@ -4,6 +4,10 @@ import { useRouter } from 'vue-router'
 import { NextStep, ProgressHero, StoryPhase } from '../components/home'
 import { currentAdventure } from '../data/adventure'
 import { sheetForDay } from '../data/farces'
+import { useIsDesktop } from '../composables/useBreakpoints'
+import DesktopHome from './home/DesktopHome.vue'
+
+const isDesktop = useIsDesktop()
 import { haptic } from '../utils/haptics'
 
 const router = useRouter()
@@ -38,7 +42,8 @@ function spinGear(event: MouseEvent) {
 </script>
 
 <template>
-  <main class="app-screen">
+  <DesktopHome v-if="isDesktop" />
+  <main v-else class="app-screen">
     <RouterLink to="/personnalisation" class="home-gear" aria-label="Personnaliser l'aventure" @click.prevent="spinGear">
       <i class="mdi mdi-cog-outline" aria-hidden="true" />
     </RouterLink>
@@ -186,15 +191,6 @@ function spinGear(event: MouseEvent) {
   }
   to {
     transform:rotate(360deg)
-  }
-}
-
-@media (min-width:1100px) {
-  .home-duo {
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:24px;
-    align-items:start
   }
 }
 
