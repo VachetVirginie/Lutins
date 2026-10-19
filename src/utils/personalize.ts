@@ -47,6 +47,13 @@ export function sheetDateLabel(day: number): string {
   return dateFmt.format(new Date(adventureStart.value.getTime() + (day - 1) * DAY_MS)).toUpperCase()
 }
 
+/** La date ISO de J{n} — la clé des visuels quotidiens nommés AAAA-MM-JJ */
+export function sheetDateISO(day: number): string {
+  const d = new Date(adventureStart.value.getTime() + (day - 1) * DAY_MS)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+}
+
 /** Une fiche du jour personnalisée : date recalculée + tous les textes interpolés */
 export function personalizeSheet(sheet: DailySheet): DailySheet {
   return {

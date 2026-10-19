@@ -5,8 +5,10 @@ import { currentAdventure } from '../data/adventure'
 import { adventure } from '../data/adventureStore'
 import { contentGapByDay } from '../data/contentGaps'
 import { dailySheetsByActivityId } from '../data/dailySheets'
+import type { KitAsset } from '../data/dailySheets'
 import { haptic } from '../utils/haptics'
 import { personalizeSheet } from '../utils/personalize'
+import { visualForDay } from '../data/dayVisuals'
 
 const route = useRoute()
 const router = useRouter()
@@ -22,6 +24,13 @@ const sheet = computed(() => {
   return raw ? personalizeSheet(raw) : raw
 })
 const gap = computed(() => contentGapByDay[dayNumber.value])
+// Le visuel du jour rejoint les annexes — résolu par la date réelle de la dépêche
+const dayVisual = computed(() => (dayNumber.value ? visualForDay(dayNumber.value) : undefined))
+const annexes = computed<KitAsset[]>(() => {
+  // les visuels générés remplacent tous les printables du kit —
+  // ils comblent les jours « Visuel de scène à créer »
+  return dayVisual.value ? [{ file: dayVisual.value, label: 'Illustration du jour', page: 0 }] : []
+})
 // Le tampon « PRÊT » fait partie de l'état partagé : il survit au rechargement et voyage entre appareils
 const preparationDone = computed({
   get: () => adventure.daysDone.has(dayNumber.value),
@@ -162,6 +171,17 @@ function printAsset(file: string) {
       </template>
     </header>
 
+    <!-- feuilleter les dépêches : jour précédent / suivant — sous le titre, sans scroll -->
+    <nav v-if="sheet && dayNumber" class="day-pager" aria-label="Feuilleter les dépêches">
+      <RouterLink v-if="dayNumber > 1" class="pager-link" :to="`/activites/jour-${dayNumber - 1}`">
+        <i class="mdi mdi-chevron-left" aria-hidden="true" /> J{{ dayNumber - 1 }}
+      </RouterLink>
+      <span v-else class="pager-ghost" />
+      <RouterLink v-if="dayNumber < totalDays" class="pager-link pager-next" :to="`/activites/jour-${dayNumber + 1}`">
+        J{{ dayNumber + 1 }} <i class="mdi mdi-chevron-right" aria-hidden="true" />
+      </RouterLink>
+    </nav>
+
     <template v-if="sheet">
       <!-- La dépêche arrive scellée : la cire se brise, la lettre se déplie -->
       <section v-if="!opened" class="envelope" :class="{ 'is-cracking': cracking }" aria-label="Dépêche scellée">
@@ -206,13 +226,13 @@ function printAsset(file: string) {
         </button>
       </section>
 
-      <section v-if="sheet.assets.length" class="annexes" aria-labelledby="assets-title">
+      <section v-if="annexes.length" class="annexes" aria-labelledby="assets-title">
         <div class="section-label"><span id="assets-title">LES ANNEXES — À DÉCOUPER</span><i class="mdi mdi-content-cut" aria-hidden="true" /></div>
         <div class="asset-grid">
-          <div v-for="asset in sheet.assets" :key="asset.file" class="stamp">
+          <div v-for="asset in annexes" :key="asset.file" class="stamp">
             <a class="stamp-frame" :href="asset.file" target="_blank" rel="noreferrer"><img :src="asset.file" :alt="asset.label" loading="lazy"></a>
             <span>{{ asset.label }}</span>
-            <small>Annexe · p. {{ asset.page }} — {{ assetKind(asset.label) }}</small>
+            <small>{{ asset.page ? `Annexe · p. ${asset.page}` : 'Visuel du jour' }} — {{ assetKind(asset.label) }}</small>
             <div class="stamp-actions">
               <button type="button" @click="printAsset(asset.file)"><i class="mdi mdi-printer" aria-hidden="true" /> Imprimer</button>
               <a :href="asset.file" download><i class="mdi mdi-download" aria-hidden="true" /> Télécharger</a>
@@ -229,19 +249,8 @@ function printAsset(file: string) {
         </ul>
       </section>
 
-      <aside v-if="gap" class="gap-note" aria-label="Élément à produire"><i class="mdi mdi-pencil-outline" aria-hidden="true" /><div><strong>Visuel de scène à créer</strong><p>{{ gap.detail }}</p></div></aside>
+      <aside v-if="gap && !dayVisual" class="gap-note" aria-label="Élément à produire"><i class="mdi mdi-pencil-outline" aria-hidden="true" /><div><strong>Visuel de scène à créer</strong><p>{{ gap.detail }}</p></div></aside>
     </template>
-
-    <!-- feuilleter les dépêches : jour précédent / suivant -->
-    <nav v-if="sheet && dayNumber" class="day-pager" aria-label="Feuilleter les dépêches">
-      <RouterLink v-if="dayNumber > 1" class="pager-link" :to="`/activites/jour-${dayNumber - 1}`">
-        <i class="mdi mdi-chevron-left" aria-hidden="true" /> Dépêche J{{ dayNumber - 1 }}
-      </RouterLink>
-      <span v-else class="pager-ghost" />
-      <RouterLink v-if="dayNumber < totalDays" class="pager-link pager-next" :to="`/activites/jour-${dayNumber + 1}`">
-        Dépêche J{{ dayNumber + 1 }} <i class="mdi mdi-chevron-right" aria-hidden="true" />
-      </RouterLink>
-    </nav>
 
     <!-- vue imprimable : lettre + annexes regroupés -->
     <div v-if="sheet" class="print-sheet" aria-hidden="true">
@@ -249,9 +258,9 @@ function printAsset(file: string) {
       <p class="print-date">{{ sheet.date }}</p>
       <h2>Le mot du lutin <small>(à découper)</small></h2>
       <p class="print-message">{{ sheet.message }}</p>
-      <template v-if="sheet.assets.length">
+      <template v-if="annexes.length">
         <h2>Annexes <small>(à imprimer)</small></h2>
-        <div class="print-assets"><figure v-for="asset in sheet.assets" :key="asset.file"><img :src="asset.file" :alt="asset.label"><figcaption>{{ asset.label }} — p. {{ asset.page }}</figcaption></figure></div>
+        <div class="print-assets"><figure v-for="asset in annexes" :key="asset.file"><img :src="asset.file" :alt="asset.label"><figcaption>{{ asset.label }}{{ asset.page ? ` — p. ${asset.page}` : '' }}</figcaption></figure></div>
       </template>
     </div>
 

@@ -35,13 +35,7 @@ export const dailySheets: Record<number, DailySheet> = {
       'Glisser dans la boîte aux lettres l’illustration imprimée du sac de voyage. À joindre : Carte A (sac à dos).',
     message:
       "Coucou Louis ! C'est moi, le lutin ! Le Père Noël t'a écrit ? Je prépare mon sac avec un bon morceau de pain d'épices pour le grand voyage vers Lyon !",
-    assets: [
-      {
-        file: '/assets/printables/annexe-74.png',
-        label: 'Carte du sac de voyage',
-        page: 74,
-      },
-    ],
+    assets: [],
     gifts: ['Pain d’épices'],
   },
   3: {
@@ -52,18 +46,7 @@ export const dailySheets: Record<number, DailySheet> = {
       'Déposer la carte des paysages enneigés ainsi que le coloriage du lutin. À joindre : Carte H (Pôle Nord) + Coloriage.',
     message:
       "Je monte à bord du traîneau d'entraînement ! Prochaine étape : la traversée de la banquise. Je t'ai glissé un coloriage de moi pour que tu puisses décorer ta chambre !",
-    assets: [
-      {
-        file: '/assets/printables/annexe-81.png',
-        label: 'Carte du départ du Pôle Nord',
-        page: 81,
-      },
-      {
-        file: '/assets/printables/annexe-82.png',
-        label: 'Coloriage du lutin',
-        page: 82,
-      },
-    ],
+    assets: [],
     gifts: [],
   },
   4: {
@@ -96,13 +79,7 @@ export const dailySheets: Record<number, DailySheet> = {
       'Déposer une petite boussole jouet ou l’illustration de boussole. À joindre : Carte Boussole.',
     message:
       'Ma boussole m’aide à m’orienter : son aiguille indique le nord. Pour rejoindre Lyon, je poursuis mon voyage tout droit vers le sud !',
-    assets: [
-      {
-        file: '/assets/printables/annexe-83.png',
-        label: 'Boussole du voyageur',
-        page: 83,
-      },
-    ],
+    assets: [],
     gifts: ['Petite boussole jouet (optionnelle)'],
   },
   7: {
@@ -113,13 +90,7 @@ export const dailySheets: Record<number, DailySheet> = {
       'Déposer la carte des montagnes enneigées dans la boîte. À joindre : Carte B (montagnes).',
     message:
       'J’escalade de magnifiques montagnes géantes ! Mes petites jambes de lutin sont un peu fatiguées, mais penser à toi me donne tout le courage nécessaire.',
-    assets: [
-      {
-        file: '/assets/printables/annexe-75.png',
-        label: 'Carte des montagnes enneigées',
-        page: 75,
-      },
-    ],
+    assets: [],
     gifts: [],
   },
   8: {
@@ -141,13 +112,7 @@ export const dailySheets: Record<number, DailySheet> = {
       'Fabriquer un petit bateau en papier plié et le glisser dans la boîte. À joindre : Bateau en papier.',
     message:
       "J'ai dû monter à bord d'un bateau pour traverser l'océan d'eau glacée. Tu peux faire voguer ce petit bateau dans ton bain ce soir !",
-    assets: [
-      {
-        file: '/assets/printables/annexe-84.png',
-        label: 'Bateau en papier',
-        page: 84,
-      },
-    ],
+    assets: [],
     gifts: [],
   },
   10: {
@@ -158,13 +123,7 @@ export const dailySheets: Record<number, DailySheet> = {
       'Déposer une petite étoile lumineuse ou phosphorescente dans la boîte. À joindre : Planche d’étoiles.',
     message:
       'Quand la nuit tombe, je contemple les étoiles pour retrouver mon chemin. Colle cette étoile au-dessus de ton lit pour qu’elle veille sur tes rêves !',
-    assets: [
-      {
-        file: '/assets/printables/annexe-85.png',
-        label: 'Étoiles et clé magique',
-        page: 85,
-      },
-    ],
+    assets: [],
     gifts: ['Étoile lumineuse'],
   },
   11: {
@@ -185,13 +144,7 @@ export const dailySheets: Record<number, DailySheet> = {
       'Imprimer et déposer la carte du monstre rigolo. À joindre : Carte C (monstres gentils).',
     message:
       "Je suis arrivé dans une forêt enchantée où l'on prépare la fête d'Halloween. J'y ai rencontré des monstres très gentils qui adorent les bonbons !",
-    assets: [
-      {
-        file: '/assets/printables/annexe-76.png',
-        label: 'Carte des monstres gentils',
-        page: 76,
-      },
-    ],
+    assets: [],
     gifts: [],
   },
   13: {
@@ -202,13 +155,7 @@ export const dailySheets: Record<number, DailySheet> = {
       'Déposer l’image montrant les deux lutins avec leurs panneaux indicateurs. À joindre : Carte D (rencontre).',
     message:
       'Incroyable Louis ! J’ai croisé un autre lutin du Père Noël ! Il m’a confié qu’il filait vers Nîmes pour aller chez Papi et Mamie Coco ! On a partagé un morceau de pain d’épices. Lui prend le chemin du sud-ouest, et moi je poursuis droit vers Lyon !',
-    assets: [
-      {
-        file: '/assets/printables/annexe-77.png',
-        label: 'Carte de la rencontre des deux chemins',
-        page: 77,
-      },
-    ],
+    assets: [],
     gifts: ['Pain d’épices'],
   },
   14: {
@@ -239,13 +186,7 @@ export const dailySheets: Record<number, DailySheet> = {
       'Déposer l’illustration de la carte de France avec le tracé du voyage. À joindre : Carte du parcours.',
     message:
       'Ça y est, me voilà en France ! C’est un pays merveilleux. Plus que quelques étapes importantes avant d’arriver à Lyon !',
-    assets: [
-      {
-        file: '/assets/printables/annexe-86.png',
-        label: 'Parcours imaginaire',
-        page: 86,
-      },
-    ],
+    assets: [],
     gifts: [],
   },
   17: {
@@ -266,13 +207,7 @@ export const dailySheets: Record<number, DailySheet> = {
       'Déposer le faux billet de train personnalisé pour le lutin. À joindre : Billet de train.',
     message:
       'Pour aller encore plus vite, j’ai décidé de monter à bord du grand train TGV ! Regarde mon billet : destination Lyon Part-Dieu !',
-    assets: [
-      {
-        file: '/assets/printables/annexe-87.png',
-        label: 'Billet du train des lutins',
-        page: 87,
-      },
-    ],
+    assets: [],
     gifts: [],
   },
   19: {
@@ -293,13 +228,7 @@ export const dailySheets: Record<number, DailySheet> = {
       'Glisser la carte montrant le train arrivant en gare. À joindre : Carte F (gare).',
     message:
       'Tchou tchou ! Le train entre en gare ! Le haut-parleur vient d’annoncer : "Terminus, Lyon !". Je suis enfin arrivé dans ta ville Louis !',
-    assets: [
-      {
-        file: '/assets/printables/annexe-79.png',
-        label: 'Carte de la gare de Lyon',
-        page: 79,
-      },
-    ],
+    assets: [],
     gifts: [],
   },
   21: {
@@ -310,13 +239,7 @@ export const dailySheets: Record<number, DailySheet> = {
       'Glisser la carte postale lyonnaise dans la boîte. À joindre : Carte G (Fourvière).',
     message:
       'Lyon est une ville magnifique ! Je suis monté tout en haut de la grande colline pour voir la basilique et apercevoir le toit de ta maison !',
-    assets: [
-      {
-        file: '/assets/printables/annexe-80.png',
-        label: 'Carte postale de Lyon',
-        page: 80,
-      },
-    ],
+    assets: [],
     gifts: [],
   },
   22: {
@@ -337,13 +260,7 @@ export const dailySheets: Record<number, DailySheet> = {
       'Déposer le dessin de carte avec une flèche rouge indiquant le quartier. À joindre : Plan à personnaliser.',
     message:
       'J’ai demandé mon chemin à un pigeon lyonnais très sympathique ! Il m’a dessiné ce plan pour trouver ton quartier.',
-    assets: [
-      {
-        file: '/assets/printables/annexe-88.png',
-        label: 'Plan du quartier',
-        page: 88,
-      },
-    ],
+    assets: [],
     gifts: [],
   },
   24: {
@@ -364,13 +281,7 @@ export const dailySheets: Record<number, DailySheet> = {
       'Imprimer une photo du portail ou de l’entrée de la maison. À joindre : Cadre photo imprimable.',
     message:
       'Regarde Louis ! Est-ce que ce n’est pas le portail de ta maison ça ? Je suis juste derrière !',
-    assets: [
-      {
-        file: '/assets/printables/annexe-89.png',
-        label: 'Cadre photo de l’entrée',
-        page: 89,
-      },
-    ],
+    assets: [],
     gifts: [],
   },
   26: {
@@ -391,13 +302,7 @@ export const dailySheets: Record<number, DailySheet> = {
       'Déposer une clé décorée ou la clé imprimée dans la boîte. À joindre : Clé magique.',
     message:
       'Voici la clé magique des lutins. Elle nous permet de nous glisser sous les portes en toute discrétion !',
-    assets: [
-      {
-        file: '/assets/printables/annexe-85.png',
-        label: 'Étoiles et clé magique',
-        page: 85,
-      },
-    ],
+    assets: [],
     gifts: [],
   },
   28: {
@@ -407,13 +312,7 @@ export const dailySheets: Record<number, DailySheet> = {
     adultPreparation:
       'Réaliser 3 ou 4 petites empreintes de bottes sur le pas de la porte avec un peu de farine ou du pochoir fourni. À joindre : Pochoir des bottes.',
     message: 'Chut… mes petites bottes sont passées par ici !',
-    assets: [
-      {
-        file: '/assets/printables/annexe-90.png',
-        label: 'Pochoir des petites bottes',
-        page: 90,
-      },
-    ],
+    assets: [],
     gifts: [],
   },
   29: {
@@ -485,13 +384,7 @@ export const dailySheets: Record<number, DailySheet> = {
       'Coller les yeux en papier fournis sur les fruits de la corbeille. À joindre : Yeux à découper.',
     message:
       'Bonjour Louis ! Aujourd’hui, même les fruits de la cuisine ont les yeux grands ouverts !',
-    assets: [
-      {
-        file: '/assets/printables/annexe-91.png',
-        label: 'Yeux à découper',
-        page: 91,
-      },
-    ],
+    assets: [],
     gifts: [],
   },
   36: {
@@ -542,13 +435,7 @@ export const dailySheets: Record<number, DailySheet> = {
     adultPreparation:
       'Attacher une serviette en papier rouge dans le dos du lutin et l’installer sur la table. À joindre : Écusson Super-Lutin.',
     message: 'Super-Lutin est prêt ! Ma mission prioritaire du jour : te faire sourire !',
-    assets: [
-      {
-        file: '/assets/printables/annexe-91.png',
-        label: 'Écusson Super-Lutin',
-        page: 91,
-      },
-    ],
+    assets: [],
     gifts: [],
   },
   41: {
@@ -558,13 +445,7 @@ export const dailySheets: Record<number, DailySheet> = {
     adultPreparation:
       'Placer des petits poissons dans le lavabo et installer le lutin tenant une paille comme canne à pêche. À joindre : Poissons découpés.',
     message: 'Silence, ça mord ! Tu penses que les poissons aiment le biscuit ?',
-    assets: [
-      {
-        file: '/assets/printables/annexe-91.png',
-        label: 'Poissons à découper',
-        page: 91,
-      },
-    ],
+    assets: [],
     gifts: [],
   },
   42: {
@@ -616,13 +497,7 @@ export const dailySheets: Record<number, DailySheet> = {
       'Installer les 2 lutins côte à côte entourés de confettis avec la banderole de bienvenue. À joindre : Banderole.',
     message:
       'Bienvenue à mon super copain ! À deux, nous aurons deux fois plus d’idées rigolotes à partager !',
-    assets: [
-      {
-        file: '/assets/printables/annexe-92.png',
-        label: 'Banderole de bienvenue',
-        page: 92,
-      },
-    ],
+    assets: [],
     gifts: [],
   },
   47: {
@@ -653,13 +528,7 @@ export const dailySheets: Record<number, DailySheet> = {
       'Disposer les deux lutins avec un bol de pop-corn et leurs tickets. À joindre : Tickets de cinéma.',
     message:
       'Ce soir, c’est grande séance de cinéma ! Louis, quel dessin animé choisis-tu ?',
-    assets: [
-      {
-        file: '/assets/printables/annexe-93.png',
-        label: 'Tickets de cinéma',
-        page: 93,
-      },
-    ],
+    assets: [],
     gifts: ['Collation adaptée à l’âge de Louis'],
   },
   50: {
@@ -711,13 +580,7 @@ export const dailySheets: Record<number, DailySheet> = {
       'Installer les deux lutins dans des voitures jouets sur une ligne de départ. À joindre : Panneau Départ/Arrivée.',
     message:
       'Attention… Prêts… Partez ! La grande course des lutins est officiellement lancée !',
-    assets: [
-      {
-        file: '/assets/printables/annexe-93.png',
-        label: 'Départ et arrivée',
-        page: 93,
-      },
-    ],
+    assets: [],
     gifts: [],
   },
   55: {
@@ -767,13 +630,7 @@ export const dailySheets: Record<number, DailySheet> = {
     adultPreparation:
       'Affichez ou posez la photo souvenir des deux lutins. À joindre : Portrait souvenir.',
     message: 'Cheeeese ! Nous avons tiré notre portrait le plus rigolo pour toi !',
-    assets: [
-      {
-        file: '/assets/printables/annexe-94.png',
-        label: 'Portrait souvenir des lutins',
-        page: 94,
-      },
-    ],
+    assets: [],
     gifts: [],
   },
   60: {
@@ -795,13 +652,7 @@ export const dailySheets: Record<number, DailySheet> = {
       'Mettre le lutin en scène en train de regarder le portrait souvenir. À joindre : Portrait souvenir.',
     message:
       'Mon copain me manque un peu aujourd’hui. Heureusement, il me reste tous nos magnifiques souvenirs partagés avec toi.',
-    assets: [
-      {
-        file: '/assets/printables/annexe-94.png',
-        label: 'Portrait souvenir des lutins',
-        page: 94,
-      },
-    ],
+    assets: [],
     gifts: [],
   },
   62: {
@@ -812,13 +663,7 @@ export const dailySheets: Record<number, DailySheet> = {
       'Dérouler la liste des petits bonheurs. À joindre : Liste des petits bonheurs.',
     message:
       'Louis, voici ta liste magique des petits bonheurs : partager, aider, rire et faire un gros câlin !',
-    assets: [
-      {
-        file: '/assets/printables/annexe-95.png',
-        label: 'Liste des petits bonheurs',
-        page: 95,
-      },
-    ],
+    assets: [],
     gifts: [],
   },
   63: {
@@ -858,13 +703,7 @@ export const dailySheets: Record<number, DailySheet> = {
       'Poser la fiche recette des sablés avec les ingrédients. À joindre : Fiche recette.',
     message:
       'Aujourd’hui, nous préparons les sablés pour le Père Noël. Tous à vos tabliers !',
-    assets: [
-      {
-        file: '/assets/printables/annexe-96.png',
-        label: 'Recette des sablés',
-        page: 96,
-      },
-    ],
+    assets: [],
     gifts: ['Ingrédients des sablés'],
   },
   67: {
@@ -885,13 +724,7 @@ export const dailySheets: Record<number, DailySheet> = {
       'Déposer la pancarte d’avis de passage. À joindre : Plateau du Père Noël.',
     message:
       'Demain c’est le grand Réveillon ! N’oublie pas de disposer un verre de lait et un biscuit sous le sapin !',
-    assets: [
-      {
-        file: '/assets/printables/annexe-97.png',
-        label: 'Plateau du Père Noël',
-        page: 97,
-      },
-    ],
+    assets: [],
     gifts: ['Lait et biscuit pour le Père Noël'],
   },
   69: {

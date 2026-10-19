@@ -1,0 +1,4 @@
+# Variables d'environnement locales pour le projet (non commitées)
+# Renseignez ces valeurs depuis Supabase Dashboard → Project Settings → API
+VITE_SUPABASE_URL=https://votre-projet.supabase.co
+VITE_SUPABASE_ANON_KEY=remplacez-avec-votre-cle-anon
