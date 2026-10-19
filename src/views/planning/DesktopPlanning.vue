@@ -42,18 +42,32 @@ const PHASE_VISUAL: Record<string, string> = {
   depart: '/assets/visuels/planning/04-depart.png',
   conclusion: '/assets/visuels/planning/05-conclusion.png',
 }
+// le paysage de chaque chapitre : une vraie scène illustrée, voilée
+const PHASE_SCENE: Record<string, string> = {
+  voyage: '/assets/created/scene-foret.jpg',
+  arrivee: '/assets/created/scene-voyage.jpg',
+  farce: '/assets/created/scene-village.jpg',
+  depart: '/assets/created/scene-lyon.jpg',
+  conclusion: '/assets/created/scene-lyon.jpg',
+}
 const ROMANS = ['I', 'II', 'III', 'IV', 'V']
 
 const chapters = computed<Chapter[]>(() => {
   const ms = milestones.value
+  // bornes d'ouverture : chaque chapitre s'ouvre sur son jalon, sauf la
+  // conclusion — la lettre clôt une semaine d'adieux, pas un jour isolé
+  const bounds = ms.map((m, i) => {
+    const from = m.phase === 'conclusion' ? Math.max(m.day - 6, 1) : m.day
+    return Math.max(from, i ? ms[i - 1].day + 1 : 1)
+  })
   return ms
     .map((m, i) => ({
       roman: ROMANS[i],
       ...PHASE_META[m.phase],
       phase: m.phase,
       visual: PHASE_VISUAL[m.phase],
-      from: m.day,
-      to: (ms[i + 1]?.day ?? total.value + 1) - 1,
+      from: bounds[i],
+      to: (bounds[i + 1] ?? total.value + 1) - 1,
     }))
     .filter((c) => c.from <= c.to)
 })
@@ -145,6 +159,10 @@ function open(day: number) {
 
 <template>
   <main class="atlas">
+    <!-- le paysage du chapitre en fond de page, comme la veillée -->
+    <img v-if="chapter" class="atlas-photo" :key="chapter.phase" :src="PHASE_SCENE[chapter.phase] ?? chapter.visual" alt="" aria-hidden="true" />
+    <i class="atlas-veil" aria-hidden="true" />
+
     <header class="atlas-head">
       <p class="atlas-over">L'ATLAS DU VOYAGE</p>
       <h1>La route des lutins</h1>
@@ -166,16 +184,8 @@ function open(day: number) {
       </nav>
 
       <!-- le paysage du chapitre -->
-      <section v-if="chapter" class="atlas-scene" :class="`decor-${chapter.decor}`" :key="chapter.roman" aria-live="polite">
-        <i class="scene-sky" aria-hidden="true" />
+      <section v-if="chapter" class="atlas-scene" :class="[`decor-${chapter.decor}`, { sparse: stops.length < 10 }]" :key="chapter.roman" aria-live="polite">
         <i class="scene-stars" aria-hidden="true" />
-        <svg class="scene-forest" viewBox="0 0 1200 80" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M0 80 L0 58 L40 58 L56 28 L72 58 L120 58 L138 36 L154 58 L220 58 L220 80 Z
-                   M250 80 L250 54 L290 54 L308 22 L326 54 L380 54 L396 40 L412 54 L470 54 L470 80 Z
-                   M500 80 L500 60 L552 60 L570 32 L588 60 L646 60 L662 44 L678 60 L740 60 L740 80 Z
-                   M770 80 L770 52 L820 52 L836 24 L852 52 L912 52 L928 38 L944 52 L1006 52 L1006 80 Z
-                   M1030 80 L1030 56 L1084 56 L1102 26 L1120 56 L1180 56 L1200 56 L1200 80 Z" />
-        </svg>
         <p class="scene-chapter">CHAPITRE {{ chapter.roman }} — {{ chapter.label.toUpperCase() }}</p>
 
         <!-- le sentier -->
@@ -203,8 +213,8 @@ function open(day: number) {
 
         <!-- la halte éditoriale du chapitre -->
         <figure v-if="chapter" class="scene-postcard">
-          <img :src="chapter.visual" :alt="`Illustration : ${chapter.label}`" loading="lazy" />
-          <figcaption>{{ chapter.label }}<small>J{{ chapter.from }} — J{{ chapter.to }}</small></figcaption>
+          <img :src="chapter.visual" :alt="`Illustration : ${chapter.label}`" aria-labelledby="postcard-cap" />
+          <figcaption id="postcard-cap">{{ chapter.label }}<small>J{{ chapter.from }} — J{{ chapter.to }}</small></figcaption>
         </figure>
 
         <!-- le passage au chapitre suivant -->
@@ -224,12 +234,29 @@ function open(day: number) {
 
 <style scoped>
 .atlas {
+  position: relative;
   min-height: 100svh;
   padding: 110px 48px 60px;
   color: #f2ead8;
   background: linear-gradient(180deg, #0a1e22 0%, #0d221b 55%, #081410 100%);
 }
+/* le halo de lanterne, comme sur la veillée */
+.atlas::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  top: -6%;
+  right: -4%;
+  width: 560px;
+  height: 560px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(224,160,60,.18), transparent 68%);
+  filter: blur(70px);
+  pointer-events: none;
+}
 .atlas-head {
+  position: relative;
+  z-index: 2;
   max-width: 1280px;
   margin: 0 auto 26px;
 }
@@ -247,17 +274,20 @@ function open(day: number) {
 }
 .atlas-sub {
   margin: 12px 0 0;
-  color: #a9bcae;
+  color: #c8d6cb;
   font-size: 14.5px;
+  text-shadow: 0 1px 6px rgba(0,0,0,.5);
 }
 
 /* ---------- corps : rail des chapitres + scène ---------- */
 .atlas-body {
+  position: relative;
+  z-index: 2;
   display: grid;
   grid-template-columns: 240px 1fr;
   gap: 26px;
-  max-width: 1280px;
-  margin: 0 auto;
+  max-width: none;
+  margin: 0;
   align-items: start;
 }
 .atlas-rail {
@@ -273,6 +303,8 @@ function open(day: number) {
   border: 1px solid rgba(224,194,131,.16);
   border-radius: 12px;
   background: rgba(12,26,20,.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   color: #a9bcae;
   text-align: left;
   cursor: pointer;
@@ -283,7 +315,7 @@ function open(day: number) {
   font: 600 15px var(--font-serif);
 }
 .rail-name { font-size: 12.5px; font-weight: 600; }
-.rail-days { font-size: 10.5px; letter-spacing: .1em; opacity: .7; }
+.rail-days { font-size: 10.5px; letter-spacing: .1em; color: #e0c283; }
 .rail-tab:hover {
   border-color: rgba(224,194,131,.45);
   transform: translateX(3px);
@@ -296,14 +328,11 @@ function open(day: number) {
 .rail-tab.done b { color: #8a9a8e; }
 .rail-tab.done .rail-name { color: #8a9a8e; }
 
-/* ---------- la scène ---------- */
+/* ---------- la scène : la map flotte sur le paysage ---------- */
 .atlas-scene {
   position: relative;
-  min-height: 560px;
-  border: 1px solid rgba(224,194,131,.18);
-  border-radius: 22px;
-  overflow: hidden;
-  box-shadow: 0 30px 60px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,244,214,.06);
+  min-height: 76svh;
+  margin: -34px -48px -60px 0;
   animation: scene-in .65s cubic-bezier(.3,.9,.35,1) both;
 }
 @keyframes scene-in {
@@ -311,18 +340,30 @@ function open(day: number) {
   to { opacity: 1; transform: none; }
 }
 
-/* le décor change avec le chapitre */
-.scene-sky {
-  position: absolute;
+/* le paysage du chapitre = fond de page, comme la veillée */
+.atlas-photo {
+  position: fixed;
   inset: 0;
-  transition: background .8s;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 42%;
+  filter: brightness(.72) saturate(.95);
+  pointer-events: none;
+  animation: photo-in .9s ease both;
 }
-.decor-pole .scene-sky { background: linear-gradient(180deg, #12303f 0%, #0f2830 55%, #0c2028 100%); }
-.decor-foret .scene-sky { background: linear-gradient(180deg, #0e2b28 0%, #0c241d 55%, #0a1c16 100%); }
-.decor-village .scene-sky { background: linear-gradient(180deg, #1c2b45 0%, #142540 55%, #101e33 100%); }
-.decor-lyon .scene-sky { background: linear-gradient(180deg, #2a2a3e 0%, #1e2438 55%, #141c2c 100%); }
-.decor-noel .scene-sky { background: linear-gradient(180deg, #26201e 0%, #1f1a16 55%, #161310 100%); }
-
+@keyframes photo-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.atlas-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(9,20,16,.78) 0%, rgba(5,17,13,.5) 32%, rgba(5,17,13,.62) 70%, rgba(5,17,13,.9) 100%);
+}
 .scene-stars {
   position: absolute;
   inset: 0 0 40%;
@@ -333,21 +374,13 @@ function open(day: number) {
   background-position: 12% 18%, 66% 8%;
   opacity: .5;
 }
-.scene-forest {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 34%;
-  width: 100%;
-  height: 70px;
-  fill: rgba(5,14,10,.85);
-}
 .scene-chapter {
   position: absolute;
   top: 22px;
   left: 26px;
   margin: 0;
-  color: rgba(224,194,131,.75);
+  color: rgba(241,204,122,.92);
+  text-shadow: 0 1px 8px rgba(0,0,0,.7);
   font-size: 10.5px;
   font-weight: 700;
   letter-spacing: .2em;
@@ -362,10 +395,11 @@ function open(day: number) {
 }
 .trail-line {
   fill: none;
-  stroke: rgba(233,220,187,.16);
-  stroke-width: 1.6;
-  stroke-dasharray: 2 8;
+  stroke: rgba(244,234,216,.6);
+  stroke-width: 1.8;
+  stroke-dasharray: 2.2 7;
   stroke-linecap: round;
+  filter: drop-shadow(0 0 3px rgba(6,15,11,.85)) drop-shadow(0 0 7px rgba(255,235,180,.3));
 }
 .trail-done {
   fill: none;
@@ -393,8 +427,9 @@ function open(day: number) {
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: #c9b78a;
-  opacity: .4;
+  background: radial-gradient(circle, #f4ead8, rgba(244,234,216,.6));
+  opacity: .95;
+  box-shadow: 0 0 0 1.5px rgba(8,18,14,.55), 0 0 8px rgba(244,234,216,.6);
   transition: transform .3s var(--spring), opacity .3s, box-shadow .3s;
 }
 .stop:hover .stop-dot {
@@ -413,6 +448,13 @@ function open(day: number) {
   background: radial-gradient(circle at 35% 30%, #fff8dc, #f1cc7a 55%, #c8954a);
   opacity: 1;
   box-shadow: 0 0 14px rgba(255,225,140,1), 0 0 36px rgba(255,190,80,.55);
+}
+/* les chapitres courts : des points plus présents sur la courbe */
+.atlas-scene.sparse .stop-dot {
+  width: 12px;
+  height: 12px;
+  opacity: 1;
+  box-shadow: 0 0 0 1.5px rgba(8,18,14,.6), 0 0 11px rgba(244,234,216,.8);
 }
 .stop-halo {
   position: absolute;
@@ -492,13 +534,14 @@ function open(day: number) {
 .scene-postcard {
   position: absolute;
   right: 26px;
-  bottom: 76px;
+  bottom: 84px;
+  z-index: 5;
   margin: 0;
   width: 190px;
   padding: 9px 9px 6px;
   border-radius: 4px;
-  background: linear-gradient(170deg, #fffef7, #f0e6cc);
-  box-shadow: 0 18px 36px rgba(0,0,0,.5);
+  background: #f6eed8;
+  box-shadow: 0 18px 36px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,252,240,.7);
   transform: rotate(2.5deg);
   transition: transform .4s var(--spring);
 }
@@ -514,18 +557,20 @@ function open(day: number) {
   border-radius: 2px;
 }
 .scene-postcard figcaption {
-  padding: 8px 4px 8px;
-  color: #6b5a38;
-  font: italic 500 13px var(--font-literary);
+  padding: 4px 4px 8px;
+  color: #2e1f0c;
+  font: 400 17px/1.25 'La Belle Aurore', var(--font-literary);
   text-align: center;
+  transform: rotate(-1.2deg);
+  text-shadow: 0 0 .5px currentColor;
 }
 .scene-postcard figcaption small {
   display: block;
-  margin-top: 2px;
-  font-style: normal;
-  font-size: 10px;
-  color: #8a6f3a;
-  letter-spacing: .1em;
+  margin-top: 1px;
+  font-family: 'La Belle Aurore', var(--font-literary);
+  font-size: 14px;
+  color: #2e1f0c;
+  letter-spacing: .05em;
 }
 
 /* le passage de chapitre */
@@ -541,28 +586,50 @@ function open(day: number) {
   background: linear-gradient(180deg, transparent, rgba(6,15,11,.85) 60%);
 }
 .scene-nav {
+  position: relative;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 10px 18px;
-  border: 1px solid rgba(224,194,131,.3);
+  border: 1px solid rgba(224,194,131,.35);
   border-radius: 999px;
-  background: rgba(9,22,17,.6);
+  background: rgba(10,28,22,.5);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   color: #e8e3d5;
   font: 500 12.5px var(--font-serif);
   letter-spacing: .08em;
   cursor: pointer;
   transition: all .3s;
 }
+/* le reflet magique qui balaie au survol */
+.scene-nav::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(255,233,168,.24) 50%, transparent 65%);
+  transform: translateX(-130%);
+  pointer-events: none;
+  transition: transform .65s ease;
+}
+.scene-nav:hover::after { transform: translateX(130%); }
 .scene-nav:hover {
-  border-color: rgba(224,194,131,.7);
+  border-color: rgba(224,194,131,.8);
   color: #ffe9a8;
-  transform: translateX(3px);
+  box-shadow: 0 0 22px rgba(224,194,131,.35), inset 0 0 12px rgba(224,194,131,.12);
+  transform: translateY(-2px);
 }
 .scene-nav.next {
-  background: rgba(224,194,131,.12);
-  border-color: rgba(224,194,131,.5);
+  background: rgba(224,194,131,.14);
+  border-color: rgba(224,194,131,.55);
   color: #ffe9a8;
+}
+.scene-nav.next:hover {
+  background: rgba(224,194,131,.24);
+  border-color: rgba(255,233,168,.85);
+  box-shadow: 0 0 28px rgba(224,194,131,.5), inset 0 0 14px rgba(255,233,168,.15);
+  transform: translateX(4px);
 }
 
 @media (prefers-reduced-motion: reduce) {

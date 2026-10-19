@@ -13,7 +13,7 @@ defineProps<{ sheet: DailySheet; annexes: KitAsset[] }>()
     <p class="print-message">{{ sheet.message }}</p>
     <template v-if="annexes.length">
       <h2>Annexes <small>(à imprimer)</small></h2>
-      <div class="print-assets"><figure v-for="asset in annexes" :key="asset.file"><img :src="asset.file" :alt="asset.label"><figcaption>{{ asset.label }}{{ asset.page ? ` — p. ${asset.page}` : '' }}</figcaption></figure></div>
+      <div class="print-assets"><figure v-for="(asset, i) in annexes" :key="asset.file"><img :src="asset.file" :alt="asset.label" :aria-labelledby="`annex-cap-${i}`"><figcaption :id="`annex-cap-${i}`">{{ asset.label }}{{ asset.page ? ` — p. ${asset.page}` : '' }}</figcaption></figure></div>
     </template>
   </div>
 </template>

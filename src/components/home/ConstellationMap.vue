@@ -288,9 +288,7 @@ onBeforeUnmount(() => onFieldLeave())
   justify-items: center;
   width: max-content;
   max-width: 130px;
-  transform: translateX(-50%) translateY(4px);
-  opacity: 0;
-  transition: opacity .22s ease, transform .22s ease;
+  transform: translateX(-50%);
   color: rgba(233,220,187,.85);
   font: 400 9px/1.35 var(--font-literary);
   letter-spacing: .1em;
@@ -299,9 +297,14 @@ onBeforeUnmount(() => onFieldLeave())
   text-shadow: 0 1px 6px rgba(0,0,0,.9), 0 0 3px rgba(0,0,0,.8);
   pointer-events: none;
 }
-/* l'étiquette du jalon ne se révèle qu'au survol — le ciel reste lisible */
-.star:hover .star-flag, .star:focus-visible .star-flag {
-  transform: translateX(-50%) translateY(0);
+/* le J du jalon reste visible — seul son titre s'ouvre au survol */
+.star-flag > span {
+  opacity: 0;
+  transform: translateY(3px);
+  transition: opacity .22s ease, transform .22s ease;
+}
+.star:hover .star-flag > span, .star:focus-visible .star-flag > span {
+  transform: none;
   opacity: 1;
 }
 .star-flag b {
@@ -316,12 +319,13 @@ onBeforeUnmount(() => onFieldLeave())
   top: calc(100% + 4px);
   left: 50%;
   transform: translateX(-50%);
-  color: rgba(233,220,187,.4);
-  font: 400 8.5px var(--font-literary);
+  color: rgba(233,220,187,.85);
+  font: 400 9px var(--font-literary);
   letter-spacing: .14em;
+  text-shadow: 0 1px 5px rgba(0,0,0,.85), 0 0 3px rgba(0,0,0,.7);
   pointer-events: none;
 }
-.star.is-done .star-tick { color: rgba(241,204,122,.55); }
+.star.is-done .star-tick { color: rgba(241,204,122,.8); }
 
 /* l'étiquette : date en fine typographie, miniature du jour */
 .star-tip {

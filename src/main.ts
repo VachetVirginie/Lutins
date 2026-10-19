@@ -7,5 +7,10 @@ import './styles/base.css'
 createApp(App).use(router).mount('#app')
 
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'))
+  if (import.meta.env.PROD) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'))
+  } else {
+    // en dev le SW fige les assets en cache — on le désinstalle
+    navigator.serviceWorker.getRegistrations().then((rs) => rs.forEach((r) => r.unregister()))
+  }
 }

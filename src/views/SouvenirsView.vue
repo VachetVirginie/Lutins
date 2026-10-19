@@ -49,9 +49,9 @@ const notes = [
       <p class="home-overline">PHOTOS</p>
       <h2>L’album du voyage</h2>
       <div class="photo-grid">
-        <figure v-for="p in photos" :key="p.src">
-          <img :src="p.src" :alt="p.caption" loading="lazy" />
-          <figcaption>{{ p.caption }}</figcaption>
+        <figure v-for="(p, i) in photos" :key="p.src">
+          <img :src="p.src" :alt="p.caption" :aria-labelledby="`photo-cap-${i}`" loading="lazy" />
+          <figcaption :id="`photo-cap-${i}`">{{ p.caption }}</figcaption>
         </figure>
         <button class="photo-add" type="button" aria-label="Ajouter une photo">
           <i class="mdi mdi-camera-plus-outline" aria-hidden="true" />

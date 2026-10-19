@@ -177,9 +177,7 @@ function breakSeal() {
   object-position: 50% 28%;
   filter: brightness(.62) saturate(.92);
 }
-/* les masques : la photo devient une atmosphère, jamais un fond d'écran —
-   voile nuit en haut pour le titre, profondeur douce au centre,
-   tombé vert forêt en bas sous le bureau */
+/* les masques : la photo devient une atmosphère, jamais un fond d'écran */
 .sky-mask {
   position: absolute;
   inset: 0;

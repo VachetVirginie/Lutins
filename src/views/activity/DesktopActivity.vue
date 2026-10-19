@@ -143,10 +143,10 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
           <div class="desk-stamps">
             <figure v-for="(asset, i) in annexes" :key="asset.file" class="stamp" :style="{ '--r': `${(i % 2 ? 2.4 : -3.1) + i * 0.6}deg` }">
               <a class="stamp-frame" :href="asset.file" target="_blank" rel="noreferrer">
-                <img :src="asset.file" :alt="asset.label" loading="lazy">
+                <img :src="asset.file" :alt="asset.label" :aria-labelledby="`stamp-cap-${i}`" loading="lazy">
                 <span class="pol-label">{{ asset.label }}</span>
               </a>
-              <figcaption><small>{{ asset.page ? `Annexe · p. ${asset.page}` : 'Visuel du jour' }} — {{ assetKind(asset.label) }}</small></figcaption>
+              <figcaption :id="`stamp-cap-${i}`"><small>{{ asset.page ? `Annexe · p. ${asset.page}` : 'Visuel du jour' }} — {{ assetKind(asset.label) }}</small></figcaption>
               <div class="stamp-actions">
                 <button type="button" @click="printAsset(asset.file)"><i class="mdi mdi-printer" aria-hidden="true" /> Imprimer</button>
                 <a :href="asset.file" download><i class="mdi mdi-download" aria-hidden="true" /></a>
@@ -494,6 +494,20 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   font: 600 15px/1 var(--font-serif);
   transform: rotate(8deg);
 }
+/* le J est gravé dans la cire : médaillon enfoncé, lettre crème */
+.wax-seal b {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 42%, rgba(94,21,10,.9), rgba(74,14,6,.7) 68%, transparent 100%);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.55), 0 1px 0 rgba(255,190,160,.22);
+  color: #ffe4c8;
+  text-shadow: 0 1px 2px rgba(0,0,0,.6);
+}
 /* le cachet postal : un filigrane encré, en arrière-plan du parchemin */
 .postmark {
   position: absolute;
@@ -718,7 +732,8 @@ blockquote.is-typing::after {
 .stamp figcaption small {
   display: block;
   font-weight: 400;
-  color: #8a6f3a;
+  color: #e0c283;
+  text-shadow: 0 1px 4px rgba(0,0,0,.6);
 }
 .stamp-actions {
   display: flex;

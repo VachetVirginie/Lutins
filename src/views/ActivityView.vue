@@ -645,10 +645,19 @@ onBeforeUnmount(() => window.removeEventListener('deviceorientation', onTilt))
 }
 
 .wax-seal b {
-  color:#f4d8c0;
+  position:relative;
+  z-index:1;
+  display:grid;
+  place-items:center;
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  background:radial-gradient(circle at 50% 42%, rgba(94,21,10,.9), rgba(74,14,6,.7) 68%, transparent 100%);
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.55),0 1px 0 rgba(255,220,190,.2);
+  color:#ffe4c8;
   font:700 19px/1 var(--font-literary);
   letter-spacing:.02em;
-  text-shadow:0 -1px 1px rgba(0,0,0,.5),0 1px 0 rgba(255,220,190,.2)
+  text-shadow:0 1px 2px rgba(0,0,0,.6)
 }
 
 /* tampon postal vintage */
