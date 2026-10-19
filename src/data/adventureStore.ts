@@ -9,7 +9,7 @@ import { supabase } from '../lib/supabase'
 
 export interface AdventureSnapshot {
   prenoms_enfants: string[]
-  nom_proche: string
+  proches: string[]
   nom_lutin: string
   deuxieme_lutin: boolean
   nom_second_lutin: string
@@ -24,6 +24,7 @@ export interface AdventureSnapshot {
   photo_entree: string
   photo_lutins: string
   prep_done: string[]
+  days_done: number[]
 }
 
 const STORAGE_KEY = 'lutin:adventure-state'
@@ -31,7 +32,7 @@ const CODE_KEY = 'lutin:family-code'
 
 const emptyState = (): AdventureSnapshot => ({
   prenoms_enfants: [],
-  nom_proche: '',
+  proches: [],
   nom_lutin: '',
   deuxieme_lutin: false,
   nom_second_lutin: '',
@@ -46,13 +47,22 @@ const emptyState = (): AdventureSnapshot => ({
   photo_entree: '',
   photo_lutins: '',
   prep_done: [],
+  days_done: [],
 })
 
 function loadLocal(): AdventureSnapshot {
   try {
-    const state = { ...emptyState(), ...JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}') }
+    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}')
+    const state = { ...emptyState(), ...raw }
     if (!Array.isArray(state.prenoms_enfants)) state.prenoms_enfants = []
     if (!Array.isArray(state.prep_done)) state.prep_done = []
+    if (!Array.isArray(state.days_done)) state.days_done = []
+    // migration : l'ancien champ texte nom_proche devient une liste
+    if (!Array.isArray(state.proches)) {
+      const legacy = typeof raw.nom_proche === 'string' ? raw.nom_proche : ''
+      state.proches = legacy.split(',').map((n: string) => n.trim()).filter(Boolean)
+    }
+    delete (state as Record<string, unknown>).nom_proche
     return state
   } catch {
     return emptyState()
@@ -60,24 +70,32 @@ function loadLocal(): AdventureSnapshot {
 }
 
 /** L'état vivant — les vues s'abonnent directement dessus */
-const { prep_done: localDone, ...localRest } = loadLocal()
-export const adventure = reactive({ ...localRest, prepDone: new Set<string>(localDone) })
+const { prep_done: localDone, days_done: localDays, ...localRest } = loadLocal()
+export const adventure = reactive({ ...localRest, prepDone: new Set<string>(localDone), daysDone: new Set<number>(localDays) })
 
 export const familyCode = ref<string | null>(localStorage.getItem(CODE_KEY))
 export const syncStatus = ref<'local' | 'connecting' | 'synced' | 'error'>(supabase && familyCode.value ? 'connecting' : 'local')
 
 /* ---- sérialisation ---- */
 const snapshot = (): AdventureSnapshot => {
-  const { prepDone, ...rest } = adventure
-  return { ...rest, prep_done: [...prepDone] }
+  const { prepDone, daysDone, ...rest } = adventure
+  return { ...rest, prep_done: [...prepDone], days_done: [...daysDone] }
 }
 
 function applyRemote(state: AdventureSnapshot) {
   applyingRemote = true
-  const { prep_done, prenoms_enfants, ...rest } = state
+  // une ligne écrite avant proches[] porte encore le texte nom_proche
+  const remote = state as AdventureSnapshot & { nom_proche?: string }
+  const { prep_done, days_done, prenoms_enfants, proches, nom_proche, ...rest } = remote
   Object.assign(adventure, rest)
   adventure.prenoms_enfants = Array.isArray(prenoms_enfants) ? prenoms_enfants : []
+  adventure.proches = Array.isArray(proches)
+    ? proches
+    : typeof nom_proche === 'string'
+      ? nom_proche.split(',').map((n) => n.trim()).filter(Boolean)
+      : []
   adventure.prepDone = new Set(Array.isArray(prep_done) ? prep_done : [])
+  adventure.daysDone = new Set(Array.isArray(days_done) ? days_done : [])
   applyingRemote = false
 }
 

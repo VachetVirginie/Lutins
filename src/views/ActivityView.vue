@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { currentAdventure } from '../data/adventure'
+import { adventure } from '../data/adventureStore'
 import { contentGapByDay } from '../data/contentGaps'
 import { dailySheetsByActivityId } from '../data/dailySheets'
 import { haptic } from '../utils/haptics'
@@ -21,7 +22,15 @@ const sheet = computed(() => {
   return raw ? personalizeSheet(raw) : raw
 })
 const gap = computed(() => contentGapByDay[dayNumber.value])
-const preparationDone = ref(false)
+// Le tampon « PRÊT » fait partie de l'état partagé : il survit au rechargement et voyage entre appareils
+const preparationDone = computed({
+  get: () => adventure.daysDone.has(dayNumber.value),
+  set: (value) => {
+    const next = new Set(adventure.daysDone)
+    value ? next.add(dayNumber.value) : next.delete(dayNumber.value)
+    adventure.daysDone = next
+  },
+})
 const copied = ref(false)
 
 const chapter = currentAdventure.chapter
@@ -32,7 +41,6 @@ const opened = ref(false)
 const cracking = ref(false)
 
 watch(sheet, () => {
-  preparationDone.value = false
   opened.value = false
   cracking.value = false
 }, { immediate: true })
@@ -316,7 +324,7 @@ function printAsset(file: string) {
   padding:0;
   border:0;
   background:none;
-  color:rgba(255,255,255,.8);
+  color:var(--color-gold);
   font-family:inherit;
   font-size:12px;
   cursor:pointer;

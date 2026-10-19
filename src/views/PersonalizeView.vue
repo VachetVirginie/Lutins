@@ -20,31 +20,38 @@ const STEPS = [
   { id: 'recap', overline: 'Dernière étape', title: 'La dépêche est prête' },
 ] as const
 
-const step = ref(0)
-const current = computed(() => STEPS[step.value])
+// La porte d'entrée : code ou nouvelle aventure — toujours posée
+const step = ref(-1)
+const dir = ref<'sheet-next' | 'sheet-prev'>('sheet-next')
+const current = computed(() => STEPS[Math.max(0, step.value)])
 const isLast = computed(() => step.value === STEPS.length - 1)
+const isGate = computed(() => step.value === -1)
 
 function next() {
   if (isLast.value) return
+  dir.value = 'sheet-next'
   haptic(8)
   step.value++
 }
 function prev() {
+  dir.value = 'sheet-prev'
   haptic(6)
-  if (step.value === 0) router.push('/home')
+  if (step.value <= 0) router.push('/home')
   else step.value--
 }
 
-/* ---- prénoms : une ligne par enfant, éditée directement ---- */
+/* ---- listes à lignes : enfants & proches, une ligne chacun ---- */
 if (!form.prenoms_enfants.length) form.prenoms_enfants = ['']
+if (!form.proches.length) form.proches = ['']
 
-function addChildRow() {
-  form.prenoms_enfants.push('')
+function addRow(field: 'prenoms_enfants' | 'proches') {
+  form[field].push('')
   haptic(8)
 }
 
-function removeChildRow(index: number) {
-  form.prenoms_enfants.splice(index, 1)
+function removeRow(field: 'prenoms_enfants' | 'proches', index: number) {
+  form[field].splice(index, 1)
+  if (!form[field].length) form[field].push('')
   haptic(6)
 }
 
@@ -66,6 +73,7 @@ async function pickPhoto(field: 'photo_entree' | 'photo_lutins', event: Event) {
 }
 
 /* ---- partage famille : un code relie les deux appareils ---- */
+const joinOpen = ref(false)
 const joinInput = ref('')
 const joinError = ref(false)
 const busy = ref(false)
@@ -100,6 +108,7 @@ async function onJoin() {
   if (!joinError.value) {
     joinInput.value = ''
     haptic([12, 40, 8])
+    step.value = 0 // l'état partagé remplit le formulaire — on le montre
   }
 }
 
@@ -122,7 +131,8 @@ const recap = computed(() => {
   const rows: { label: string; value: string }[] = []
   const kids = form.prenoms_enfants.filter(Boolean)
   if (kids.length) rows.push({ label: 'Destinataires', value: kids.join(', ') })
-  if (form.nom_proche) rows.push({ label: 'Proches', value: form.nom_proche })
+  const kin = form.proches.filter(Boolean)
+  if (kin.length) rows.push({ label: 'Proches', value: kin.join(', ') })
   if (form.nom_lutin) rows.push({ label: 'Premier lutin', value: form.nom_lutin })
   if (form.deuxieme_lutin && form.nom_second_lutin) rows.push({ label: 'Second lutin', value: form.nom_second_lutin })
   if (form.ville) rows.push({ label: 'Ville', value: form.ville })
@@ -142,18 +152,69 @@ const recap = computed(() => {
   <main class="app-screen personalize-screen">
     <header class="pz-header">
       <button class="pz-back" type="button" @click="prev">
-        <i class="mdi mdi-chevron-left" aria-hidden="true" /> {{ step === 0 ? 'Retour' : 'Précédent' }}
+        <i class="mdi mdi-chevron-left" aria-hidden="true" /> Retour
       </button>
+      <div class="pz-emblem" aria-hidden="true"><i class="mdi mdi-feather" /><b /><b /></div>
       <p class="pz-overline">LE FORMULAIRE DE L'EXPÉDITION</p>
       <h1>Votre aventure,<br />à vos couleurs</h1>
     </header>
 
     <!-- le ruban de progression : une piste de cire -->
-    <ol class="pz-track" aria-hidden="true">
+    <ol v-if="!isGate" class="pz-track" aria-hidden="true">
       <li v-for="(s, i) in STEPS" :key="s.id" :class="{ done: i < step, now: i === step }"><i /></li>
     </ol>
 
-    <section :key="step" class="pz-sheet" aria-live="polite">
+    <!-- la feuille tourne comme une dépêche : transition directionnelle -->
+    <Transition :name="dir" mode="out-in" appear>
+    <section :key="step" class="pz-sheet" :class="{ 'pz-gate': isGate }" aria-live="polite">
+      <i class="pz-spark s1" aria-hidden="true" /><i class="pz-spark s2" aria-hidden="true" />
+      <!-- la porte d'entrée : code ou nouvelle expédition -->
+      <template v-if="isGate">
+      <template v-if="familyCode">
+        <p class="pz-step-over">VOTRE EXPÉDITION</p>
+        <h2 class="pz-step-title">Vous voyagez déjà à deux</h2>
+        <div class="pz-gate-opt pz-gate-linked">
+          <i class="mdi mdi-link-variant" aria-hidden="true" />
+          <span><b>{{ familyCode }}</b><small>{{ syncLabel }}</small></span>
+        </div>
+        <button type="button" class="pz-gate-opt" @click="next">
+          <i class="mdi mdi-feather" aria-hidden="true" />
+          <span><b>Reprendre le formulaire</b><small>vos réglages sont déjà partagés</small></span>
+          <i class="mdi mdi-arrow-right" aria-hidden="true" />
+        </button>
+        <button type="button" class="pz-gate-link" @click="onLeave">Quitter cette expédition</button>
+      </template>
+      <template v-else>
+        <p class="pz-step-over">AVANT TOUT</p>
+        <h2 class="pz-step-title">Rejoignez-vous une expédition ?</h2>
+        <button
+          type="button"
+          class="pz-gate-opt"
+          :class="{ open: joinOpen }"
+          @click="joinOpen = !joinOpen; haptic(8)"
+        >
+          <i class="mdi mdi-key-variant" aria-hidden="true" />
+          <span><b>J'ai un code famille</b><small>l'autre parent m'a invité</small></span>
+          <i class="mdi mdi-chevron-down pz-gate-caret" aria-hidden="true" />
+        </button>
+        <div v-if="joinOpen" class="pz-gate-join">
+          <span class="pz-join">
+            <input v-model="joinInput" type="text" placeholder="LUTIN-XXXX" maxlength="9" autocapitalize="characters" autofocus />
+            <button type="button" class="pz-family-btn" :disabled="busy || !joinInput.trim()" @click="onJoin">Rejoindre</button>
+          </span>
+          <p v-if="joinError" class="pz-error">Ce code n'existe pas — vérifiez les 4 lettres.</p>
+        </div>
+        <button type="button" class="pz-gate-opt" @click="next">
+          <i class="mdi mdi-feather" aria-hidden="true" />
+          <span><b>Je crée notre aventure</b><small>je remplis le formulaire</small></span>
+          <i class="mdi mdi-arrow-right" aria-hidden="true" />
+        </button>
+        <p v-if="!syncAvailable" class="pz-note">La synchronisation n'est pas encore configurée — tout restera sur cet appareil.</p>
+      </template>
+      </template>
+
+      <!-- les six feuilles de la dépêche -->
+      <template v-else>
       <p class="pz-step-over">{{ current.overline }}</p>
       <h2 class="pz-step-title">{{ current.title }}</h2>
 
@@ -168,19 +229,33 @@ const recap = computed(() => {
               type="button"
               class="pz-row-del"
               aria-label="Retirer cet enfant"
-              @click="removeChildRow(i)"
+              @click="removeRow('prenoms_enfants', i)"
             >
               <i class="mdi mdi-close" aria-hidden="true" />
             </button>
           </div>
-          <button type="button" class="pz-add-row" @click="addChildRow">
+          <button type="button" class="pz-add-row" @click="addRow('prenoms_enfants')">
             <i class="mdi mdi-plus" aria-hidden="true" /> Ajouter un enfant
           </button>
         </div>
-        <label class="pz-field">
-          <span>Un proche qui apparaît dans l'histoire</span>
-          <input v-model="form.nom_proche" type="text" placeholder="ex : Papi et Mamie" />
-        </label>
+        <div class="pz-field">
+          <span>Les proches qui apparaissent dans l'histoire</span>
+          <div v-for="(name, i) in form.proches" :key="i" class="pz-row">
+            <input v-model="form.proches[i]" type="text" placeholder="ex : Papi, Mamie, Tata Lise…" autocomplete="off" />
+            <button
+              v-if="form.proches.length > 1"
+              type="button"
+              class="pz-row-del"
+              aria-label="Retirer ce proche"
+              @click="removeRow('proches', i)"
+            >
+              <i class="mdi mdi-close" aria-hidden="true" />
+            </button>
+          </div>
+          <button type="button" class="pz-add-row" @click="addRow('proches')">
+            <i class="mdi mdi-plus" aria-hidden="true" /> Ajouter un proche
+          </button>
+        </div>
       </template>
 
       <!-- 2 · les lutins -->
@@ -318,10 +393,12 @@ const recap = computed(() => {
           Ces informations ne quittent jamais votre appareil.
         </p>
       </template>
+      </template>
     </section>
+    </Transition>
 
     <footer class="pz-footer">
-      <button v-if="!isLast" type="button" class="pz-cta" @click="next">
+      <button v-if="!isLast && !isGate" type="button" class="pz-cta" @click="next">
         Continuer <i class="mdi mdi-arrow-right" aria-hidden="true" />
       </button>
       <RouterLink v-else to="/home" class="pz-cta pz-cta--seal" @click="haptic([12, 40, 8])">
@@ -338,16 +415,16 @@ const recap = computed(() => {
 }
 
 .pz-back {
-  display:inline-flex;
+  display:flex;
   align-items:center;
-  gap:2px;
-  margin:0 auto 14px;
-  padding:6px 12px;
+  gap:4px;
+  margin-bottom:14px;
+  padding:0;
   border:0;
-  border-radius:999px;
-  background:rgba(255,255,255,.05);
-  color:#9db4a8;
-  font:600 12px var(--font-ui);
+  background:none;
+  color:var(--color-gold);
+  font-family:inherit;
+  font-size:12px;
   cursor:pointer;
   -webkit-tap-highlight-color:transparent
 }
@@ -363,6 +440,97 @@ const recap = computed(() => {
   margin:0;
   font:400 clamp(30px,8.5vw,38px)/1.05 var(--font-literary);
   letter-spacing:-.01em
+}
+
+/* le cachet-plume qui préside le formulaire */
+.pz-emblem {
+  position:relative;
+  display:grid;
+  place-items:center;
+  width:58px;
+  height:58px;
+  margin:0 auto 14px;
+  border:1px solid rgba(230,194,128,.5);
+  border-radius:50%;
+  background:radial-gradient(circle at 32% 28%,#2a4a3a,#0d1f18 72%);
+  box-shadow:0 0 0 4px rgba(230,194,128,.06),0 8px 22px rgba(0,0,0,.4),inset 0 0 14px rgba(230,194,128,.12);
+  animation:emblem-in 1s var(--spring) both .1s
+}
+
+.pz-emblem::after {
+  content:'';
+  position:absolute;
+  inset:-5px;
+  border-radius:50%;
+  border:1px dashed rgba(230,194,128,.28);
+  animation:emblem-spin 24s linear infinite
+}
+
+.pz-emblem > i {
+  color:#e6c280;
+  font-size:24px;
+  text-shadow:0 0 12px rgba(230,194,128,.55);
+  animation:emblem-sway 4.5s ease-in-out infinite
+}
+
+.pz-emblem b {
+  position:absolute;
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  background:#ffe9a8;
+  box-shadow:0 0 8px #e6c280;
+  animation:spark-twinkle 2.8s ease-in-out infinite
+}
+
+.pz-emblem b:nth-of-type(1) {
+  top:4px;
+  right:6px
+}
+
+.pz-emblem b:nth-of-type(2) {
+  bottom:6px;
+  left:2px;
+  animation-delay:1.4s;
+  width:3px;
+  height:3px
+}
+
+@keyframes emblem-in {
+  from {
+    opacity:0;
+    transform:scale(.4) rotate(-30deg)
+  }
+  to {
+    opacity:1;
+    transform:none
+  }
+}
+
+@keyframes emblem-spin {
+  to {
+    transform:rotate(360deg)
+  }
+}
+
+@keyframes emblem-sway {
+  0%,100% {
+    transform:rotate(-6deg)
+  }
+  50% {
+    transform:rotate(8deg) translateY(-1px)
+  }
+}
+
+@keyframes spark-twinkle {
+  0%,100% {
+    opacity:.15;
+    transform:scale(.6)
+  }
+  50% {
+    opacity:1;
+    transform:scale(1.2)
+  }
 }
 
 /* la piste de cire relie les six étapes */
@@ -391,29 +559,121 @@ const recap = computed(() => {
 .pz-track .now i {
   width:34px;
   background:linear-gradient(90deg,#e6c280,#ffe9a8);
-  box-shadow:0 0 10px rgba(230,194,128,.6)
+  box-shadow:0 0 10px rgba(230,194,128,.6);
+  animation:track-glow 2.6s ease-in-out infinite
+}
+
+@keyframes track-glow {
+  50% {
+    box-shadow:0 0 18px rgba(230,194,128,.95)
+  }
 }
 
 /* la feuille du formulaire */
 .pz-sheet {
+  position:relative;
   padding:20px 18px 22px;
   border:1px solid rgba(241,204,122,.16);
   border-radius:20px;
   background:linear-gradient(165deg,#162b22,#0d1f18 70%);
   box-shadow:0 18px 38px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,244,214,.05);
-  animation:sheet-in .6s var(--spring) both
+  overflow:hidden
 }
 
-@keyframes sheet-in {
-  from {
-    opacity:0;
-    transform:translateY(20px) rotate(.6deg)
+/* deux étincelles vagabondent en coin de feuille */
+.pz-spark {
+  position:absolute;
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:#ffe9a8;
+  box-shadow:0 0 10px 2px rgba(230,194,128,.55);
+  pointer-events:none;
+  animation:spark-drift 5s ease-in-out infinite
+}
+
+.pz-spark.s1 {
+  top:16px;
+  right:22px
+}
+
+.pz-spark.s2 {
+  top:34px;
+  right:38px;
+  width:3px;
+  height:3px;
+  animation-delay:2.4s;
+  animation-duration:6.5s
+}
+
+@keyframes spark-drift {
+  0%,100% {
+    opacity:.1;
+    transform:translate(0,0) scale(.5)
   }
-  to {
-    opacity:1;
-    transform:none
+  50% {
+    opacity:.9;
+    transform:translate(-6px,7px) scale(1)
   }
 }
+
+/* le feuilletage : chaque feuille entre par le côté et pivote comme un papier qu'on tourne */
+.sheet-next-enter-active,
+.sheet-prev-enter-active {
+  transition:opacity .55s var(--spring),transform .55s var(--spring)
+}
+
+.sheet-next-leave-active,
+.sheet-prev-leave-active {
+  transition:opacity .3s ease,transform .3s ease
+}
+
+.sheet-next-enter-from {
+  opacity:0;
+  transform:translateX(54px) rotate(1.6deg) scale(.97)
+}
+
+.sheet-next-leave-to {
+  opacity:0;
+  transform:translateX(-40px) rotate(-1.2deg)
+}
+
+.sheet-prev-enter-from {
+  opacity:0;
+  transform:translateX(-54px) rotate(-1.6deg) scale(.97)
+}
+
+.sheet-prev-leave-to {
+  opacity:0;
+  transform:translateX(40px) rotate(1.2deg)
+}
+
+/* les champs se posent en cascade, comme l'encre qui sèche ligne à ligne */
+.pz-sheet > .pz-field,
+.pz-sheet > .pz-row,
+.pz-sheet > .pz-duo,
+.pz-sheet > .pz-note,
+.pz-sheet > .pz-computed,
+.pz-sheet > .pz-piece,
+.pz-sheet > .pz-switch,
+.pz-sheet > .pz-recap,
+.pz-sheet > .pz-private,
+.pz-sheet > .pz-gate-opt,
+.pz-sheet > .pz-gate-join,
+.pz-sheet > .pz-gate-link,
+.pz-sheet > .pz-step-over,
+.pz-sheet > .pz-step-title,
+.pz-sheet > .pz-family-actions {
+  animation:field-in .5s var(--spring) both
+}
+
+.pz-sheet > *:nth-child(3) { animation-delay:.06s }
+.pz-sheet > *:nth-child(4) { animation-delay:.12s }
+.pz-sheet > *:nth-child(5) { animation-delay:.18s }
+.pz-sheet > *:nth-child(6) { animation-delay:.24s }
+.pz-sheet > *:nth-child(7) { animation-delay:.3s }
+.pz-sheet > *:nth-child(8) { animation-delay:.36s }
+.pz-sheet > *:nth-child(n+9) { animation-delay:.42s }
 
 .pz-step-over {
   margin:0 0 4px;
@@ -454,6 +714,7 @@ const recap = computed(() => {
   border-radius:0;
   background:transparent;
   color:#f4ead4;
+  caret-color:#e6c280;
   font:italic 500 17px/1.35 var(--font-literary);
   transition:border-color .3s;
   -webkit-appearance:none;
@@ -465,6 +726,18 @@ const recap = computed(() => {
   outline:none;
   border-bottom-color:#e6c280;
   border-bottom-style:solid
+}
+
+/* l'encre prend : le libellé s'or et le liseré devient plein une fois rempli */
+.pz-field:focus-within > span {
+  color:#e6c280;
+  transition:color .3s
+}
+
+.pz-field input[type='text']:not(:placeholder-shown),
+.pz-field textarea:not(:placeholder-shown) {
+  border-bottom-style:solid;
+  border-bottom-color:rgba(230,194,128,.55)
 }
 
 .pz-field input::placeholder,
@@ -502,6 +775,97 @@ const recap = computed(() => {
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:16px
+}
+
+/* la porte d'entrée : rejoindre ou créer */
+.pz-gate {
+  display:grid;
+  gap:12px
+}
+
+.pz-gate .pz-step-title {
+  margin-bottom:6px
+}
+
+.pz-gate-opt {
+  display:flex;
+  align-items:center;
+  gap:13px;
+  padding:15px 16px;
+  border:1px solid rgba(241,204,122,.22);
+  border-radius:16px;
+  background:rgba(255,255,255,.03);
+  color:#f4ead4;
+  text-align:left;
+  cursor:pointer;
+  transition:transform .2s var(--spring),border-color .3s,background .3s;
+  -webkit-tap-highlight-color:transparent
+}
+
+.pz-gate-opt:active {
+  transform:scale(.98)
+}
+
+.pz-gate-opt.open {
+  border-color:rgba(230,194,128,.5);
+  background:rgba(230,194,128,.07)
+}
+
+.pz-gate-opt > i:first-child {
+  color:#e6c280;
+  font-size:22px
+}
+
+.pz-gate-opt > span {
+  flex:1;
+  display:grid;
+  gap:2px
+}
+
+.pz-gate-opt b {
+  font:600 15px var(--font-ui)
+}
+
+.pz-gate-opt small {
+  color:#8fa79a;
+  font:italic 500 12.5px var(--font-literary)
+}
+
+.pz-gate-opt > i:last-child {
+  color:#8fa79a;
+  transition:transform .3s var(--spring)
+}
+
+.pz-gate-opt.open .pz-gate-caret {
+  transform:rotate(180deg)
+}
+
+.pz-gate-join {
+  padding:2px 4px 8px;
+  animation:field-in .4s var(--spring) both
+}
+
+.pz-gate-linked {
+  cursor:default;
+  border-color:rgba(230,194,128,.45);
+  background:rgba(230,194,128,.08)
+}
+
+.pz-gate-linked b {
+  font-family:var(--font-ui);
+  letter-spacing:.08em
+}
+
+.pz-gate-link {
+  justify-self:center;
+  margin-top:4px;
+  padding:6px 12px;
+  border:none;
+  background:none;
+  color:#8fa79a;
+  font:italic 500 13px var(--font-literary);
+  text-decoration:underline dotted;
+  cursor:pointer
 }
 
 /* lignes de destinataires : un champ par enfant */
@@ -912,11 +1276,51 @@ const recap = computed(() => {
   transform:scale(.95)
 }
 
+/* le sceau final : un reflet de cire qui passe */
+.pz-cta--seal {
+  position:relative;
+  overflow:hidden
+}
+
+.pz-cta--seal::after {
+  content:'';
+  position:absolute;
+  top:-30%;
+  bottom:-30%;
+  left:-40%;
+  width:34%;
+  background:linear-gradient(105deg,transparent,rgba(255,255,255,.55),transparent);
+  transform:skewX(-18deg);
+  animation:seal-sheen 3.4s ease-in-out infinite
+}
+
+@keyframes seal-sheen {
+  0%,55% {
+    left:-45%
+  }
+  85%,100% {
+    left:115%
+  }
+}
+
 @media (prefers-reduced-motion:reduce) {
-  .pz-sheet,
-  .pz-chips li,
+  .pz-sheet > *,
+  .pz-emblem,
+  .pz-emblem::after,
+  .pz-emblem > i,
+  .pz-emblem b,
+  .pz-spark,
+  .pz-track .now i,
+  .pz-cta--seal::after,
   .pz-field--in {
     animation:none
+  }
+
+  .sheet-next-enter-active,
+  .sheet-next-leave-active,
+  .sheet-prev-enter-active,
+  .sheet-prev-leave-active {
+    transition:opacity .15s ease
   }
 }
 </style>

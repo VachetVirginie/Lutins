@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { motion } from 'motion-v'
+import { useRouter } from 'vue-router'
 import { NextStep, ProgressHero, StoryPhase } from '../components/home'
 import { currentAdventure } from '../data/adventure'
 import { dailySheets } from '../data/dailySheets'
+import { haptic } from '../utils/haptics'
+
+const router = useRouter()
 
 const rise = (delay = 0) => ({
   initial: { opacity: 0, y: 26 },
@@ -21,10 +25,23 @@ const tomorrowTitle =
   currentAdventure.currentDay < currentAdventure.totalDays
     ? dailySheets[currentAdventure.currentDay + 1]?.title
     : undefined
+
+// L'engrenage tourne d'un tour complet au tap — la navigation suit l'enclenchement
+function spinGear(event: MouseEvent) {
+  haptic([8, 30, 8])
+  const icon = (event.currentTarget as HTMLElement).querySelector('i')
+  icon?.classList.remove('is-spinning')
+  void icon?.getBoundingClientRect() // reflow pour rejouer l'animation
+  icon?.classList.add('is-spinning')
+  window.setTimeout(() => router.push('/personnalisation'), 180)
+}
 </script>
 
 <template>
   <main class="app-screen">
+    <RouterLink to="/personnalisation" class="home-gear" aria-label="Personnaliser l'aventure" @click.prevent="spinGear">
+      <i class="mdi mdi-cog-outline" aria-hidden="true" />
+    </RouterLink>
     <svg class="home-ornament" viewBox="0 0 60 96" aria-hidden="true">
       <defs>
         <radialGradient id="orn-ball" cx="36%" cy="30%" r="80%">
@@ -45,9 +62,6 @@ const tomorrowTitle =
     <motion.footer v-if="tomorrowTitle" class="home-signoff" v-bind="reveal">
       <i aria-hidden="true" /><p>Et demain — <em>{{ tomorrowTitle }}</em></p><i aria-hidden="true" />
     </motion.footer>
-    <motion.div class="home-personalize" v-bind="reveal">
-      <RouterLink to="/personnalisation"><i class="mdi mdi-feather" aria-hidden="true" /> Personnaliser l'aventure</RouterLink>
-    </motion.div>
   </main>
 </template>
 
@@ -133,30 +147,49 @@ const tomorrowTitle =
   font-style:italic
 }
 
-/* l'entrée discrète vers le formulaire de l'expédition */
-.home-personalize {
-  display:flex;
-  justify-content:center;
-  margin-top:20px
-}
-
-.home-personalize a {
-  display:inline-flex;
-  align-items:center;
-  gap:7px;
-  padding:8px 15px;
-  border:1px dashed rgba(241,204,122,.35);
-  border-radius:999px;
+/* l'engrenage d'accès au formulaire de l'expédition */
+.home-gear {
+  position:absolute;
+  z-index:6;
+  top:calc(12px + env(safe-area-inset-top));
+  right:14px;
+  display:grid;
+  place-items:center;
+  width:40px;
+  height:40px;
+  border:1px solid rgba(241,204,122,.3);
+  border-radius:50%;
+  background:linear-gradient(165deg,#1a332a,#0f211a);
   color:#9db4a8;
-  font:600 11.5px var(--font-ui);
-  letter-spacing:.05em;
+  font-size:19px;
   text-decoration:none;
-  transition:color .3s,border-color .3s;
+  box-shadow:0 8px 20px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,244,214,.08);
+  transition:color .3s,transform .35s var(--spring);
   -webkit-tap-highlight-color:transparent
 }
 
-.home-personalize a:active {
+.home-gear:active {
   color:var(--color-gold);
-  border-color:rgba(241,204,122,.6)
+  transform:scale(.92)
+}
+
+/* le tour complet au tap */
+.home-gear i.is-spinning {
+  animation:gear-spin .65s cubic-bezier(.3,.85,.35,1.05) both
+}
+
+@keyframes gear-spin {
+  from {
+    transform:rotate(0)
+  }
+  to {
+    transform:rotate(360deg)
+  }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .home-gear i.is-spinning {
+    animation:none
+  }
 }
 </style>

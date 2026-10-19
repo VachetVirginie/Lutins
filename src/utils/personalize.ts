@@ -33,6 +33,8 @@ export function personalize(text: string): string {
   }
 
   if (kids.length) out = swap(out, 'Louis', kids.join(' et '))
+  const kin = adventure.proches.filter(Boolean)
+  if (kin.length) out = swap(out, 'Papi et Mamie Coco', kin.join(' et '))
   if (adventure.ville.trim()) out = swap(out, 'Lyon', adventure.ville.trim())
   return out
 }
