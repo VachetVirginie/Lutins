@@ -3,7 +3,7 @@ import { motion } from 'motion-v'
 import { useRouter } from 'vue-router'
 import { NextStep, ProgressHero, StoryPhase } from '../components/home'
 import { currentAdventure } from '../data/adventure'
-import { dailySheets } from '../data/dailySheets'
+import { sheetForDay } from '../data/farces'
 import { haptic } from '../utils/haptics'
 
 const router = useRouter()
@@ -23,7 +23,7 @@ const reveal = {
 // Teaser du lendemain : la page se referme sur une promesse, pas sur une liste
 const tomorrowTitle =
   currentAdventure.currentDay < currentAdventure.totalDays
-    ? dailySheets[currentAdventure.currentDay + 1]?.title
+    ? sheetForDay(currentAdventure.currentDay + 1)?.title
     : undefined
 
 // L'engrenage tourne d'un tour complet au tap — la navigation suit l'enclenchement

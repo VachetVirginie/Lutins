@@ -18,6 +18,7 @@ export interface AdventureSnapshot {
   quartier: string
   date_debut: string
   date_fin: string
+  arrivee_lutin: string
   jours_sans_activite: string
   lieux_sejour: string
   activites_modifiees: string
@@ -41,6 +42,7 @@ const emptyState = (): AdventureSnapshot => ({
   quartier: '',
   date_debut: '',
   date_fin: '',
+  arrivee_lutin: '',
   jours_sans_activite: '',
   lieux_sejour: '',
   activites_modifiees: '',

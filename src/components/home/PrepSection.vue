@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { currentAdventure } from '../../data/adventure'
-import { dailySheets } from '../../data/dailySheets'
+import { sheetForDay } from '../../data/farces'
 import { preparationCatalog } from '../../data/preparationCatalog'
 
 const horizonEnd = currentAdventure.currentDay + 6
-const items = ref(preparationCatalog
+const items = ref(preparationCatalog.value
   .filter((item) => item.day >= currentAdventure.currentDay && item.day <= horizonEnd)
   .map((item) => ({ ...item, done: false })))
 const TOTAL_PREP = items.value.length
@@ -17,7 +17,7 @@ const upcomingDays = computed(() => Array.from({ length: 7 }, (_, index) => {
   const dayItems = items.value.filter((item) => item.day === day)
   return {
     day,
-    title: dailySheets[day]?.title ?? `Jour ${day}`,
+    title: sheetForDay(day)?.title ?? `Jour ${day}`,
     detail: dayItems.length ? `${dayItems.length} élément${dayItems.length > 1 ? 's' : ''} à préparer` : 'Voir la fiche du jour',
     done: dayItems.length > 0 && dayItems.every((item) => item.done),
     activityId: `jour-${day}`,

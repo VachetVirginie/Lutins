@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { motion } from 'motion-v'
 import { currentAdventure } from '../data/adventure'
 import { adventure } from '../data/adventureStore'
-import { preparationCatalog, type PreparationCategory } from '../data/preparationCatalog'
+import { preparationCatalog, type PreparationCatalogItem, type PreparationCategory } from '../data/preparationCatalog'
 import { haptic } from '../utils/haptics'
 
 const router = useRouter()
@@ -32,7 +32,7 @@ const groups: { id: PreparationCategory; label: string }[] = [
 
 const visibleGroups = computed(() => groups
   .filter((group) => filter.value === 'all' || group.id === filter.value)
-  .map((group) => ({ ...group, items: preparationCatalog.filter((item) => item.category === group.id) }))
+  .map((group) => ({ ...group, items: preparationCatalog.value.filter((item) => item.category === group.id) }))
   .filter((group) => group.items.length))
 
 // La réserve se lit d'abord à l'horizon d'une semaine — le reste reste plié
@@ -41,7 +41,7 @@ const totalDays = currentAdventure.totalDays
 const showLater = ref(false)
 const showPast = ref(false)
 
-type CatalogGroup = { id: PreparationCategory; label: string; items: typeof preparationCatalog }
+type CatalogGroup = { id: PreparationCategory; label: string; items: PreparationCatalogItem[] }
 
 function splitGroups(minExclusive: number, maxInclusive: number): Ref<CatalogGroup[]> {
   return computed(() => visibleGroups.value
@@ -78,8 +78,8 @@ function toggleSection(toggle: Ref<boolean> | null): void {
 }
 
 const readyCount = computed(() => done.value.size)
-const totalCount = preparationCatalog.length
-const fillPct = computed(() => (totalCount ? readyCount.value / totalCount : 0))
+const totalCount = computed(() => preparationCatalog.value.length)
+const fillPct = computed(() => (totalCount.value ? readyCount.value / totalCount.value : 0))
 
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches
 const sackEl = ref<HTMLElement>()

@@ -1,4 +1,6 @@
-import { dailySheets } from './dailySheets'
+import { computed } from 'vue'
+import { totalDays } from './calendar'
+import { sheetForDay } from './farces'
 
 export type PreparationCategory = 'print' | 'food' | 'gift' | 'material'
 
@@ -55,29 +57,35 @@ function splitSetup(text: string): string[] {
     .filter((s) => s.length > 4))]
 }
 
-export const preparationCatalog: PreparationCatalogItem[] = Object.values(dailySheets).flatMap((sheet) => [
-  ...sheet.assets.map((asset) => ({
-    id: `j${sheet.day}-print-${asset.page}`,
-    day: sheet.day,
-    title: asset.label,
-    detail: `Annexe du kit · page ${asset.page}`,
-    category: 'print' as const,
-    activityId: activityId(sheet.day),
-  })),
-  ...sheet.gifts.map((gift, index) => ({
-    id: `j${sheet.day}-gift-${index}`,
-    day: sheet.day,
-    title: gift,
-    detail: 'À prévoir pour la surprise du jour',
-    category: foodWords.test(gift) ? 'food' as const : 'gift' as const,
-    activityId: activityId(sheet.day),
-  })),
-  ...splitSetup(sheet.adultPreparation).map((step, index) => ({
-    id: `j${sheet.day}-setup-${index}`,
-    day: sheet.day,
-    title: step,
-    detail: `Mise en place · ${sheet.title}`,
-    category: 'material' as const,
-    activityId: activityId(sheet.day),
-  })),
-])
+export const preparationCatalog = computed<PreparationCatalogItem[]>(() =>
+  Array.from({ length: totalDays.value }, (_, i) => i + 1).flatMap((day) => {
+    const sheet = sheetForDay(day)
+    if (!sheet) return []
+    return [
+      ...sheet.assets.map((asset) => ({
+        id: `j${sheet.day}-print-${asset.page}`,
+        day: sheet.day,
+        title: asset.label,
+        detail: `Annexe du kit · page ${asset.page}`,
+        category: 'print' as const,
+        activityId: activityId(sheet.day),
+      })),
+      ...sheet.gifts.map((gift, index) => ({
+        id: `j${sheet.day}-gift-${index}`,
+        day: sheet.day,
+        title: gift,
+        detail: 'À prévoir pour la surprise du jour',
+        category: foodWords.test(gift) ? ('food' as const) : ('gift' as const),
+        activityId: activityId(sheet.day),
+      })),
+      ...splitSetup(sheet.adultPreparation).map((step, index) => ({
+        id: `j${sheet.day}-setup-${index}`,
+        day: sheet.day,
+        title: step,
+        detail: `Mise en place · ${sheet.title}`,
+        category: 'material' as const,
+        activityId: activityId(sheet.day),
+      })),
+    ]
+  }),
+)

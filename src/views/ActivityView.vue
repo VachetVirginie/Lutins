@@ -5,6 +5,7 @@ import { currentAdventure } from '../data/adventure'
 import { adventure } from '../data/adventureStore'
 import { contentGapByDay } from '../data/contentGaps'
 import { dailySheetsByActivityId } from '../data/dailySheets'
+import { sheetForDay } from '../data/farces'
 import type { KitAsset } from '../data/dailySheets'
 import { haptic } from '../utils/haptics'
 import { personalizeSheet } from '../utils/personalize'
@@ -20,7 +21,7 @@ function goBack() {
 const activityId = computed(() => String(route.params.activityId))
 const dayNumber = computed(() => Number(activityId.value.match(/jour-(\d+)/)?.[1] ?? 0))
 const sheet = computed(() => {
-  const raw = dailySheetsByActivityId[activityId.value] ?? dailySheetsByActivityId[`jour-${dayNumber.value}`]
+  const raw = sheetForDay(dayNumber.value) ?? dailySheetsByActivityId[activityId.value]
   return raw ? personalizeSheet(raw) : raw
 })
 const gap = computed(() => contentGapByDay[dayNumber.value])

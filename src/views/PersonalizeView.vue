@@ -62,6 +62,13 @@ const joursDisponibles = computed(() => {
   return d > 0 ? d : null
 })
 
+/** Numéro de jour d'arrivée du lutin — décale tout le plan des farces */
+const jourArrivee = computed(() => {
+  if (!form.date_debut || !form.arrivee_lutin) return null
+  const d = Math.round((new Date(form.arrivee_lutin).getTime() - new Date(form.date_debut).getTime()) / 86_400_000) + 1
+  return d >= 2 && joursDisponibles.value && d <= joursDisponibles.value - 2 ? d : null
+})
+
 /* ---- photos : aperçu instantané, upload si l'expédition est partagée ---- */
 async function pickPhoto(field: 'photo_entree' | 'photo_lutins', event: Event) {
   const file = (event.target as HTMLInputElement).files?.[0]
@@ -139,6 +146,7 @@ const recap = computed(() => {
   if (form.quartier) rows.push({ label: 'Quartier', value: form.quartier })
   if (form.destination) rows.push({ label: 'Destination', value: form.destination })
   if (joursDisponibles.value) rows.push({ label: 'Fenêtre du voyage', value: `${form.date_debut} → ${form.date_fin} · ${joursDisponibles.value} jours` })
+  if (form.arrivee_lutin) rows.push({ label: 'Arrivée du lutin', value: jourArrivee.value ? `${form.arrivee_lutin} (J${jourArrivee.value})` : form.arrivee_lutin })
   if (form.jours_sans_activite) rows.push({ label: 'Jours de pause', value: form.jours_sans_activite })
   if (form.lieux_sejour) rows.push({ label: 'Lieux de séjour', value: form.lieux_sejour })
   if (form.activites_modifiees) rows.push({ label: 'Ajustements', value: form.activites_modifiees })
@@ -306,6 +314,16 @@ const recap = computed(() => {
         </div>
         <p v-if="joursDisponibles" class="pz-computed">
           <i class="mdi mdi-calendar-star" aria-hidden="true" /> {{ joursDisponibles }} jours d'aventure
+        </p>
+        <label class="pz-field">
+          <span>Arrivée du lutin chez vous</span>
+          <input v-model="form.arrivee_lutin" type="date" />
+        </label>
+        <p v-if="jourArrivee" class="pz-computed">
+          <i class="mdi mdi-door-open" aria-hidden="true" /> Le lutin frappe à la porte le J{{ jourArrivee }} — les farces suivent à partir de là
+        </p>
+        <p v-else class="pz-computed">
+          <i class="mdi mdi-door-open" aria-hidden="true" /> Sans date d'arrivée, le lutin frappe à la porte vers le J29
         </p>
         <label class="pz-field">
           <span>Jours sans activité</span>

@@ -1,17 +1,26 @@
-// Les visuels sont ordonnés par nom de fichier : le premier illustre J1,
-// le deuxième J2, etc. — la date dans le nom n'est qu'un libellé, le
-// calendrier réel reste paramétrable depuis le formulaire.
+// Chaque fichier illustre une dépêche :
+// - `jour-XX.jpg` → explicitement le jour XX (recommandé pour les farces)
+// - tout autre nom → comble les jours restants dans l'ordre alphabétique
 const files = import.meta.glob('../assets/visuels/*.jpg', {
   eager: true,
   query: '?url',
   import: 'default',
 }) as Record<string, string>
 
-const ordered = Object.keys(files)
-  .sort()
-  .map((path) => files[path])
+const byDay = new Map<number, string>()
+const unassigned: string[] = []
+
+for (const [path, url] of Object.entries(files).sort(([a], [b]) => a.localeCompare(b))) {
+  const match = /jour-?(\d+)/i.exec(path)
+  if (match) byDay.set(Number(match[1]), url)
+  else unassigned.push(url)
+}
+
+for (let day = 1; day <= 70 && unassigned.length; day++) {
+  if (!byDay.has(day)) byDay.set(day, unassigned.shift()!)
+}
 
 /** Le visuel de la dépêche J{n} — undefined s'il n'y en a pas (encore) */
 export function visualForDay(day: number): string | undefined {
-  return ordered[day - 1]
+  return byDay.get(day)
 }
