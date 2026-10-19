@@ -17,7 +17,7 @@ onMounted(() => {
 
 <template>
   <div ref="root" class="scene-night" aria-hidden="true">
-    <TresCanvas :alpha="true" :antialias="false" :depth="false" :stencil="false" :power-preference="'low-power'">
+    <TresCanvas :alpha="true" :clear-alpha="0" :antialias="false" :depth="false" :stencil="false" :power-preference="'low-power'">
       <TresPerspectiveCamera :position="[0, 0, 9]" :fov="48" />
       <SceneNightRig />
     </TresCanvas>

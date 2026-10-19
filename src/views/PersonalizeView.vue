@@ -164,7 +164,7 @@ const recap = computed(() => {
       </button>
       <div class="pz-emblem" aria-hidden="true"><i class="mdi mdi-feather" /><b /><b /></div>
       <p class="pz-overline">LE FORMULAIRE DE L'EXPÉDITION</p>
-      <h1>Votre aventure,<br />à vos couleurs</h1>
+      <h1 id="pz-title">Votre aventure,<br />à vos couleurs</h1>
     </header>
 
     <!-- le ruban de progression : une piste de cire -->
@@ -174,7 +174,7 @@ const recap = computed(() => {
 
     <!-- la feuille tourne comme une dépêche : transition directionnelle -->
     <Transition :name="dir" mode="out-in" appear>
-    <section :key="step" class="pz-sheet" :class="{ 'pz-gate': isGate }" aria-live="polite">
+    <section :key="step" class="pz-sheet" :class="{ 'pz-gate': isGate }" role="form" aria-labelledby="pz-title" aria-live="polite">
       <i class="pz-spark s1" aria-hidden="true" /><i class="pz-spark s2" aria-hidden="true" />
       <!-- la porte d'entrée : code ou nouvelle expédition -->
       <template v-if="isGate">
@@ -206,10 +206,10 @@ const recap = computed(() => {
           <i class="mdi mdi-chevron-down pz-gate-caret" aria-hidden="true" />
         </button>
         <div v-if="joinOpen" class="pz-gate-join">
-          <span class="pz-join">
-            <input v-model="joinInput" type="text" placeholder="LUTIN-XXXX" maxlength="10" autocapitalize="characters" autofocus />
-            <button type="button" class="pz-family-btn" :disabled="busy || !joinInput.trim()" @click="onJoin">Rejoindre</button>
-          </span>
+          <form class="pz-join" aria-label="Rejoindre l'aventure avec un code famille" @submit.prevent="onJoin">
+            <input v-model="joinInput" type="text" placeholder="LUTIN-XXXX" maxlength="10" autocapitalize="characters" autofocus title="Code famille" />
+            <button type="submit" class="pz-family-btn" :disabled="busy || !joinInput.trim()">Rejoindre</button>
+          </form>
           <p v-if="joinError" class="pz-error">Ce code n'existe pas — vérifiez les 4 lettres.</p>
         </div>
         <button type="button" class="pz-gate-opt" @click="next">
@@ -229,9 +229,9 @@ const recap = computed(() => {
       <!-- 1 · la famille -->
       <template v-if="current.id === 'famille'">
         <div class="pz-field">
-          <span>Prénom(s) des enfants</span>
+          <span id="pz-lbl-enfants">Prénom(s) des enfants</span>
           <div v-for="(name, i) in form.prenoms_enfants" :key="i" class="pz-row">
-            <input v-model="form.prenoms_enfants[i]" type="text" placeholder="Prénom de l'enfant" autocomplete="off" />
+            <input v-model="form.prenoms_enfants[i]" type="text" placeholder="Prénom de l'enfant" autocomplete="off" aria-labelledby="pz-lbl-enfants" />
             <button
               v-if="form.prenoms_enfants.length > 1"
               type="button"
@@ -247,9 +247,9 @@ const recap = computed(() => {
           </button>
         </div>
         <div class="pz-field">
-          <span>Les proches qui apparaissent dans l'histoire</span>
+          <span id="pz-lbl-proches">Les proches qui apparaissent dans l'histoire</span>
           <div v-for="(name, i) in form.proches" :key="i" class="pz-row">
-            <input v-model="form.proches[i]" type="text" placeholder="ex : Papi, Mamie, Tata Lise…" autocomplete="off" />
+            <input v-model="form.proches[i]" type="text" placeholder="ex : Papi, Mamie, Tata Lise…" autocomplete="off" aria-labelledby="pz-lbl-proches" />
             <button
               v-if="form.proches.length > 1"
               type="button"
@@ -268,56 +268,56 @@ const recap = computed(() => {
 
       <!-- 2 · les lutins -->
       <template v-else-if="current.id === 'lutins'">
-        <label class="pz-field">
+        <label class="pz-field" for="pz-nom-lutin">
           <span>Le nom du lutin</span>
-          <input v-model="form.nom_lutin" type="text" placeholder="ex : Farfadet" />
+          <input id="pz-nom-lutin" v-model="form.nom_lutin" type="text" placeholder="ex : Farfadet" />
         </label>
-        <label class="pz-switch">
-          <input v-model="form.deuxieme_lutin" type="checkbox" @change="haptic(8)" />
+        <label class="pz-switch" for="pz-deuxieme-lutin">
+          <input id="pz-deuxieme-lutin" v-model="form.deuxieme_lutin" type="checkbox" @change="haptic(8)" />
           <i aria-hidden="true" />
           <span>Un deuxième lutin rejoint l'aventure</span>
         </label>
-        <label v-if="form.deuxieme_lutin" class="pz-field pz-field--in">
+        <label v-if="form.deuxieme_lutin" class="pz-field pz-field--in" for="pz-nom-second">
           <span>Le nom du second lutin</span>
-          <input v-model="form.nom_second_lutin" type="text" placeholder="ex : Gribouille" />
+          <input id="pz-nom-second" v-model="form.nom_second_lutin" type="text" placeholder="ex : Gribouille" />
         </label>
         <p v-else class="pz-note">Un seul lutin voyagera — le second chapitre des farces sera adapté.</p>
       </template>
 
       <!-- 3 · le trajet -->
       <template v-else-if="current.id === 'voyage'">
-        <label class="pz-field">
+        <label class="pz-field" for="pz-ville">
           <span>La ville d'arrivée</span>
-          <input v-model="form.ville" type="text" placeholder="ex : Lyon" />
+          <input id="pz-ville" v-model="form.ville" type="text" placeholder="ex : Lyon" />
         </label>
-        <label class="pz-field">
+        <label class="pz-field" for="pz-destination">
           <span>La destination du voyage</span>
-          <input v-model="form.destination" type="text" placeholder="ex : la maison familiale" />
+          <input id="pz-destination" v-model="form.destination" type="text" placeholder="ex : la maison familiale" />
         </label>
-        <label class="pz-field">
+        <label class="pz-field" for="pz-quartier">
           <span>Le quartier</span>
-          <input v-model="form.quartier" type="text" placeholder="ex : Croix-Rousse" />
+          <input id="pz-quartier" v-model="form.quartier" type="text" placeholder="ex : Croix-Rousse" />
         </label>
       </template>
 
       <!-- 4 · le calendrier -->
       <template v-else-if="current.id === 'calendrier'">
         <div class="pz-duo">
-          <label class="pz-field">
+          <label class="pz-field" for="pz-date-debut">
             <span>Départ</span>
-            <input v-model="form.date_debut" type="date" />
+            <input id="pz-date-debut" v-model="form.date_debut" type="date" />
           </label>
-          <label class="pz-field">
+          <label class="pz-field" for="pz-date-fin">
             <span>Retour</span>
-            <input v-model="form.date_fin" type="date" />
+            <input id="pz-date-fin" v-model="form.date_fin" type="date" />
           </label>
         </div>
         <p v-if="joursDisponibles" class="pz-computed">
           <i class="mdi mdi-calendar-star" aria-hidden="true" /> {{ joursDisponibles }} jours d'aventure
         </p>
-        <label class="pz-field">
+        <label class="pz-field" for="pz-arrivee">
           <span>Arrivée du lutin chez vous</span>
-          <input v-model="form.arrivee_lutin" type="date" />
+          <input id="pz-arrivee" v-model="form.arrivee_lutin" type="date" />
         </label>
         <p v-if="jourArrivee" class="pz-computed">
           <i class="mdi mdi-door-open" aria-hidden="true" /> Le lutin frappe à la porte le J{{ jourArrivee }} — les farces suivent à partir de là
@@ -325,17 +325,17 @@ const recap = computed(() => {
         <p v-else class="pz-computed">
           <i class="mdi mdi-door-open" aria-hidden="true" /> Sans date d'arrivée, le lutin frappe à la porte vers le J29
         </p>
-        <label class="pz-field">
+        <label class="pz-field" for="pz-pauses">
           <span>Jours sans activité</span>
-          <input v-model="form.jours_sans_activite" type="text" placeholder="ex : 14 nov., 3 déc." />
+          <input id="pz-pauses" v-model="form.jours_sans_activite" type="text" placeholder="ex : 14 nov., 3 déc." />
         </label>
-        <label class="pz-field">
+        <label class="pz-field" for="pz-lieux">
           <span>Lieux de séjour ou déplacement</span>
-          <textarea v-model="form.lieux_sejour" rows="2" placeholder="ex : 3 jours chez Papi et Mamie à la mi-parcours" />
+          <textarea id="pz-lieux" v-model="form.lieux_sejour" rows="2" placeholder="ex : 3 jours chez Papi et Mamie à la mi-parcours" />
         </label>
-        <label class="pz-field">
+        <label class="pz-field" for="pz-ajustements">
           <span>Activités remplacées ou déplacées</span>
-          <textarea v-model="form.activites_modifiees" rows="2" placeholder="ex : la chasse au trésor du J40 déplacée au lendemain" />
+          <textarea id="pz-ajustements" v-model="form.activites_modifiees" rows="2" placeholder="ex : la chasse au trésor du J40 déplacée au lendemain" />
         </label>
       </template>
 
@@ -344,25 +344,25 @@ const recap = computed(() => {
         <article class="pz-piece">
           <header><b>J23</b><span>Le plan du quartier</span></header>
           <p>Le quartier renseigné au trajet sera dessiné sur la carte, la flèche tracée jusqu'à la maison.</p>
-          <label class="pz-field">
+          <label class="pz-field" for="pz-quartier-2">
             <span>Confirmer le quartier</span>
-            <input v-model="form.quartier" type="text" placeholder="ex : Croix-Rousse" />
+            <input id="pz-quartier-2" v-model="form.quartier" type="text" placeholder="ex : Croix-Rousse" />
           </label>
         </article>
         <article class="pz-piece">
-          <header><b>J25</b><span>L'entrée de la maison</span></header>
+          <header><b>J25</b><span id="pz-photo-entree-title">L'entrée de la maison</span></header>
           <p>La porte, le portail ou le paillasson — le repère que le lutin reconnaîtra.</p>
-          <label class="pz-photo" :class="{ filled: form.photo_entree }">
-            <input type="file" accept="image/*" @change="pickPhoto('photo_entree', $event)" />
+          <label class="pz-photo" :class="{ filled: form.photo_entree }" for="pz-photo-entree">
+            <input id="pz-photo-entree" type="file" accept="image/*" aria-labelledby="pz-photo-entree-title" @change="pickPhoto('photo_entree', $event)" />
             <img v-if="form.photo_entree" :src="form.photo_entree" alt="Aperçu de l'entrée" />
             <span v-else><i class="mdi mdi-camera-outline" aria-hidden="true" /> Joindre une photo</span>
           </label>
         </article>
         <article class="pz-piece">
-          <header><b>J59 · J61</b><span>Le portrait des lutins</span></header>
+          <header><b>J59 · J61</b><span id="pz-photo-lutins-title">Le portrait des lutins</span></header>
           <p>La photo des lutins ou le portrait fourni dans le kit.</p>
-          <label class="pz-photo" :class="{ filled: form.photo_lutins }">
-            <input type="file" accept="image/*" @change="pickPhoto('photo_lutins', $event)" />
+          <label class="pz-photo" :class="{ filled: form.photo_lutins }" for="pz-photo-lutins">
+            <input id="pz-photo-lutins" type="file" accept="image/*" aria-labelledby="pz-photo-lutins-title" @change="pickPhoto('photo_lutins', $event)" />
             <img v-if="form.photo_lutins" :src="form.photo_lutins" alt="Aperçu des lutins" />
             <span v-else><i class="mdi mdi-camera-outline" aria-hidden="true" /> Joindre une photo</span>
           </label>
@@ -379,10 +379,10 @@ const recap = computed(() => {
               <button type="button" class="pz-family-btn" :disabled="busy || !syncAvailable" @click="onCreateFamily">
                 Créer un code famille
               </button>
-              <span class="pz-join">
-                <input v-model="joinInput" type="text" placeholder="LUTIN-XXXX" maxlength="10" autocapitalize="characters" />
-                <button type="button" class="pz-family-btn" :disabled="busy || !joinInput.trim()" @click="onJoin">Rejoindre</button>
-              </span>
+              <form class="pz-join" aria-label="Rejoindre l'aventure avec un code famille" @submit.prevent="onJoin">
+                <input v-model="joinInput" type="text" placeholder="LUTIN-XXXX" maxlength="10" autocapitalize="characters" title="Code famille" />
+                <button type="submit" class="pz-family-btn" :disabled="busy || !joinInput.trim()">Rejoindre</button>
+              </form>
             </div>
             <p v-if="joinError" class="pz-error">Ce code n'existe pas — vérifiez les 4 lettres.</p>
             <p v-if="!syncAvailable" class="pz-note">La synchronisation n'est pas encore configurée — tout reste sur cet appareil.</p>
@@ -845,7 +845,7 @@ const recap = computed(() => {
 }
 
 .pz-gate-opt small {
-  color:#8fa79a;
+  color:#bccfc3;
   font:italic 500 12.5px var(--font-literary)
 }
 

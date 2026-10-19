@@ -66,6 +66,8 @@ function breakSeal() {
   <main ref="scene" class="veille" @mousemove.passive="onMouse">
     <!-- le ciel : aurore, lune, neige -->
     <div class="sky" aria-hidden="true">
+      <img class="sky-photo" src="/assets/created/journey-station.png" alt="" />
+      <i class="sky-mask" />
       <i class="aurora aurora--a" /><i class="aurora aurora--b" />
       <i class="ambient-glow" />
       <i class="moon" />
@@ -151,16 +153,39 @@ function breakSeal() {
   min-height: 100svh;
   overflow: hidden;
   color: #f2ead8;
-  /* le vert forêt : sapin lumineux au centre, vert nuit aux bords — jamais noir */
-  background: radial-gradient(circle at 50% 18%, #1c4433 0%, #143528 45%, #0f2c21 72%, #0c241b 100%);
+  /* l'ambiance de l'affiche : mur vert forêt très sombre, lumière de
+     bougie en haut à droite, reflet chaud du parquet en bas à gauche */
+  background:
+    radial-gradient(ellipse 85% 50% at 80% -6%, rgba(224,160,60,.16), transparent 62%),
+    radial-gradient(ellipse 95% 55% at 15% 112%, rgba(190,120,55,.13), transparent 62%),
+    linear-gradient(180deg, #10221b 0%, #0b1a15 55%, #071310 100%);
 }
 
-/* ---------- le ciel : il couvre tout l'écran, plus de coupure ---------- */
+/* ---------- le ciel : l'illustration de la gare en fond, voilée ---------- */
 .sky {
   position: absolute;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
+}
+.sky-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 28%;
+  filter: brightness(.62) saturate(.92);
+}
+/* les masques : la photo devient une atmosphère, jamais un fond d'écran —
+   voile nuit en haut pour le titre, profondeur douce au centre,
+   tombé vert forêt en bas sous le bureau */
+.sky-mask {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(9,20,16,.86) 0%, rgba(9,20,16,.52) 34%, rgba(9,20,16,.58) 60%, rgba(7,16,13,.92) 100%),
+    linear-gradient(90deg, rgba(7,16,13,.55) 0%, transparent 42%, transparent 72%, rgba(7,16,13,.6) 100%);
 }
 .aurora {
   position: absolute;
@@ -173,7 +198,7 @@ function breakSeal() {
   left: -8%;
   width: 62vw;
   height: 46vh;
-  background: radial-gradient(ellipse, rgba(64,190,150,.28), transparent 70%);
+  background: radial-gradient(ellipse, rgba(52,140,105,.24), transparent 70%);
   animation: aurora-a 22s ease-in-out infinite alternate;
 }
 .aurora--b {
@@ -508,7 +533,7 @@ function breakSeal() {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #d4dccf;
+  color: #eef1e6;
   font: 500 13.5px/1.35 var(--font-literary);
   white-space: nowrap;
   overflow: hidden;

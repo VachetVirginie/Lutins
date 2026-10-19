@@ -282,13 +282,15 @@ onBeforeUnmount(() => onFieldLeave())
 /* ---- repères : les jalons portent leur nom, les dizaines leur numéro ---- */
 .star-flag {
   position: absolute;
-  bottom: calc(100% + 6px);
+  top: calc(100% + 7px);
   left: 50%;
   display: grid;
   justify-items: center;
   width: max-content;
   max-width: 130px;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(4px);
+  opacity: 0;
+  transition: opacity .22s ease, transform .22s ease;
   color: rgba(233,220,187,.85);
   font: 400 9px/1.35 var(--font-literary);
   letter-spacing: .1em;
@@ -296,6 +298,11 @@ onBeforeUnmount(() => onFieldLeave())
   text-transform: uppercase;
   text-shadow: 0 1px 6px rgba(0,0,0,.9), 0 0 3px rgba(0,0,0,.8);
   pointer-events: none;
+}
+/* l'étiquette du jalon ne se révèle qu'au survol — le ciel reste lisible */
+.star:hover .star-flag, .star:focus-visible .star-flag {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
 }
 .star-flag b {
   color: var(--color-gold);

@@ -124,6 +124,8 @@ function embark(id: string, ev: MouseEvent): void {
 
 <template>
   <main class="app-screen prepare-screen">
+    <img class="prepare-deco" src="/assets/created/reserve-atelier.jpg" alt="" aria-hidden="true" />
+    <i class="prepare-veil" aria-hidden="true" />
     <i class="warm-glow" aria-hidden="true" />
     <header class="prepare-header">
       <button class="back-link" type="button" @click="goBack"><i class="mdi mdi-chevron-left" aria-hidden="true" /> Retour</button>
@@ -134,6 +136,7 @@ function embark(id: string, ev: MouseEvent): void {
 
     <!-- la réserve : le sac se remplit colis après colis -->
     <section ref="sackEl" class="sack" aria-label="Progression de la réserve">
+      <div class="sack-badge" aria-hidden="true">
       <svg class="sack-figure" viewBox="0 0 64 72" aria-hidden="true">
         <defs>
           <clipPath id="sack-clip"><path d="M32 7c-5.5 0-9.5 2.5-11.5 6.5-4-1-7 1-6 5-5 6-8 13-8 21 0 14 10 24 25.5 24S57.5 53.5 57.5 39.5c0-8-3-15-8-21 1-4-2-6-6-5-2-4-6-6.5-11.5-6.5z" /></clipPath>
@@ -150,10 +153,12 @@ function embark(id: string, ev: MouseEvent): void {
         <path d="M14 19.5c6 4 30 4 36 0" fill="none" stroke="#e6c280" stroke-width="1.3" />
         <path d="M32 39l2.1 4.4 4.8.7-3.5 3.3.8 4.8-4.2-2.3-4.2 2.3.8-4.8-3.5-3.3 4.8-.7z" fill="#e6c280" opacity=".9" />
       </svg>
+      </div>
       <div class="sack-copy">
         <p class="sack-overline">LA RÉSERVE</p>
         <strong>{{ readyCount }}<em>/{{ totalCount }}</em></strong>
-        <span>{{ readyCount === totalCount ? 'Tout est embarqué — la route peut commencer.' : 'colis à bord' }}</span>
+        <label class="sack-legend" for="sack-progress">{{ readyCount === totalCount ? 'Tout est embarqué — la route peut commencer.' : 'colis à bord' }}</label>
+        <progress id="sack-progress" class="sack-bar" :value="readyCount" :max="totalCount" />
       </div>
     </section>
 
@@ -200,15 +205,44 @@ function embark(id: string, ev: MouseEvent): void {
   overflow:hidden
 }
 
+/* le décor feutré : la réserve du lutin, floutée, derrière tout */
+.prepare-deco {
+  position:absolute;
+  inset:0;
+  z-index:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:50% 40%;
+  filter:blur(6px) brightness(.8) saturate(1.05);
+  opacity:.55;
+  pointer-events:none
+}
+
+/* le voile : la lumière monte du décor, l'interface reste nette */
+.prepare-veil {
+  position:absolute;
+  inset:0;
+  z-index:0;
+  background:linear-gradient(180deg,rgba(8,18,14,.1) 0%,rgba(8,18,14,.28) 52%,rgba(8,18,14,.52) 100%);
+  pointer-events:none
+}
+
+.prepare-screen > :not(.prepare-deco):not(.prepare-veil) {
+  position:relative;
+  z-index:1
+}
+
+/* le halo de lanterne, comme sur la veillée */
 .warm-glow {
   position:absolute;
-  top:-70px;
-  right:-60px;
-  width:300px;
-  height:300px;
+  top:-110px;
+  right:-80px;
+  width:560px;
+  height:560px;
   border-radius:50%;
-  background:radial-gradient(circle,rgba(255,190,80,.14),transparent 65%);
-  filter:blur(4px);
+  background:radial-gradient(circle,rgba(224,160,60,.2),transparent 68%);
+  filter:blur(60px);
   pointer-events:none
 }
 
@@ -257,26 +291,45 @@ function embark(id: string, ev: MouseEvent): void {
   line-height:1.5
 }
 
-/* ---- la réserve : sac qui se remplit ---- */
+/* ---- la réserve : carte signature en verre, sac en badge de laiton ---- */
 .sack {
   display:flex;
   align-items:center;
   gap:18px;
   margin-top:24px;
-  padding:16px 20px;
-  border:1px solid transparent;
+  padding:18px 20px;
+  border:1px solid rgba(224,194,131,.3);
   border-radius:22px;
-  background:
-    linear-gradient(165deg,#172e25 0%,#0e1f17 60%,#0c1a13 100%) padding-box,
-    linear-gradient(155deg,rgba(241,204,122,.45),rgba(241,204,122,.1) 40%,rgba(241,204,122,.25) 100%) border-box;
-  box-shadow:0 18px 42px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,244,214,.07)
+  background:rgba(10,28,22,.5);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  box-shadow:0 22px 48px rgba(0,0,0,.42),0 0 30px rgba(224,160,60,.08),inset 0 1px 0 rgba(255,244,214,.1)
+}
+
+/* le médaillon de laiton où le sac respire */
+.sack-badge {
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+  width:76px;
+  height:76px;
+  border:1px solid rgba(255,233,168,.65);
+  border-radius:50%;
+  background:radial-gradient(circle at 34% 26%,#f4dfa4 0%,#d8b96e 45%,#a67d34 100%);
+  box-shadow:0 0 0 3px rgba(10,28,22,.4),0 0 22px rgba(224,194,131,.35),inset 0 -8px 14px rgba(90,60,20,.35);
+  animation:sack-shine 4s ease-in-out infinite
+}
+
+@keyframes sack-shine {
+  0%,100% { box-shadow:0 0 0 3px rgba(10,28,22,.4),0 0 18px rgba(224,194,131,.3),inset 0 -8px 14px rgba(90,60,20,.35) }
+  50% { box-shadow:0 0 0 3px rgba(10,28,22,.4),0 0 34px rgba(224,194,131,.6),inset 0 -8px 14px rgba(90,60,20,.35) }
 }
 
 .sack-figure {
-  width:60px;
-  height:68px;
+  width:46px;
+  height:52px;
   flex:0 0 auto;
-  filter:drop-shadow(0 6px 14px rgba(0,0,0,.4))
+  filter:drop-shadow(0 3px 6px rgba(60,35,10,.5))
 }
 
 .sack-figure rect {
@@ -306,11 +359,42 @@ function embark(id: string, ev: MouseEvent): void {
   color:#a9bcae
 }
 
-.sack-copy span {
+.sack-legend {
   display:block;
   margin-top:5px;
   color:#a9bcae;
   font-size:11.5px
+}
+
+/* la barre d'embarquement : l'or se déverse colis après colis — <progress> natif */
+.sack-bar {
+  display:block;
+  margin-top:12px;
+  width:100%;
+  height:5px;
+  appearance:none;
+  -webkit-appearance:none;
+  border:0;
+  border-radius:999px;
+  background:rgba(255,255,255,.08);
+  overflow:hidden
+}
+
+.sack-bar::-webkit-progress-bar {
+  border-radius:999px;
+  background:rgba(255,255,255,.08)
+}
+
+.sack-bar::-webkit-progress-value {
+  border-radius:999px;
+  background:linear-gradient(90deg,#a67d34,#e0c283 55%,#ffe9a8);
+  box-shadow:0 0 10px rgba(224,194,131,.55)
+}
+
+.sack-bar::-moz-progress-bar {
+  border-radius:999px;
+  background:linear-gradient(90deg,#a67d34,#e0c283 55%,#ffe9a8);
+  box-shadow:0 0 10px rgba(224,194,131,.55)
 }
 
 /* ---- filtres ---- */
@@ -342,13 +426,14 @@ function embark(id: string, ev: MouseEvent): void {
   transition:color .25s,border-color .25s,transform .35s var(--spring)
 }
 
-/* la pilule d'or glisse de filtre en filtre (layoutId) */
+/* la pilule d'or glisse de filtre en filtre (layoutId) — verre doré, pas beige plein */
 .tab-pill {
   position:absolute;
   inset:0;
+  border:1px solid rgba(224,194,131,.6);
   border-radius:999px;
-  background:#e6c280;
-  box-shadow:0 0 14px rgba(230,194,128,.4);
+  background:rgba(224,194,131,.13);
+  box-shadow:0 0 18px rgba(224,194,131,.28),inset 0 0 12px rgba(224,194,131,.12);
   pointer-events:none
 }
 
@@ -362,9 +447,10 @@ function embark(id: string, ev: MouseEvent): void {
 }
 
 .scope-tabs button.active {
-  border-color:#e6c280;
-  color:#12251e;
-  font-weight:800
+  border-color:transparent;
+  color:#ffe9a8;
+  font-weight:800;
+  text-shadow:0 0 10px rgba(224,194,131,.55)
 }
 
 /* ---- manifeste : colis-étiquettes ---- */
@@ -434,14 +520,25 @@ function embark(id: string, ev: MouseEvent): void {
   align-items:center;
   gap:12px;
   padding:11px 12px;
-  border:1px solid rgba(230,194,128,.16);
+  border:1px solid rgba(230,194,128,.22);
   border-radius:15px;
-  background:rgba(255,255,255,.045);
+  background:rgba(255,255,255,.065);
   backdrop-filter:blur(12px);
   -webkit-backdrop-filter:blur(12px);
   box-shadow:0 10px 22px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.06);
   animation:parcel-in .7s var(--spring) calc(var(--i,0)*60ms) both;
-  transition:opacity .3s
+  transition:opacity .3s,border-color .3s,box-shadow .3s,transform .3s
+}
+
+/* la lueur de lanterne qui suit la main */
+.parcel:hover {
+  border-color:rgba(224,194,131,.42);
+  box-shadow:0 10px 22px rgba(0,0,0,.3),0 0 20px rgba(224,194,131,.16),inset 0 1px 0 rgba(255,255,255,.1);
+  transform:translateY(-1px)
+}
+
+.parcel:hover .parcel-day {
+  box-shadow:0 0 16px rgba(224,194,131,.4),inset 0 0 6px rgba(224,194,131,.18)
 }
 
 @keyframes parcel-in {
@@ -452,7 +549,7 @@ function embark(id: string, ev: MouseEvent): void {
 }
 
 .parcel.done {
-  opacity:.45
+  opacity:.55
 }
 
 /* le cercle de coche, irrégulier comme la cire — or plein à l'embarquement */
@@ -497,18 +594,21 @@ function embark(id: string, ev: MouseEvent): void {
   transition:transform .35s var(--spring)
 }
 
-/* pastille jour */
+/* pastille jour : l'or incandescent cerclé de laiton, comme la constellation */
 .parcel-day {
   display:grid;
   place-items:center;
   flex:0 0 auto;
   width:28px;
   height:28px;
-  border:1px solid #e6c280;
+  border:1px solid rgba(216,185,110,.85);
   border-radius:50%;
-  color:#e6c280;
+  background:radial-gradient(circle at 50% 32%,rgba(224,194,131,.22),rgba(224,194,131,.05));
+  color:#ffe9a8;
   font-size:11px;
-  font-weight:700
+  font-weight:700;
+  text-shadow:0 0 9px rgba(224,194,131,.65);
+  box-shadow:0 0 10px rgba(224,194,131,.18),inset 0 0 6px rgba(224,194,131,.12)
 }
 
 .parcel-copy {
@@ -524,7 +624,7 @@ function embark(id: string, ev: MouseEvent): void {
   position:relative;
   max-width:100%;
   overflow:hidden;
-  color:#f2ead6;
+  color:#f4eae1;
   font-size:13.5px;
   font-weight:600;
   text-overflow:ellipsis;
@@ -556,11 +656,10 @@ function embark(id: string, ev: MouseEvent): void {
 
 .parcel-copy small {
   overflow:hidden;
-  color:#cdbd92;
+  color:#e0c283;
   font:italic 500 12px/1.4 var(--font-literary);
   text-overflow:ellipsis;
-  white-space:nowrap;
-  opacity:.95
+  white-space:nowrap
 }
 
 .parcel-go {
@@ -570,7 +669,7 @@ function embark(id: string, ev: MouseEvent): void {
 }
 
 @media (prefers-reduced-motion:reduce) {
-  .parcel {
+  .parcel,.sack-badge {
     animation:none
   }
 
@@ -582,6 +681,28 @@ function embark(id: string, ev: MouseEvent): void {
 @media (min-width:1100px) {
   .parcels {
     grid-template-columns:1fr 1fr
+  }
+}
+
+/* le bureau : la réserve occupe toute la scène, pas une colonne mobile */
+@media (min-width:1024px) {
+  .prepare-screen {
+    max-width:none;
+    padding-inline:clamp(48px,7vw,110px)
+  }
+
+  .sack {
+    max-width:640px
+  }
+
+  .manifest {
+    max-width:1500px
+  }
+}
+
+@media (min-width:1440px) {
+  .parcels {
+    grid-template-columns:1fr 1fr 1fr
   }
 }
 
