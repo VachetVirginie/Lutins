@@ -199,7 +199,7 @@ const recap = computed(() => {
         </button>
         <div v-if="joinOpen" class="pz-gate-join">
           <span class="pz-join">
-            <input v-model="joinInput" type="text" placeholder="LUTIN-XXXX" maxlength="9" autocapitalize="characters" autofocus />
+            <input v-model="joinInput" type="text" placeholder="LUTIN-XXXX" maxlength="10" autocapitalize="characters" autofocus />
             <button type="button" class="pz-family-btn" :disabled="busy || !joinInput.trim()" @click="onJoin">Rejoindre</button>
           </span>
           <p v-if="joinError" class="pz-error">Ce code n'existe pas — vérifiez les 4 lettres.</p>
@@ -362,7 +362,7 @@ const recap = computed(() => {
                 Créer un code famille
               </button>
               <span class="pz-join">
-                <input v-model="joinInput" type="text" placeholder="LUTIN-XXXX" maxlength="9" autocapitalize="characters" />
+                <input v-model="joinInput" type="text" placeholder="LUTIN-XXXX" maxlength="10" autocapitalize="characters" />
                 <button type="button" class="pz-family-btn" :disabled="busy || !joinInput.trim()" @click="onJoin">Rejoindre</button>
               </span>
             </div>

@@ -170,7 +170,11 @@ export async function createFamily(): Promise<string | null> {
 /** Rejoint une expédition existante : tire l'état puis s'abonne aux changements */
 export async function joinFamily(code: string): Promise<boolean> {
   if (!supabase) return false
-  const normalized = code.trim().toUpperCase()
+  let normalized = code.trim().toUpperCase().replace(/\s+/g, '')
+  if (!normalized.startsWith('LUTIN-')) {
+    const tail = normalized.replace(/^LUTIN-?/, '')
+    normalized = `LUTIN-${tail}` // accepte LUTINXXXX ou le seul suffixe
+  }
   const { data, error } = await supabase
     .from('adventures')
     .select('state')
