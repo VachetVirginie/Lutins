@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { currentAdventure, journeyMilestones } from '../../data/adventure'
+import { PHASES, ROMANS } from '../../data/chapters'
 import { sheetForDay } from '../../data/farces'
 
 /**
@@ -21,36 +22,13 @@ interface Chapter {
   label: string
   from: number
   to: number
-  decor: 'pole' | 'foret' | 'village' | 'lyon' | 'noel'
   phase: string
   visual: string
 }
 
 // un chapitre par jalon : la phase du jalon porte la sémantique,
 // sans second lutin les chapitres « farce »/« départ » n'existent pas
-const PHASE_META: Record<string, { label: string; decor: Chapter['decor'] }> = {
-  voyage: { label: 'Le voyage', decor: 'pole' },
-  arrivee: { label: 'Un lutin parmi vous', decor: 'foret' },
-  farce: { label: 'Les deux lutins', decor: 'village' },
-  depart: { label: 'Le dernier voyage', decor: 'lyon' },
-  conclusion: { label: 'La lettre du Père Noël', decor: 'noel' },
-}
-const PHASE_VISUAL: Record<string, string> = {
-  voyage: '/assets/visuels/planning/01-voyage.png',
-  arrivee: '/assets/visuels/planning/02-arrivee.png',
-  farce: '/assets/visuels/planning/03-farces.png',
-  depart: '/assets/visuels/planning/04-depart.png',
-  conclusion: '/assets/visuels/planning/05-conclusion.png',
-}
-// le paysage de chaque chapitre : une vraie scène illustrée, voilée
-const PHASE_SCENE: Record<string, string> = {
-  voyage: '/assets/created/scene-foret.jpg',
-  arrivee: '/assets/created/scene-voyage.jpg',
-  farce: '/assets/created/scene-village.jpg',
-  depart: '/assets/created/scene-lyon.jpg',
-  conclusion: '/assets/created/scene-lyon.jpg',
-}
-const ROMANS = ['I', 'II', 'III', 'IV', 'V']
+const phaseMeta = (phase: string) => PHASES[phase]
 
 const chapters = computed<Chapter[]>(() => {
   const ms = milestones.value
@@ -63,9 +41,9 @@ const chapters = computed<Chapter[]>(() => {
   return ms
     .map((m, i) => ({
       roman: ROMANS[i],
-      ...PHASE_META[m.phase],
+      label: phaseMeta(m.phase)?.label ?? m.phase,
       phase: m.phase,
-      visual: PHASE_VISUAL[m.phase],
+      visual: phaseMeta(m.phase)?.visual ?? '',
       from: bounds[i],
       to: (bounds[i + 1] ?? total.value + 1) - 1,
     }))
@@ -160,7 +138,7 @@ function open(day: number) {
 <template>
   <main class="atlas">
     <!-- le paysage du chapitre en fond de page, comme la veillée -->
-    <img v-if="chapter" class="atlas-photo" :key="chapter.phase" :src="PHASE_SCENE[chapter.phase] ?? chapter.visual" alt="" aria-hidden="true" />
+    <img v-if="chapter" class="atlas-photo" :key="chapter.phase" :src="phaseMeta(chapter.phase)?.scene ?? chapter.visual" alt="" aria-hidden="true" />
     <i class="atlas-veil" aria-hidden="true" />
 
     <header class="atlas-head">
@@ -184,7 +162,7 @@ function open(day: number) {
       </nav>
 
       <!-- le paysage du chapitre -->
-      <section v-if="chapter" class="atlas-scene" :class="[`decor-${chapter.decor}`, { sparse: stops.length < 10 }]" :key="chapter.roman" aria-live="polite">
+      <section v-if="chapter" class="atlas-scene" :class="{ sparse: stops.length < 10 }" :key="chapter.roman" aria-live="polite">
         <i class="scene-stars" aria-hidden="true" />
         <p class="scene-chapter">CHAPITRE {{ chapter.roman }} — {{ chapter.label.toUpperCase() }}</p>
 

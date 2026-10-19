@@ -1,5 +1,6 @@
 import { computed, reactive } from 'vue'
 import { adventure } from './adventureStore'
+import { PHASES } from './chapters'
 import { sheetForDay } from './farces'
 import {
   arrivalDay,
@@ -62,11 +63,11 @@ export const narrativeMilestones = journeyMilestones
  * Sans second lutin, les jalons J46/J60 n'existent pas et le chapitre III est sauté.
  */
 const CHAPTERS = [
-  { roman: 'I', label: 'Le voyage', heroA: 'Le voyage', heroEm: 'commence.', tagline: 'Le premier chapitre s’ouvre aujourd’hui.' },
-  { roman: 'II', label: 'Un lutin parmi vous', heroA: 'Le lutin', heroEm: 'est arrivé.', tagline: 'Un nouvel habitant veille sur la maison.' },
-  { roman: 'III', label: 'Les deux lutins', heroA: 'Deux lutins', heroEm: 'en farce.', tagline: 'Deux complices en embuscade.' },
-  { roman: 'IV', label: 'Le dernier voyage', heroA: 'Le dernier', heroEm: 'voyage.', tagline: 'Les adieux se préparent en douceur.' },
-  { roman: 'V', label: 'La lettre du Père Noël', heroA: 'Noël', heroEm: 'est là.', tagline: 'Le dernier chapitre s’écrit à Noël.' },
+  { roman: 'I', label: PHASES.voyage.label, heroA: 'Le voyage', heroEm: 'commence.', tagline: 'Le premier chapitre s’ouvre aujourd’hui.' },
+  { roman: 'II', label: PHASES.arrivee.label, heroA: 'Le lutin', heroEm: 'est arrivé.', tagline: 'Un nouvel habitant veille sur la maison.' },
+  { roman: 'III', label: PHASES.farce.label, heroA: 'Deux lutins', heroEm: 'en farce.', tagline: 'Deux complices en embuscade.' },
+  { roman: 'IV', label: PHASES.depart.label, heroA: 'Le dernier', heroEm: 'voyage.', tagline: 'Les adieux se préparent en douceur.' },
+  { roman: 'V', label: PHASES.conclusion.label, heroA: 'Noël', heroEm: 'est là.', tagline: 'Le dernier chapitre s’écrit à Noël.' },
 ] as const
 
 /** Le chapitre suit la phase du jalon courant — pas sa position dans la liste */

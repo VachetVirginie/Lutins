@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { currentAdventure } from '../data/adventure'
 import { adventure } from '../data/adventureStore'
@@ -43,6 +43,26 @@ export function useDaySheet() {
 
   const chapter = computed(() => currentAdventure.chapter)
   const totalDays = computed(() => currentAdventure.totalDays)
+
+  // Le rituel du sceau — partagé entre coquilles : chaque vue choisit
+  // son effet de cire (haptique mobile, son desktop) au moment du geste.
+  const opened = ref(false)
+  const cracking = ref(false)
+
+  watch(sheet, () => {
+    opened.value = false
+    cracking.value = false
+  }, { immediate: true })
+
+  function unseal(opts: { crack?: () => void; open?: () => void; delay?: number } = {}) {
+    if (cracking.value || opened.value) return
+    cracking.value = true
+    opts.crack?.()
+    window.setTimeout(() => {
+      opened.value = true
+      opts.open?.()
+    }, opts.delay ?? 720)
+  }
 
   const copied = ref(false)
 
@@ -100,6 +120,9 @@ export function useDaySheet() {
     preparationDone,
     chapter,
     totalDays,
+    opened,
+    cracking,
+    unseal,
     copied,
     goBack,
     goToDay,

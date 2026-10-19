@@ -6,20 +6,15 @@ import { waxCrack } from '../../utils/sound'
 
 const {
   sheet, gap, dayVisual, annexes, preparationDone, chapter, totalDays, dayNumber,
+  opened, cracking, unseal,
   goBack, goToDay, copied, copyMessage, assetKind, printSheet, printAsset, togglePreparation,
 } = useDaySheet()
-
-/* ---- le sceau : même rituel qu'au mobile, mais au clic ---- */
-const opened = ref(false)
-const cracking = ref(false)
 
 /* ---- la lettre se déroule puis s'écrit : effet machine à écrire douce ---- */
 const typedMessage = ref('')
 let typer: number | undefined
 
 watch(sheet, () => {
-  opened.value = false
-  cracking.value = false
   typedMessage.value = ''
   if (typer) window.clearInterval(typer)
 }, { immediate: true })
@@ -43,11 +38,8 @@ onBeforeUnmount(() => {
   if (typer) window.clearInterval(typer)
 })
 
-function unseal() {
-  if (cracking.value || opened.value) return
-  cracking.value = true
-  waxCrack()
-  window.setTimeout(() => (opened.value = true), 720)
+function crackWax() {
+  unseal({ crack: waxCrack })
 }
 
 /* ---- parallaxe souris : la scène respire, jamais plus de quelques pixels ---- */
@@ -101,7 +93,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
       <div class="env-scene" :class="{ 'is-cracking': cracking }">
         <div class="env-body">
           <i class="env-flap" aria-hidden="true" />
-          <button class="env-seal" type="button" :disabled="cracking" :aria-label="`J${sheet.day} · Briser le sceau pour lire la dépêche`" @click="unseal">
+          <button class="env-seal" type="button" :disabled="cracking" :aria-label="`J${sheet.day} · Briser le sceau pour lire la dépêche`" @click="crackWax">
             <b>J{{ sheet.day }}</b>
           </button>
           <span class="env-burst" aria-hidden="true"><i v-for="n in 8" :key="n" :style="{ '--a': `${n * 45}deg`, '--dd': `${46 + n * 8}px` }" /></span>

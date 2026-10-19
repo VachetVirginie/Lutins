@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { currentAdventure, narrativeMilestones } from '../data/adventure'
+import { PHASES } from '../data/chapters'
 import { useIsDesktop } from '../composables/useBreakpoints'
 import DesktopPlanning from './planning/DesktopPlanning.vue'
 import { haptic } from '../utils/haptics'
@@ -23,14 +24,6 @@ const MAP_H = TOTAL * ROW_H + 110
 const milestoneByDay = new Map<number, (typeof narrativeMilestones.value)[number]>(narrativeMilestones.value.map((m) => [m.day as number, m]))
 
 /* chaque jalon porte l'emblème de son chapitre */
-const PHASE_ICON: Record<string, string> = {
-  voyage: 'mdi-mailbox-open-outline',
-  arrivee: 'mdi-door-open',
-  farce: 'mdi-emoticon-wink-outline',
-  depart: 'mdi-exit-to-app',
-  conclusion: 'mdi-ornament',
-}
-
 const stops = Array.from({ length: TOTAL }, (_, i) => {
   const day = i + 1
   const milestone = milestoneByDay.get(day)
@@ -41,7 +34,7 @@ const stops = Array.from({ length: TOTAL }, (_, i) => {
     title: milestone?.title,
     detail: milestone?.detail,
     milestone: Boolean(milestone),
-    icon: milestone ? PHASE_ICON[milestone.phase] : null,
+    icon: milestone ? PHASES[milestone.phase]?.icon : null,
     state: day < CURRENT ? 'past' : day === CURRENT ? 'current' : 'future',
   }
 })

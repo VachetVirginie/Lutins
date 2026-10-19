@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useIsDesktop } from '../composables/useBreakpoints'
 import { useDaySheet } from '../composables/useDaySheet'
@@ -12,26 +12,13 @@ const router = useRouter()
 
 const {
   sheet, gap, dayVisual, annexes, preparationDone, chapter, totalDays, dayNumber,
+  opened, cracking, unseal,
   goBack, copied, copyMessage, assetKind, printSheet, printAsset, togglePreparation,
 } = useDaySheet()
 
 // La dépêche arrive scellée : un geste sur la cire l'ouvre — écho du sceau d'ouverture
-const opened = ref(false)
-const cracking = ref(false)
-
-watch(sheet, () => {
-  opened.value = false
-  cracking.value = false
-}, { immediate: true })
-
-function unseal() {
-  if (cracking.value || opened.value) return
-  cracking.value = true
-  haptic([12, 40, 8])
-  window.setTimeout(() => {
-    opened.value = true
-    haptic(10)
-  }, 820)
+function crackWax() {
+  unseal({ crack: () => haptic([12, 40, 8]), open: () => haptic(10), delay: 820 })
 }
 
 // Feuilleter les dépêches : swipe horizontal = jour précédent / suivant
@@ -128,7 +115,7 @@ onBeforeUnmount(() => window.removeEventListener('deviceorientation', onTilt))
           type="button"
           :disabled="cracking"
           :aria-label="`J${sheet.day} · Briser le sceau pour lire la dépêche`"
-          @click="unseal"
+          @click="crackWax"
         ><b>J{{ sheet.day }}</b></button>
         <span class="env-burst" aria-hidden="true">
           <i v-for="n in 8" :key="n" :style="{ '--a': `${n * 45}deg`, '--dd': `${42 + n * 7}px` }" />
