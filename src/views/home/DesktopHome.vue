@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, defineAsyncComponent, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { currentAdventure, journeyMilestones, remainingDays } from '../../data/adventure'
 import { adventure } from '../../data/adventureStore'
 import { sheetForDay } from '../../data/farces'
 import { preparationCatalog } from '../../data/preparationCatalog'
-import SceneNight from '../../components/magic/SceneNight.vue'
+
 import ConstellationMap from '../../components/home/ConstellationMap.vue'
 import { waxCrack } from '../../utils/sound'
+
+// WebGL hors du chemin critique : la scène ne se charge qu'au montage réel de la
+// veillée, pas quand le routeur précharge /home depuis l'écran d'ouverture
+const SceneNight = defineAsyncComponent(() => import('../../components/magic/SceneNight.vue'))
 
 /**
  * « La veillée » — l'accueil desktop n'est pas une page, c'est une scène :

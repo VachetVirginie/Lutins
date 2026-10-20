@@ -25,10 +25,13 @@ onMounted(() => {
   document.documentElement.style.setProperty('--sky-rgb', rgb)
   document.documentElement.style.setProperty('--sky-alpha', alpha)
 
+  // Le portail Three.js ne se précharge qu'à la première interaction : le rituel
+  // du sceau (maintien ~1,5 s) laisse le temps de récupérer le chunk sans qu'il
+  // ne pèse sur le chargement initial
   if (route.name === 'opening') {
-    const warm = () => import('./components/PortalTransition.vue')
-    if ('requestIdleCallback' in window) requestIdleCallback(warm)
-    else setTimeout(warm, 700)
+    const warm = () => void import('./components/PortalTransition.vue')
+    window.addEventListener('pointermove', warm, { once: true })
+    window.addEventListener('pointerdown', warm, { once: true })
   }
 })
 

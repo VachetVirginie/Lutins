@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lutins-farceurs.netlify.app/sitemap.xml
