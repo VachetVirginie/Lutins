@@ -8,4 +8,16 @@ export default defineConfig({
       ...templateCompilerOptions,
     }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        // vendor séparé : téléchargement en parallèle + cache stable
+        // d'un déploiement à l'autre (vue change rarement, l'app souvent)
+        manualChunks: {
+          vue: ['vue', 'vue-router'],
+          motion: ['motion-v'],
+        },
+      },
+    },
+  },
 })

@@ -1,5 +1,6 @@
 import { reactive, ref, watch } from 'vue'
-import { supabase } from '../lib/supabase'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import { getSupabase, syncAvailable } from '../lib/supabase'
 
 /**
  * L'état partagé de l'aventure — vit en mémoire + localStorage,
@@ -76,7 +77,7 @@ const { prep_done: localDone, days_done: localDays, ...localRest } = loadLocal()
 export const adventure = reactive({ ...localRest, prepDone: new Set<string>(localDone), daysDone: new Set<number>(localDays) })
 
 export const familyCode = ref<string | null>(localStorage.getItem(CODE_KEY))
-export const syncStatus = ref<'local' | 'connecting' | 'synced' | 'error'>(supabase && familyCode.value ? 'connecting' : 'local')
+export const syncStatus = ref<'local' | 'connecting' | 'synced' | 'error'>(syncAvailable && familyCode.value ? 'connecting' : 'local')
 
 /* ---- sérialisation ---- */
 const snapshot = (): AdventureSnapshot => {
@@ -109,16 +110,18 @@ watch(
   () => snapshot(),
   (state) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
-    const sb = supabase
-    if (applyingRemote || !familyCode.value || !sb) return
+    if (applyingRemote || !familyCode.value) return
     clearTimeout(pushTimer)
     pushTimer = window.setTimeout(() => {
-      sb.from('adventures')
-        .upsert({ code: familyCode.value, state, updated_at: new Date().toISOString() })
-        .then(({ error }) => {
-          syncStatus.value = error ? 'error' : 'synced'
-          if (error) console.warn('[lutins] sync push failed:', error.message)
-        })
+      void getSupabase().then((sb) => {
+        if (!sb) return
+        sb.from('adventures')
+          .upsert({ code: familyCode.value, state, updated_at: new Date().toISOString() })
+          .then(({ error }) => {
+            syncStatus.value = error ? 'error' : 'synced'
+            if (error) console.warn('[lutins] sync push failed:', error.message)
+          })
+      })
     }, 800)
   },
   { deep: true, flush: 'sync' },
@@ -133,11 +136,11 @@ function generateCode(): string {
   return `LUTIN-${tail}`
 }
 
-let channel: ReturnType<NonNullable<typeof supabase>['channel']> | null = null
+let channel: ReturnType<SupabaseClient['channel']> | null = null
 
-function subscribe(code: string) {
+async function subscribe(code: string) {
   channel?.unsubscribe()
-  const sb = supabase
+  const sb = await getSupabase()
   if (!sb) return
   channel = sb
     .channel(`adventure-${code}`)
@@ -160,7 +163,7 @@ function subscribe(code: string) {
 
 /** Rattrapage : tire l'état distant (au démarrage ou après une coupure realtime) */
 async function fetchRemote(code: string) {
-  const sb = supabase
+  const sb = await getSupabase()
   if (!sb) return
   const { data, error } = await sb.from('adventures').select('state').eq('code', code).maybeSingle()
   if (error) {
@@ -172,9 +175,10 @@ async function fetchRemote(code: string) {
 
 /** Crée une expédition partagée : génère le code et pousse l'état courant */
 export async function createFamily(): Promise<string | null> {
-  if (!supabase) return null
+  const sb = await getSupabase()
+  if (!sb) return null
   const code = generateCode()
-  const { error } = await supabase
+  const { error } = await sb
     .from('adventures')
     .upsert({ code, state: snapshot(), updated_at: new Date().toISOString() })
   if (error) {
@@ -185,19 +189,20 @@ export async function createFamily(): Promise<string | null> {
   familyCode.value = code
   localStorage.setItem(CODE_KEY, code)
   syncStatus.value = 'connecting'
-  subscribe(code)
+  void subscribe(code)
   return code
 }
 
 /** Rejoint une expédition existante : tire l'état puis s'abonne aux changements */
 export async function joinFamily(code: string): Promise<boolean> {
-  if (!supabase) return false
+  const sb = await getSupabase()
+  if (!sb) return false
   let normalized = code.trim().toUpperCase().replace(/\s+/g, '')
   if (!normalized.startsWith('LUTIN-')) {
     const tail = normalized.replace(/^LUTIN-?/, '')
     normalized = `LUTIN-${tail}` // accepte LUTINXXXX ou le seul suffixe
   }
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from('adventures')
     .select('state')
     .eq('code', normalized)
@@ -207,7 +212,7 @@ export async function joinFamily(code: string): Promise<boolean> {
   familyCode.value = normalized
   localStorage.setItem(CODE_KEY, normalized)
   syncStatus.value = 'connecting'
-  subscribe(normalized)
+  void subscribe(normalized)
   return true
 }
 
@@ -221,10 +226,10 @@ export function leaveFamily() {
 }
 
 /** Reconnexion au démarrage si un code est déjà enregistré : rattrapage + abonnement */
-if (supabase && familyCode.value) {
+if (syncAvailable && familyCode.value) {
   const code = familyCode.value
   void fetchRemote(code)
-  subscribe(code)
+  void subscribe(code)
   // le realtime ne couvre pas l'absence : on retélécharge au retour au premier plan
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden && familyCode.value) void fetchRemote(familyCode.value)
@@ -256,13 +261,14 @@ export function fileToDataUrl(file: File, maxSize = 1024, quality = 0.82): Promi
  * Renvoie l'URL publique à ranger dans le state — null si non synchronisé.
  */
 export async function uploadPhoto(field: 'photo_entree' | 'photo_lutins', file: File): Promise<string | null> {
-  if (!supabase || !familyCode.value) return null
+  const sb = await getSupabase()
+  if (!sb || !familyCode.value) return null
   const path = `${familyCode.value}/${field}`
-  const { error } = await supabase.storage.from('adventure-photos').upload(path, file, { upsert: true, contentType: file.type })
+  const { error } = await sb.storage.from('adventure-photos').upload(path, file, { upsert: true, contentType: file.type })
   if (error) {
     syncStatus.value = 'error'
     return null
   }
-  const { data } = supabase.storage.from('adventure-photos').getPublicUrl(path)
+  const { data } = sb.storage.from('adventure-photos').getPublicUrl(path)
   return `${data.publicUrl}?v=${Date.now()}` // cache-bust après un ré-upload
 }
