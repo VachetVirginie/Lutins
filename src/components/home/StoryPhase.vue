@@ -78,7 +78,7 @@ onMounted(() => {
           <template v-if="n.state === 'active'">
             <i class="elf-halo" aria-hidden="true" />
             <i v-for="s in 3" :key="s" class="elf-spark" :class="`elf-spark--${s}`" aria-hidden="true" />
-            <img class="phase-elf" src="/assets/imgs/lutin.png" alt="" />
+            <img class="phase-elf" src="/assets/imgs/lutin.webp" alt="" />
           </template>
           <b class="node-dot" aria-hidden="true" />
           <span class="node-label"><strong>J{{ n.day }}</strong><em v-if="n.title"> {{ n.title }}</em></span>

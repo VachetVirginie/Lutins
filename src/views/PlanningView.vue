@@ -81,7 +81,7 @@ onBeforeUnmount(() => {
 <template>
   <DesktopPlanning v-if="isDesktop" />
   <main v-else class="app-screen planning-screen">
-    <div class="planning-bg" aria-hidden="true"><img ref="landscapeEl" src="/assets/landscapes/journey-map.jpg" alt="" /></div>
+    <div class="planning-bg" aria-hidden="true"><img ref="landscapeEl" src="/assets/landscapes/journey-map.webp" alt="" /></div>
     <header class="planning-header"><button class="back-link" type="button" @click="goBack"><i class="mdi mdi-chevron-left" aria-hidden="true" /> Retour</button><p class="planning-overline">LA CARTE DU VOYAGE</p><h1>Le planning</h1><p>La route des lutins, du premier courrier jusqu’au retour au Pôle Nord.</p></header>
     <section class="planning-progress"><div><strong>Jour {{ CURRENT }}</strong><span>sur {{ TOTAL }}</span></div><div class="planning-progress-bar"><i :style="{ width: (CURRENT / TOTAL) * 100 + '%' }" /></div><small>Le voyage commence</small></section>
 
@@ -109,7 +109,7 @@ onBeforeUnmount(() => {
           <small v-if="s.detail">{{ s.detail }}</small>
           <span v-if="s.state === 'current'" class="stop-cta">Ouvrir la journée<i class="mdi mdi-chevron-right" aria-hidden="true" /></span>
         </span>
-        <img v-if="s.state === 'current'" class="stop-elf" src="/assets/imgs/lutin.png" alt="" aria-hidden="true" />
+        <img v-if="s.state === 'current'" class="stop-elf" src="/assets/imgs/lutin.webp" alt="" aria-hidden="true" />
       </RouterLink>
     </section>
   </main>

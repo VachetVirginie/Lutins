@@ -15,10 +15,10 @@ const doneActivities = [
 ]
 
 const photos = [
-  { src: '/assets/created/arrival-living-room.png', caption: 'Le salon prêt', tilt: '-2deg' },
-  { src: '/assets/created/journey-station.png', caption: 'Le voyage', tilt: '3deg' },
-  { src: '/assets/created/journey-backpack.png', caption: 'Le sac du lutin', tilt: '-1.5deg' },
-  { src: '/assets/created/arrival-mobile-hero.png', caption: 'La forêt', tilt: '2.5deg' },
+  { src: '/assets/created/arrival-living-room.webp', caption: 'Le salon prêt', tilt: '-2deg' },
+  { src: '/assets/created/journey-station.webp', caption: 'Le voyage', tilt: '3deg' },
+  { src: '/assets/created/journey-backpack.webp', caption: 'Le sac du lutin', tilt: '-1.5deg' },
+  { src: '/assets/created/arrival-mobile-hero.webp', caption: 'La forêt', tilt: '2.5deg' },
 ]
 
 const notes = [
@@ -79,7 +79,7 @@ const notes = [
   position:fixed;
   inset:0;
   z-index:-2;
-  background:url('/assets/created/reserve-atelier.jpg') center/cover no-repeat;
+  background:url('/assets/created/reserve-atelier.webp') center/cover no-repeat;
   filter:blur(12px);
   opacity:.25;
   transform:scale(1.06);

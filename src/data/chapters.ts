@@ -14,32 +14,32 @@ export const PHASES: Record<string, PhaseMeta> = {
   voyage: {
     label: 'Le voyage',
     icon: 'mdi-mailbox-open-outline',
-    visual: '/assets/visuels/planning/01-voyage.png',
-    scene: '/assets/created/scene-foret.jpg',
+    visual: '/assets/visuels/planning/01-voyage.webp',
+    scene: '/assets/created/scene-foret.webp',
   },
   arrivee: {
     label: 'Un lutin parmi vous',
     icon: 'mdi-door-open',
-    visual: '/assets/visuels/planning/02-arrivee.png',
-    scene: '/assets/created/scene-voyage.jpg',
+    visual: '/assets/visuels/planning/02-arrivee.webp',
+    scene: '/assets/created/scene-voyage.webp',
   },
   farce: {
     label: 'Les deux lutins',
     icon: 'mdi-emoticon-wink-outline',
-    visual: '/assets/visuels/planning/03-farces.png',
-    scene: '/assets/created/scene-village.jpg',
+    visual: '/assets/visuels/planning/03-farces.webp',
+    scene: '/assets/created/scene-village.webp',
   },
   depart: {
     label: 'Le dernier voyage',
     icon: 'mdi-exit-to-app',
-    visual: '/assets/visuels/planning/04-depart.png',
-    scene: '/assets/created/scene-lyon.jpg',
+    visual: '/assets/visuels/planning/04-depart.webp',
+    scene: '/assets/created/scene-lyon.webp',
   },
   conclusion: {
     label: 'La lettre du Père Noël',
     icon: 'mdi-ornament',
-    visual: '/assets/visuels/planning/05-conclusion.png',
-    scene: '/assets/created/scene-lyon.jpg',
+    visual: '/assets/visuels/planning/05-conclusion.webp',
+    scene: '/assets/created/scene-lyon.webp',
   },
 }
 

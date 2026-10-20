@@ -48,7 +48,7 @@ export const dailySheets: Record<number, DailySheet> = {
       "Je monte à bord du traîneau d'entraînement ! Prochaine étape : la traversée de la banquise. Je t'ai glissé un coloriage de moi pour que tu puisses décorer ta chambre !",
     assets: [
       {
-        file: '/assets/printables/coloriage-lutin.jpg',
+        file: '/assets/printables/coloriage-lutin.webp',
         label: 'Coloriage du lutin',
         page: 0,
       },

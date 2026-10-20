@@ -27,7 +27,7 @@ function enter() {
 
 <template>
   <main class="opening-desk">
-    <img class="opening-image" src="/assets/created/arrival-mobile-hero.png" alt="Un lutin se prépare à commencer son aventure de Noël" />
+    <img class="opening-image" src="/assets/created/arrival-mobile-hero.webp" alt="Un lutin se prépare à commencer son aventure de Noël" />
     <i class="aurora aurora--a" aria-hidden="true" /><i class="aurora aurora--b" aria-hidden="true" />
     <div class="opening-overlay" aria-hidden="true" />
     <NightCanvas class="opening-snow" />

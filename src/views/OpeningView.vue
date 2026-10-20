@@ -26,7 +26,7 @@ function enter() {
 <template>
   <DesktopOpening v-if="isDesktop" />
   <main v-else class="opening-screen">
-    <img class="opening-image" src="/assets/created/arrival-mobile-hero.png" alt="Un lutin se prépare à commencer son aventure de Noël" />
+    <img class="opening-image" src="/assets/created/arrival-mobile-hero.webp" alt="Un lutin se prépare à commencer son aventure de Noël" />
     <div class="opening-overlay" />
     <section class="opening-copy">
       <p class="opening-chapter"><i /> {{ totalDays }} NUITS DE MERVEILLES <i /></p>

@@ -1,7 +1,7 @@
 // Chaque fichier illustre une dépêche :
-// - `jour-XX.jpg` → explicitement le jour XX (recommandé pour les farces)
+// - `jour-XX.webp` → explicitement le jour XX (recommandé pour les farces)
 // - tout autre nom → comble les jours restants dans l'ordre alphabétique
-const files = import.meta.glob('../assets/visuels/*.jpg', {
+const files = import.meta.glob('../assets/visuels/*.webp', {
   eager: true,
   query: '?url',
   import: 'default',

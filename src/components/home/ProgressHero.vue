@@ -30,7 +30,7 @@ onBeforeUnmount(() => {
 <template>
   <section class="progress-hero">
     <div class="hero-scene" aria-hidden="true">
-      <img ref="sceneEl" src="/assets/created/arrival-mobile-hero.png" alt="" />
+      <img ref="sceneEl" src="/assets/created/arrival-mobile-hero.webp" alt="" />
       <i class="hero-veil" />
     </div>
 

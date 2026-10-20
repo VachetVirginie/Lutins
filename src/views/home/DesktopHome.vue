@@ -66,7 +66,7 @@ function breakSeal() {
   <main ref="scene" class="veille" @mousemove.passive="onMouse">
     <!-- le ciel : aurore, lune, neige -->
     <div class="sky" aria-hidden="true">
-      <img class="sky-photo" src="/assets/created/journey-station.png" alt="" />
+      <img class="sky-photo" src="/assets/created/journey-station.webp" alt="" />
       <i class="sky-mask" />
       <i class="aurora aurora--a" /><i class="aurora aurora--b" />
       <i class="ambient-glow" />

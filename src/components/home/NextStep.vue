@@ -5,7 +5,7 @@ import { currentAdventure } from '../../data/adventure'
 <template>
   <section class="home-next">
     <div class="next-art">
-      <img src="/assets/created/journey-station.png" alt="La traversée des lutins" /><span class="next-tag">LA PROCHAINE HALTE</span>
+      <img src="/assets/created/journey-station.webp" alt="La traversée des lutins" /><span class="next-tag">LA PROCHAINE HALTE</span>
       <span class="next-postmark" aria-hidden="true">POSTE DU<br />PÔLE NORD</span>
     </div>
     <span class="next-seal" aria-hidden="true"><b>J{{ currentAdventure.currentDay }}</b></span>

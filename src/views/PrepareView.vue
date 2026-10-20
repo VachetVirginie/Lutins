@@ -124,7 +124,7 @@ function embark(id: string, ev: MouseEvent): void {
 
 <template>
   <main class="app-screen prepare-screen">
-    <img class="prepare-deco" src="/assets/created/reserve-atelier.jpg" alt="" aria-hidden="true" />
+    <img class="prepare-deco" src="/assets/created/reserve-atelier.webp" alt="" aria-hidden="true" />
     <i class="prepare-veil" aria-hidden="true" />
     <i class="warm-glow" aria-hidden="true" />
     <header class="prepare-header">

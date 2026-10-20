@@ -1,4 +1,4 @@
-const VERSION = 'v3'
+const VERSION = 'v4'
 const SHELL_CACHE = `lutins-shell-${VERSION}`
 const ASSET_CACHE = `lutins-assets-${VERSION}`
 
@@ -31,19 +31,22 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // Assets: network first (les fichiers de public/assets/ ne sont pas hashés),
-  // cache en repli hors-ligne — et on ne met jamais une erreur en cache
+  // Assets: stale-while-revalidate — le cache répond instantanément,
+  // le réseau le rafraîchit en arrière-plan ; jamais d'erreur en cache
   if (url.origin === self.location.origin && (url.pathname.startsWith('/assets/') || url.pathname.includes('materialdesignicons'))) {
     event.respondWith(
-      fetch(event.request)
-        .then((res) => {
-          if (res.ok) {
-            const copy = res.clone()
-            caches.open(ASSET_CACHE).then((c) => c.put(event.request, copy))
-          }
-          return res
-        })
-        .catch(() => caches.match(event.request).then((cached) => cached || Response.error())),
+      caches.match(event.request).then((cached) => {
+        const refresh = fetch(event.request)
+          .then((res) => {
+            if (res.ok) {
+              const copy = res.clone()
+              caches.open(ASSET_CACHE).then((c) => c.put(event.request, copy))
+            }
+            return res
+          })
+          .catch(() => cached || Response.error())
+        return cached || refresh
+      }),
     )
   }
 })
