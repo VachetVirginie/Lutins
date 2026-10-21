@@ -17,13 +17,13 @@
          remplacé par le vrai composant au montage. Reprend les styles de
          OpeningView (mobile uniquement, la coquille desktop est différente). */
       .opening-skeleton{position:relative;display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;min-height:100svh;max-width:540px;margin:auto;padding-bottom:calc(38px + env(safe-area-inset-bottom));overflow:hidden;background:#10231e;color:#fff;font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif}
-      .os-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:58% 78%;filter:brightness(1.09) contrast(1.06) saturate(1.04)}
+      .os-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:58% 78%;filter:brightness(1.09) contrast(1.06) saturate(1.04);transform:scale(1.03)}
       .os-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,18,15,.72) 0%,rgba(4,18,15,.36) 48%,rgba(4,18,15,.08) 78%),linear-gradient(180deg,rgba(7,26,22,.62) 0%,rgba(7,26,22,.08) 42%,rgba(7,26,22,.78) 100%)}
       .os-copy{position:relative;z-index:1;grid-row:2;align-self:start;padding:clamp(28px,6vh,58px) 28px 24px}
       .os-chapter{display:flex;align-items:center;gap:9px;margin:0 0 30px;color:#f1cc7a;font-size:8px;font-weight:700;letter-spacing:.24em;opacity:.82}
       .os-chapter i{width:22px;height:1px;background:#f1cc7a}
       .os-kicker{max-width:310px;margin:0 0 8px;font-size:14px;letter-spacing:.01em;opacity:.92}
-      .os-copy h1{max-width:300px;margin:0;font:500 clamp(40px,10vw,58px)/.93 Georgia,serif;letter-spacing:-.065em}
+      .os-copy h1{max-width:320px;margin:0;font:500 clamp(42px,10.6vw,60px)/.93 Georgia,serif;letter-spacing:-.065em}
       .os-copy h1 em{color:#f1cc7a;font-style:italic}
       .os-subtitle{max-width:235px;margin:22px 0 0;font-size:14px;line-height:1.4;opacity:.82}
       .os-entry{position:relative;z-index:1;grid-row:3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;margin:0 28px}
@@ -31,7 +31,7 @@
       .os-hint{display:grid;gap:3px;margin:2px 0 0;justify-items:center;text-align:center}
       .os-hint b{color:#f1cc7a;font-size:9.5px;font-weight:700;letter-spacing:.22em;text-transform:uppercase}
       .os-hint span{color:rgba(255,255,255,.7);font:italic 400 13.5px 'Cormorant Garamond',Georgia,serif}
-      @media(max-width:380px){.os-image{object-position:58% 74%}.os-copy{padding-right:24px;padding-left:24px}.os-copy h1{font-size:40px}}
+      @media(max-width:380px){.os-image{object-position:58% 74%}.os-copy{padding-right:24px;padding-left:24px}.os-copy h1{font-size:42px}}
       @media(max-height:700px){.os-copy{padding-top:24px;padding-bottom:16px}.os-subtitle{margin-top:20px}}
     </style>
   </head>

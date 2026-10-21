@@ -2,10 +2,13 @@
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { MotionConfig } from 'motion-v'
-import AmbientDust from './components/AmbientDust.vue'
-import LanternNav from './components/LanternNav.vue'
-import CursorLantern from './components/magic/CursorLantern.vue'
-import SealStamp from './components/SealStamp.vue'
+
+// Purement décoratifs ou masqués sur l'ouverture : montés après le boot,
+// ils ne ralentissent plus le premier rendu
+const AmbientDust = defineAsyncComponent(() => import('./components/AmbientDust.vue'))
+const LanternNav = defineAsyncComponent(() => import('./components/LanternNav.vue'))
+const CursorLantern = defineAsyncComponent(() => import('./components/magic/CursorLantern.vue'))
+const SealStamp = defineAsyncComponent(() => import('./components/SealStamp.vue'))
 
 // La traversée du sceau reste hors du bundle initial : chargée en tâche de
 // fond sur l'écran d'ouverture, prête avant que le sceau ne soit déverrouillé
