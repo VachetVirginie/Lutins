@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { motion } from 'motion-v'
+import { MotionConfig, motion } from 'motion-v'
 
 const reveal = {
   initial: { opacity: 0, y: 30 },
@@ -28,7 +28,8 @@ const notes = [
 </script>
 
 <template>
-  <main class="app-screen">
+  <MotionConfig :reducedMotion="'user'">
+    <main class="app-screen">
     <header class="app-header">
       <p class="home-overline">SOUVENIRS</p>
       <h1>La mémoire du voyage</h1>
@@ -69,7 +70,8 @@ const notes = [
       </article>
       <button class="note-add" type="button"><i class="mdi mdi-plus" aria-hidden="true" /> Ajouter une note</button>
     </motion.section>
-  </main>
+    </main>
+  </MotionConfig>
 </template>
 
 <style scoped>

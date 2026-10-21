@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { motion } from 'motion-v'
+import { MotionConfig, motion } from 'motion-v'
 import { currentAdventure } from '../data/adventure'
 import { adventure } from '../data/adventureStore'
 import { preparationCatalog, type PreparationCatalogItem, type PreparationCategory } from '../data/preparationCatalog'
@@ -123,7 +123,8 @@ function embark(id: string, ev: MouseEvent): void {
 </script>
 
 <template>
-  <main class="app-screen prepare-screen">
+  <MotionConfig :reducedMotion="'user'">
+    <main class="app-screen prepare-screen">
     <img class="prepare-deco" src="/assets/created/reserve-atelier.webp" alt="" aria-hidden="true" />
     <i class="prepare-veil" aria-hidden="true" />
     <i class="warm-glow" aria-hidden="true" />
@@ -197,7 +198,8 @@ function embark(id: string, ev: MouseEvent): void {
         </template>
       </template>
     </section>
-  </main>
+    </main>
+  </MotionConfig>
 </template>
 
 <style scoped>

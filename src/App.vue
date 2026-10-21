@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { MotionConfig } from 'motion-v'
 
 // Purement décoratifs ou masqués sur l'ouverture : montés après le boot,
 // ils ne ralentissent plus le premier rendu
@@ -71,20 +70,18 @@ watch(
 </script>
 
 <template>
-  <MotionConfig :reducedMotion="'user'">
-    <div class="app-shell">
-      <AmbientDust />
-      <router-view v-slot="{ Component, route }">
-        <transition :name="transitionName" mode="out-in">
-          <component :is="Component" :key="route.path" />
-        </transition>
-      </router-view>
-      <LanternNav v-if="showNav" />
-      <CursorLantern />
-      <SealStamp />
-      <PortalTransition v-if="gusting" />
-    </div>
-  </MotionConfig>
+  <div class="app-shell">
+    <AmbientDust />
+    <router-view v-slot="{ Component, route }">
+      <transition :name="transitionName" mode="out-in">
+        <component :is="Component" :key="route.path" />
+      </transition>
+    </router-view>
+    <LanternNav v-if="showNav" />
+    <CursorLantern />
+    <SealStamp />
+    <PortalTransition v-if="gusting" />
+  </div>
 </template>
 
 <style scoped>

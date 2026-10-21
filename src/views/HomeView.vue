@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { motion } from 'motion-v'
+import { MotionConfig, motion } from 'motion-v'
 import { useRouter } from 'vue-router'
 import { NextStep, ProgressHero, StoryPhase } from '../components/home'
 import { currentAdventure } from '../data/adventure'
@@ -42,8 +42,9 @@ function spinGear(event: MouseEvent) {
 </script>
 
 <template>
-  <DesktopHome v-if="isDesktop" />
-  <main v-else class="app-screen">
+  <MotionConfig :reducedMotion="'user'">
+    <DesktopHome v-if="isDesktop" />
+    <main v-else class="app-screen">
     <RouterLink to="/personnalisation" class="home-gear" @click.prevent="spinGear">
       <i class="mdi mdi-cog-outline" aria-hidden="true" />
       <span class="sr-only">Personnaliser l'aventure</span>
@@ -70,7 +71,8 @@ function spinGear(event: MouseEvent) {
     <motion.footer v-if="tomorrowTitle" class="home-signoff" v-bind="reveal">
       <i aria-hidden="true" /><p>Et demain — <em>{{ tomorrowTitle }}</em></p><i aria-hidden="true" />
     </motion.footer>
-  </main>
+    </main>
+  </MotionConfig>
 </template>
 
 <style scoped>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-import { motion } from 'motion-v'
+import { MotionConfig, motion } from 'motion-v'
 import { haptic } from '../utils/haptics'
 
 const route = useRoute()
@@ -21,7 +21,8 @@ function isActive(to: string): boolean {
 </script>
 
 <template>
-  <nav class="lantern-nav" aria-label="Navigation principale">
+  <MotionConfig :reducedMotion="'user'">
+    <nav class="lantern-nav" aria-label="Navigation principale">
     <i class="nav-scrim" aria-hidden="true" />
     <i class="nav-trail" aria-hidden="true" />
     <RouterLink
@@ -44,7 +45,8 @@ function isActive(to: string): boolean {
       </span>
       <span class="lantern-label">{{ item.label }}</span>
     </RouterLink>
-  </nav>
+    </nav>
+  </MotionConfig>
 </template>
 
 <style scoped>
